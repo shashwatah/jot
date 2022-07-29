@@ -3,11 +3,11 @@ use clap::{ Parser, Subcommand };
 #[derive(Parser, Debug)]
 struct Args { 
     #[clap(subcommand)]
-    action: Action,
+    command: Command,
 }
 
 #[derive(Subcommand, Debug)]
-enum Action {
+enum Command {
     /// list and perform fs operations on vaults.
     Vlt,
     /// list and perform fs operations on notes (in the current directory)
@@ -17,12 +17,12 @@ enum Action {
     /// switch directories with standard fs syntax.
     Cdr,
     /// list and open notes from current vault's history.
-    His,
-    /// open last opened note in the current vault.
+    Hst,
+    /// open last accessed note in the current vault.
     Lst,
     /// find directories and notes in the current vault.
     Fnd,
-    /// list, create and delete app wide memos or quick notes.
+    /// list, create and delete memos or quick notes (independent of current vault).
     Mem,
     /// show this help message.
     Help,
