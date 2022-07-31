@@ -10,41 +10,38 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    /// list and perform fs operations on vaults.
+    /// list and switch vaults or perform fs operations on them.
     VLT {
-        /// name for the vault to be created.
-        #[clap(value_parser)]
-        vault_name: Option<String>,
-        /// location for the vault to be created.
-        #[clap(value_parser)]
-        location: Option<PathBuf>,
+        /// name for new vault.
+        #[clap(value_parser, name="vault name", requires="vault path")]
+        name: Option<String>,
+        /// fs path of new vault.
+        #[clap(value_parser, name="vault path")]
+        path: Option<PathBuf>,
         #[clap(subcommand)]
         command: Option<VltCommand>,
     },
-    /// operations for notes.
+    /// list, open, rename, move, and delete notes.
     NTS {
-        /// name for the note to be created.
-        #[clap(value_parser)]
-        note_name: Option<String>,
-        /// location for the note to be created.
-        #[clap(value_parser)]
-        location: Option<PathBuf>,
+        /// name for new note (to be created in current location).
+        #[clap(value_parser, name="note name")]
+        name: Option<String>,
         #[clap(subcommand)]
         command: Option<NtsCommand>,
     },
-    /// fs operations for directories.
+    /// display directory tree of current vault or perform fs operation on directories.
     DIR {
-        /// name for the directory to be created.
-        #[clap(value_parser)]
-        dir_name: Option<String>,
+        /// name for new directory (to be created in current location).
+        #[clap(value_parser, name="directory name")]
+        name: Option<String>,
         #[clap(subcommand)]
         command: Option<DirCommand>,
     },
-    /// switch directories with standard fs syntax.
+    /// switch directories within current vault.
     CDR {
-        /// location of the directory to switch to.
-        #[clap(value_parser)]
-        location: PathBuf,
+        /// path of directory (with current location as root).
+        #[clap(value_parser, name="directory path")]
+        path: PathBuf,
     },
     /// list and open notes from current vault's history.
     HST {
@@ -57,16 +54,17 @@ enum Command {
     LST,
     /// find directories and notes in the current vault.
     FND {
-        /// query directories or files
-        #[clap(value_parser)]
+        /// regex query string.
+        #[clap(value_parser, name="query")]
         query: String,
-        #[clap(value_enum, value_parser)]
+        /// query files (fil) or directories (dir).
+        #[clap(value_enum, value_parser, name="query type")]
         query_type: QueryType,
     },
-    /// list, create and delete memos or quick notes (independent of current vault).
+    /// list, create and delete memos/quick notes (independent of current vault).
     MEM {
-        /// memo content.
-        #[clap(value_parser)]
+        /// content for new memo.
+        #[clap(value_parser, name="content")]
         content: Option<String>,
         #[clap(subcommand)]
         command: Option<MemCommand>,
@@ -80,34 +78,57 @@ enum Command {
 #[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
 enum VltCommand {
-    /// enter a vault.
-    ENT { vault_name: String },
+    /// enter/switch to a vault.
+    ENT { 
+        #[clap(name="vault name")]
+        name: String 
+    },
     /// delete a vault.
-    DEL { vault_name: String },
+    DEL {
+        #[clap(name="vault name")]
+        name: String
+    },
     /// rename a vault.
     REN {
-        vault_name: String,
+        #[clap(name="current name")]
+        name: String,
+        #[clap(name="new name")]
         new_name: String,
     },
-    /// move vault to new location in the fs.
+    /// move vault to a new location in the fs.
     MOV {
-        vault_name: String,
-        new_location: PathBuf,
+        #[clap(name="vault name")]
+        name: String,
+        #[clap(name="new path")]
+        new_path: PathBuf,
     },
 }
 
 #[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
 enum NtsCommand {
-    /// enter a note.
-    OPN { note_name: String },
+    /// open a note with the editor defined in config.
+    OPN {
+        #[clap(name="note title")] 
+        title: String
+    },
     /// delete a note.
-    DEL { note_name: String },
-    /// rename a note.
-    REN { note_name: String, new_name: String },
-    /// move note to new location.
+    DEL {
+        #[clap(name="note title")] 
+        title: String 
+    },
+    /// rename/retitle a note.
+    REN { 
+        #[clap(name="current title")]
+        title: String,
+        #[clap(name="new title")] 
+        new_title: String 
+    },
+    /// move note to new location (with the current location as root).
     MOV {
-        note_name: String,
+        #[clap(name="note title")]
+        title: String,
+        #[clap(name="new location")]
         new_location: PathBuf,
     },
 }
@@ -116,12 +137,22 @@ enum NtsCommand {
 #[clap(args_conflicts_with_subcommands = true)]
 enum DirCommand {
     /// delete a directory.
-    DEL { dir_name: String },
+    DEL { 
+        #[clap(name="directory name")]
+        name: String
+    },
     /// rename a directory.
-    REN { dir_name: String, new_name: String },
-    /// move directory to a new location.
+    REN { 
+        #[clap(name="current name")]
+        name: String, 
+        #[clap(name="new name")]
+        new_name: String
+    },
+    /// move directory to a new location within current vault (with current location as root).
     MOV {
-        dir_name: String,
+        #[clap(name="directory name")]
+        name: String,
+        #[clap(name="new location")]
         new_location: PathBuf,
     },
 }
