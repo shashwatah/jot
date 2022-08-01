@@ -28,7 +28,7 @@ pub struct Cli {
 enum Command {
     /// 📁 list and switch vaults or perform fs operations on them.
     #[clap(override_usage(
-        "jot vlt \n    jot vlt <vault name> <vault path> \n    jot vlt <SUBCOMMAND> asdsad"
+        "jot vlt \n    jot vlt <vault name> <vault path> \n    jot vlt <SUBCOMMAND>"
     ))]
     VLT {
         /// name for new vault.
@@ -65,6 +65,7 @@ enum Command {
         path: PathBuf,
     },
     /// 🗒️ list and open notes from current vault's history.
+    #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
     HST {
         #[clap(subcommand)]
         command: Option<HstCommand>,
