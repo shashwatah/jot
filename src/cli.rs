@@ -8,12 +8,12 @@ use std::path::PathBuf;
 #[clap(global_setting(AppSettings::HidePossibleValuesInHelp))]
 #[clap(before_help(
     r#"
-                                ________      _____ 
-                                ______(_)_______  /_
-                                _____  /_  __ \  __/
-                                ____  / / /_/ / /_  
-                                ___  /  \____/\__/  
-                                /___/ 
+                                    ________      _____ 
+                                    ______(_)_______  /_
+                                    _____  /_  __ \  __/
+                                    ____  / / /_/ / /_  
+                                    ___  /  \____/\__/  
+                                    /___/ 
 "#
 ))]
 #[clap(help_template(
@@ -32,11 +32,11 @@ enum Command {
     ))]
     VLT {
         /// name for new vault.
-        #[clap(value_parser, name = "vault name")]
-        name: String,
+        #[clap(value_parser, name = "vault name", requires = "vault path")]
+        name: Option<String>,
         /// fs path of new vault.
         #[clap(value_parser, name = "vault path")]
-        path: PathBuf,
+        path: Option<PathBuf>,
         #[clap(subcommand)]
         command: Option<VltCommand>,
     },
