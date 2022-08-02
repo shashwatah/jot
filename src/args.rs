@@ -19,7 +19,7 @@ use std::path::PathBuf;
 #[clap(help_template(
     "{before-help}{about-with-newline}{usage-heading}\n    {usage}\n\n{all-args}"
 ))]
-pub struct Cli {
+pub struct Args {
     #[clap(subcommand)]
     command: Command,
 }
