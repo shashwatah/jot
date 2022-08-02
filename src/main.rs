@@ -5,5 +5,5 @@ use app::App;
 
 fn main() {
     let app: App = App::new();
-    println!("{:?}", app);
+    app.display_args()
 }

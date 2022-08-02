@@ -2,10 +2,10 @@ use clap::{AppSettings, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[clap(global_setting(AppSettings::DeriveDisplayOrder))]
-#[clap(global_setting(AppSettings::DontCollapseArgsInUsage))]
-#[clap(global_setting(AppSettings::DisableColoredHelp))]
 #[clap(global_setting(AppSettings::HidePossibleValuesInHelp))]
+#[clap(global_setting(AppSettings::DontCollapseArgsInUsage))]
+#[clap(global_setting(AppSettings::DeriveDisplayOrder))]
+#[clap(global_setting(AppSettings::ColorNever))]
 #[clap(before_help(
     r#"
                                     ________      _____ 
