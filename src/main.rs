@@ -1,9 +1,9 @@
-mod cli;
+mod app;
+mod args;
 
-use clap::Parser;
-use cli::Cli;
+use app::App;
 
 fn main() {
-    let args = Cli::parse();
-    println!("{:?}", args);
+    let app: App = App::new();
+    println!("{:?}", app);
 }
