@@ -1,26 +1,34 @@
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap};
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 enum FileFormat {
-    Text, 
-    Markdown
+    Text,
+    Markdown,
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     editor: String,
     format: FileFormat,
-    vaults: HashMap<String, String>
+    vaults: HashMap<String, String>,
 }
 
-impl Config {
-    pub fn load_config() -> Config {
+impl Default for Config {
+    fn default() -> Self {
         Config {
             editor: "nvim".to_string(),
             format: FileFormat::Markdown,
-            vaults: HashMap::new()
+            vaults: HashMap::new(),
         }
+    }
+}
+
+impl Config {
+    pub fn load_config() -> Result<Self, confy::ConfyError> {
+        let config: Config = confy::load("jot")?;
+        Ok(config)
     }
 }
