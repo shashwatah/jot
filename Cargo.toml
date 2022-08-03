@@ -6,4 +6,6 @@ authors = ["araekiel"]
 
 [dependencies]
 clap = { version = "3.2.15", features = ["derive"] }
+confy = "0.4.0"
 dialoguer = "0.10.1"
+serde = { version = "1.0.142", features = ["derive"] }
