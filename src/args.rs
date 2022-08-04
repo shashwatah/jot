@@ -1,5 +1,4 @@
 use clap::{AppSettings, Parser, Subcommand, ValueEnum};
-use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[clap(global_setting(AppSettings::HidePossibleValuesInHelp))]
@@ -21,11 +20,11 @@ use std::path::PathBuf;
 ))]
 pub struct Args {
     #[clap(subcommand)]
-    command: Command,
+    pub command: Command,
 }
 
 #[derive(Subcommand, Debug)]
-enum Command {
+pub enum Command {
     /// 📁 list and switch vaults or perform fs operations on them.
     #[clap(override_usage(
         "jot vlt \n    jot vlt <vault name> <vault path> \n    jot vlt <SUBCOMMAND>"
@@ -36,11 +35,11 @@ enum Command {
         name: Option<String>,
         /// fs path of new vault.
         #[clap(value_parser, name = "vault path")]
-        path: Option<PathBuf>,
+        path: Option<String>,
         #[clap(subcommand)]
         command: Option<VltCommand>,
     },
-    /// 📝 list, open, rename, move, and delete notes.
+    /// 📝 list, create, open, rename, move, and delete notes.
     #[clap(override_usage("jot nts\n    jot nts [note name]\n    jot nts <SUBCOMMAND>"))]
     NTS {
         /// name for new note (to be created in current location).
@@ -49,7 +48,7 @@ enum Command {
         #[clap(subcommand)]
         command: Option<NtsCommand>,
     },
-    /// 📂 display directory tree of current vault or perform fs operation on directories.
+    /// 📂 perform fs operations on directories or display current vault's tree.
     #[clap(override_usage("jot dir\n    jot dir [directory name]\n    jot dir <SUBCOMMAND>"))]
     DIR {
         /// name for new directory (to be created in current location).
@@ -62,7 +61,7 @@ enum Command {
     CDR {
         /// path of directory (with current location as root).
         #[clap(value_parser, name = "directory path")]
-        path: PathBuf,
+        path: String,
     },
     /// 🗒️ list and open notes from current vault's history.
     #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
@@ -100,7 +99,7 @@ enum Command {
 
 #[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
-enum VltCommand {
+pub enum VltCommand {
     /// 🚪 enter/switch to a vault.
     ENT {
         #[clap(name = "vault name")]
@@ -123,7 +122,7 @@ enum VltCommand {
         #[clap(name = "vault name")]
         name: String,
         #[clap(name = "new path")]
-        new_path: PathBuf,
+        new_path: String,
     },
     /// 🆘 show this help message or help for given command.
     Help,
@@ -131,7 +130,7 @@ enum VltCommand {
 
 #[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
-enum NtsCommand {
+pub enum NtsCommand {
     /// 📖 open a note with the editor defined in config.
     OPN {
         #[clap(name = "note title")]
@@ -154,7 +153,7 @@ enum NtsCommand {
         #[clap(name = "note title")]
         title: String,
         #[clap(name = "new location")]
-        new_location: PathBuf,
+        new_location: String,
     },
     /// 🗄️ move note to (root of) a different vault.
     MVV {
@@ -169,7 +168,7 @@ enum NtsCommand {
 
 #[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
-enum DirCommand {
+pub enum DirCommand {
     /// 🚮 delete a directory.
     DEL {
         #[clap(name = "directory name")]
@@ -187,7 +186,7 @@ enum DirCommand {
         #[clap(name = "directory name")]
         name: String,
         #[clap(name = "new location")]
-        new_location: PathBuf,
+        new_location: String,
     },
     /// 🗄️ move directory to (root of) a different vault.
     MVV {
@@ -201,7 +200,7 @@ enum DirCommand {
 }
 
 #[derive(Subcommand, Debug)]
-enum HstCommand {
+pub enum HstCommand {
     /// 📖 open a note from history.
     OPN,
     /// 🆘 show this help message or help for given command.
@@ -209,14 +208,14 @@ enum HstCommand {
 }
 
 #[derive(ValueEnum, Clone, Debug)]
-enum QueryType {
+pub enum QueryType {
     FIL,
     DIR,
 }
 
 #[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
-enum MemCommand {
+pub enum MemCommand {
     /// 🚮 choose which memo to delete.
     DEL,
     /// 🆘 show this help message or help for given command.
