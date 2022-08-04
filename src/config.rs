@@ -14,8 +14,7 @@ pub struct Config {
     editor: String,
     format: FileFormat,
     current_vault: Option<String>,
-    vaults: HashMap<String, String>
-    
+    vaults: HashMap<String, String>,
 }
 
 impl Default for Config {
@@ -24,7 +23,7 @@ impl Default for Config {
             editor: "nvim".to_string(),
             format: FileFormat::Markdown,
             vaults: HashMap::new(),
-            current_vault: None 
+            current_vault: None,
         }
     }
 }
@@ -43,20 +42,20 @@ impl Config {
         &self.current_vault
     }
 
-    pub fn update_editor(&mut self, editor: String) {
-        self.editor = editor;
-        confy::store("jot", self).unwrap()
-    }
-    pub fn update_format(&mut self, format: FileFormat) {
-        self.format = format;
-        confy::store("jot", self).unwrap()
-    }
+    // pub fn update_editor(&mut self, editor: String) {
+    //     self.editor = editor;
+    //     confy::store("jot", self).unwrap()
+    // }
+    // pub fn update_format(&mut self, format: FileFormat) {
+    //     self.format = format;
+    //     confy::store("jot", self).unwrap()
+    // }
 
     pub fn add_vault(&mut self, name: String, path: String) {
         self.vaults.entry(name).or_insert(path);
         confy::store("jot", self).unwrap()
     }
-    
+
     pub fn del_vault(&mut self, name: &str) {
         self.vaults.remove(name);
         confy::store("jot", self).unwrap()
