@@ -38,7 +38,7 @@ impl App {
             } => {
                 if let Some(VltCommand::ENT { name }) = command {
                     self.config.update_current_vault(String::from(name));
-                    println!("vaults: {:#?}", self.config.get_vaults());
+                    println!("vaults: {:#?}", self.config.get_vaults().keys());
                     match self.config.get_current_vault() {
                         Some(current_vault) => println!("current vault: {}", current_vault),
                         None => println!("Not inside a vault"),

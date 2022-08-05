@@ -6,6 +6,3 @@ pub struct Vault {
     name: String,
     location: PathBuf,
 }
-
-
-
