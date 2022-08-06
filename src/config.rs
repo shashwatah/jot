@@ -34,42 +34,51 @@ impl Config {
         config
     }
 
-    pub fn get_vaults(&self) -> &HashMap<String, String> {
-        &self.vaults
-    }
-
     pub fn get_current_vault(&self) -> &Option<String> {
         &self.current_vault
     }
 
-    // pub fn update_editor(&mut self, editor: String) {
-    //     self.editor = editor;
-    //     confy::store("jot", self).unwrap()
-    // }
-    // pub fn update_format(&mut self, format: FileFormat) {
-    //     self.format = format;
-    //     confy::store("jot", self).unwrap()
-    // }
+    pub fn get_vaults(&self) -> &HashMap<String, String> {
+        &self.vaults
+    }
+
+    pub fn update_current_vault(&mut self, vault: Option<&str>) {
+        match vault {
+            Some(name) => {
+                if self.vaults.contains_key(name) {
+                    self.current_vault = Some(name.to_string());
+                    confy::store("jot", self).unwrap();
+                    println!("switched to {}", name)
+                } else {
+                    panic!("Vault doesn't exist")
+                }
+            }
+            None => {
+                self.current_vault = None;
+                confy::store("jot", self).unwrap()
+            }
+        }
+    }
 
     pub fn add_vault(&mut self, name: String, path: String) {
         self.vaults.entry(name).or_insert(path);
         confy::store("jot", self).unwrap()
     }
 
-    pub fn del_vault(&mut self, name: &str) {
-        self.vaults.remove(name);
-        confy::store("jot", self).unwrap()
-    }
-
-    pub fn update_current_vault(&mut self, name: String) {
-        if self.vaults.contains_key(&name) {
-            self.current_vault = Some(name);
-            confy::store("jot", self).unwrap()
+    pub fn delete_vault(&mut self, name: &str) {
+        if let Some(vault) = self.get_current_vault() {
+            if name == vault {
+                self.update_current_vault(None)
+            }
         }
-    }
 
-    pub fn exit_current_vault(&mut self) {
-        self.current_vault = None;
-        confy::store("jot", self).unwrap()
+        if self.vaults.contains_key(name) {
+            self.vaults.remove(name);
+            confy::store("jot", self).unwrap();
+
+            println!("{} deleted", name)
+        } else {
+            panic!("vault doesn't exist")
+        }
     }
 }
