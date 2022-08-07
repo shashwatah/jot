@@ -1,37 +1,32 @@
 use crate::args::VltCommand;
 use crate::config::Config;
+use crate::fs::{check_path, create_directory, create_path_string};
 
-#[allow(dead_code)]
-#[derive(Debug)]
-pub struct Vault {
-    name: String,
-    location: String,
-}
-
-pub fn handle_vault_cmd(
+pub fn handle_vlt_command(
     name: &Option<String>,
     path: &Option<String>,
     command: &Option<VltCommand>,
     config: &mut Config,
 ) -> () {
-    if let Some(name_str) = name {
-        if let Some(path_str) = path {
-            config.add_vault(String::from(name_str), String::from(path_str));
+    // if name and path are some -> create vault with name and path
+    if let Some(name_value) = name {
+        if let Some(path_value) = path {
+            create_vault(name_value, path_value, config);
             return ();
         }
     }
 
     if let Some(VltCommand::ENT { name }) = command {
-        config.update_current_vault(Some(name));
+        enter_vault(name, config);
         return ();
     }
 
     if let Some(VltCommand::DEL { name }) = command {
-        delete_vault(name);
-        config.delete_vault(name);
+        delete_vault(name, config);
         return ();
     }
 
+    // no arg passed -> display all vaults, highlight current vault
     println!("vaults: {:#?}", config.get_vaults().keys());
     match config.get_current_vault() {
         Some(current_vault) => println!("current vault: {}", current_vault),
@@ -39,6 +34,47 @@ pub fn handle_vault_cmd(
     }
 }
 
-pub fn create_vault() {}
-pub fn delete_vault(name: &str) {}
-pub fn move_vault() {}
+fn create_vault(name: &str, path: &str, config: &mut Config) {
+    // check if path is exists
+    if check_path(path) == true {
+        // create finale path string
+        let final_path = create_path_string(name, path);
+        // create directory at path
+        create_directory(final_path);
+        // create .jot inside the folder
+        // add vault to config
+        config.add_vault(String::from(name), String::from(path));
+    } else {
+        println!("path doesn't exist");
+    }
+}
+
+fn enter_vault(name: &str, config: &mut Config) {
+    if config.check_vault(name) == true {
+        if let Some(current_vault) = config.get_current_vault() {
+            if current_vault == name {
+                println!("already in {}", name);
+                return ();
+            }
+        }
+        config.update_current_vault(Some(name.to_string()));
+        println!("switched to {}", name)
+    } else {
+        println!("vault doesn't exist")
+    }
+}
+
+fn delete_vault(name: &str, config: &mut Config) {
+    if config.check_vault(name) == true {
+        if let Some(vault) = config.get_current_vault() {
+            if name == vault {
+                config.update_current_vault(None)
+            }
+        }
+
+        config.delete_vault(name);
+        println!("{} deleted", name)
+    } else {
+        println!("vault doesn't exist")
+    }
+}

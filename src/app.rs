@@ -1,6 +1,6 @@
 use crate::args::{Args, Command};
 use crate::config::Config;
-use crate::vault::{handle_vault_cmd, Vault};
+use crate::vault::handle_vlt_command;
 use clap::Parser;
 
 #[allow(dead_code)]
@@ -8,7 +8,6 @@ use clap::Parser;
 pub struct App {
     config: Config,
     args: Args,
-    current_vault: Option<Vault>,
 }
 
 impl App {
@@ -16,7 +15,6 @@ impl App {
         App {
             config: Config::load_config(),
             args: Args::parse(),
-            current_vault: None,
         }
     }
 
@@ -36,7 +34,7 @@ impl App {
                 path,
                 command,
             } => {
-                let _ = handle_vault_cmd(name, path, command, &mut self.config);
+                handle_vlt_command(name, path, command, &mut self.config);
             }
             _ => {
                 self.display_config();
