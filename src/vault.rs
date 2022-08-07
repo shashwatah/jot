@@ -1,6 +1,6 @@
 use crate::args::VltCommand;
 use crate::config::Config;
-use crate::fs::{check_path, create_directory, create_path_string};
+use crate::fs::{check_path, create_directory, create_path_string, delete_directory};
 
 pub fn handle_vlt_command(
     name: &Option<String>,
@@ -30,22 +30,29 @@ pub fn handle_vlt_command(
     println!("vaults: {:#?}", config.get_vaults().keys());
     match config.get_current_vault() {
         Some(current_vault) => println!("current vault: {}", current_vault),
-        None => println!("Not inside a vault"),
+        None => println!("not inside a vault"),
     }
 }
 
 fn create_vault(name: &str, path: &str, config: &mut Config) {
-    // check if path is exists
-    if check_path(path) == true {
-        // create finale path string
-        let final_path = create_path_string(name, path);
-        // create directory at path
-        create_directory(final_path);
-        // create .jot inside the folder
-        // add vault to config
-        config.add_vault(String::from(name), String::from(path));
+    // check if vault name doesn't already exist
+    if config.check_vault(name) == false {
+        // check if path is exists
+        if check_path(path) == true {
+            // create finale path string
+            let final_path = create_path_string(name, path);
+            // create directory at path
+            create_directory(&final_path);
+            // create .jot inside the folder
+            // add vault to config
+            config.add_vault(String::from(name), final_path);
+
+            println!("{} created", name)
+        } else {
+            println!("path doesn't exist")
+        }
     } else {
-        println!("path doesn't exist");
+        println!("vault already exists")
     }
 }
 
@@ -72,8 +79,11 @@ fn delete_vault(name: &str, config: &mut Config) {
             }
         }
 
-        config.delete_vault(name);
-        println!("{} deleted", name)
+        if let Some(path) = config.get_vault_path(name) {
+            delete_directory(path);
+            config.delete_vault(name);
+            println!("{} deleted", name)
+        }
     } else {
         println!("vault doesn't exist")
     }
