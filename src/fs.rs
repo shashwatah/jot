@@ -1,5 +1,5 @@
+use std::fs::{remove_dir_all, DirBuilder};
 use std::path::Path;
-use std::fs::DirBuilder;
 
 pub fn check_path(path: &str) -> bool {
     Path::new(path).exists()
@@ -13,6 +13,10 @@ pub fn create_path_string(name: &str, path: &str) -> String {
     }
 }
 
-pub fn create_directory(path: String) {
-    DirBuilder::new().recursive(true).create(path).unwrap();
+pub fn create_directory(path: &str) {
+    DirBuilder::new().create(path).unwrap();
+}
+
+pub fn delete_directory(path: &str) {
+    remove_dir_all(path).unwrap()
 }
