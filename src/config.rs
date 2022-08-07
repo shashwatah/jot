@@ -42,43 +42,22 @@ impl Config {
         &self.vaults
     }
 
-    pub fn update_current_vault(&mut self, vault: Option<&str>) {
-        match vault {
-            Some(name) => {
-                if self.vaults.contains_key(name) {
-                    self.current_vault = Some(name.to_string());
-                    confy::store("jot", self).unwrap();
-                    println!("switched to {}", name)
-                } else {
-                    panic!("Vault doesn't exist")
-                }
-            }
-            None => {
-                self.current_vault = None;
-                confy::store("jot", self).unwrap()
-            }
-        }
+    pub fn check_vault(&self, name: &str) -> bool {
+        self.vaults.contains_key(name)
+    }
+
+    pub fn update_current_vault(&mut self, vault: Option<String>) {
+        self.current_vault = vault;
+        confy::store("jot", self).unwrap()
     }
 
     pub fn add_vault(&mut self, name: String, path: String) {
-        self.vaults.entry(name).or_insert(path);
+        self.vaults.insert(name, path);
         confy::store("jot", self).unwrap()
     }
 
     pub fn delete_vault(&mut self, name: &str) {
-        if let Some(vault) = self.get_current_vault() {
-            if name == vault {
-                self.update_current_vault(None)
-            }
-        }
-
-        if self.vaults.contains_key(name) {
-            self.vaults.remove(name);
-            confy::store("jot", self).unwrap();
-
-            println!("{} deleted", name)
-        } else {
-            panic!("vault doesn't exist")
-        }
+        self.vaults.remove(name);   
+        confy::store("jot", self).unwrap();
     }
 }
