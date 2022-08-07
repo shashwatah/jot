@@ -42,6 +42,10 @@ impl Config {
         &self.vaults
     }
 
+    pub fn get_vault_path(&self, name: &str) -> Option<&String> {
+        self.vaults.get(name)
+    }
+
     pub fn check_vault(&self, name: &str) -> bool {
         self.vaults.contains_key(name)
     }
@@ -57,7 +61,7 @@ impl Config {
     }
 
     pub fn delete_vault(&mut self, name: &str) {
-        self.vaults.remove(name);   
+        self.vaults.remove(name);
         confy::store("jot", self).unwrap();
     }
 }
