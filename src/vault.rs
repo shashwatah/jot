@@ -1,6 +1,6 @@
 use crate::args::VltCommand;
 use crate::config::Config;
-use crate::fs::{check_path, create_directory, create_path_string, delete_directory};
+use crate::fs::{check_path, create_directory, create_path_string, delete_directory, rename_directory};
 
 pub fn handle_vlt_command(
     name: &Option<String>,
@@ -23,6 +23,11 @@ pub fn handle_vlt_command(
 
     if let Some(VltCommand::DEL { name }) = command {
         delete_vault(name, config);
+        return ();
+    }
+
+    if let Some(VltCommand::REN { name, new_name }) = command {
+        rename_vault(name, new_name, config);
         return ();
     }
 
@@ -68,6 +73,23 @@ fn enter_vault(name: &str, config: &mut Config) {
         println!("switched to {}", name)
     } else {
         println!("vault doesn't exist")
+    }
+}
+
+fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
+    // check if vault exists
+    if config.check_vault(name) == true {
+        rename_directory(name, new_name, config.get_vault_path(name).unwrap());
+        config.rename_vault(name, new_name);
+        // check if its the current vault, update if it is 
+        if let Some(vault) = config.get_current_vault() {
+            if name == vault {
+                config.update_current_vault(Some(new_name.to_string()));
+            }
+        }
+        println!("vault {} renamed to {}", name, new_name)
+    } else {
+        panic!("vault doesn't exist")
     }
 }
 
