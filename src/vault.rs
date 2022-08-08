@@ -10,39 +10,39 @@ pub fn handle_vlt_command(
     path: &Option<String>,
     command: &Option<VltCommand>,
     config: &mut Config,
-) -> () {
+) {
     // if name and path are some -> create vault with name and path
     if let Some(name_value) = name {
         if let Some(path_value) = path {
             create_vault(name_value, path_value, config);
-            return ();
         }
     }
 
     if let Some(VltCommand::ENT { name }) = command {
         enter_vault(name, config);
-        return ();
     }
 
     if let Some(VltCommand::DEL { name }) = command {
         delete_vault(name, config);
-        return ();
     }
 
     if let Some(VltCommand::REN { name, new_name }) = command {
         rename_vault(name, new_name, config);
-        return ();
     }
 
     if let Some(VltCommand::MOV { name, new_path }) = command {
         move_vault(name, new_path, config);
-        return ();
     }
+    
     // no arg passed -> display all vaults, highlight current vault
-    println!("vaults: {:#?}", config.get_vaults().keys());
-    match config.get_current_vault() {
-        Some(current_vault) => println!("current vault: {}", current_vault),
-        None => println!("not inside a vault"),
+    if let None = name {
+        if let None = command {
+            println!("vaults: {:#?}", config.get_vaults().keys());
+            match config.get_current_vault() {
+                Some(current_vault) => println!("current vault: {}", current_vault),
+                None => println!("not inside a vault"),
+            }
+        }
     }
 }
 
