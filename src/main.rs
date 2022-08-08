@@ -1,8 +1,8 @@
 mod app;
 mod args;
 mod config;
-mod vault;
 mod fs;
+mod vault;
 
 use app::App;
 
