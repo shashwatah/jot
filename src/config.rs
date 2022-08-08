@@ -52,16 +52,26 @@ impl Config {
 
     pub fn update_current_vault(&mut self, vault: Option<String>) {
         self.current_vault = vault;
-        confy::store("jot", self).unwrap()
+        self.update_config_file();
     }
 
     pub fn add_vault(&mut self, name: String, path: String) {
         self.vaults.insert(name, path);
-        confy::store("jot", self).unwrap()
+        self.update_config_file();
     }
 
     pub fn delete_vault(&mut self, name: &str) {
         self.vaults.remove(name);
+        self.update_config_file();
+    }
+
+    pub fn rename_vault(&mut self, name: &str, new_name: &str) {
+        let value = self.vaults.remove(name);
+        self.vaults.insert(new_name.to_string(), value.unwrap());
+        self.update_config_file();
+    }
+
+    fn update_config_file(&self) {
         confy::store("jot", self).unwrap();
     }
 }
