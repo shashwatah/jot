@@ -45,7 +45,7 @@ fn create_vault(name: &str, path: &str, config: &mut Config) {
             create_directory(&final_path);
             // create .jot inside the folder
             // add vault to config
-            config.add_vault(String::from(name), final_path);
+            config.add_vault(String::from(name), String::from(path));
 
             println!("{} created", name)
         } else {
@@ -79,11 +79,12 @@ fn delete_vault(name: &str, config: &mut Config) {
             }
         }
 
-        if let Some(path) = config.get_vault_path(name) {
-            delete_directory(path);
-            config.delete_vault(name);
-            println!("{} deleted", name)
-        }
+        // using unwrap because vault check has already been performed and the vault
+        // definitely exists at this point
+        let final_path = create_path_string(name, config.get_vault_path(name).unwrap());
+        delete_directory(&final_path);
+        config.delete_vault(name);
+        println!("{} deleted", name)
     } else {
         println!("vault doesn't exist")
     }
