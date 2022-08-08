@@ -1,6 +1,9 @@
 use crate::args::VltCommand;
 use crate::config::Config;
-use crate::fs::{check_path, create_directory, create_path_string, delete_directory, rename_directory};
+use crate::fs::{
+    check_path, create_directory, create_path_string, delete_directory, move_dirctory,
+    rename_directory,
+};
 
 pub fn handle_vlt_command(
     name: &Option<String>,
@@ -31,6 +34,10 @@ pub fn handle_vlt_command(
         return ();
     }
 
+    if let Some(VltCommand::MOV { name, new_path }) = command {
+        move_vault(name, new_path, config);
+        return ();
+    }
     // no arg passed -> display all vaults, highlight current vault
     println!("vaults: {:#?}", config.get_vaults().keys());
     match config.get_current_vault() {
@@ -81,7 +88,7 @@ fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
     if config.check_vault(name) == true {
         rename_directory(name, new_name, config.get_vault_path(name).unwrap());
         config.rename_vault(name, new_name);
-        // check if its the current vault, update if it is 
+        // check if its the current vault, update if it is
         if let Some(vault) = config.get_current_vault() {
             if name == vault {
                 config.update_current_vault(Some(new_name.to_string()));
@@ -109,5 +116,20 @@ fn delete_vault(name: &str, config: &mut Config) {
         println!("{} deleted", name)
     } else {
         println!("vault doesn't exist")
+    }
+}
+
+pub fn move_vault(name: &str, new_path: &str, config: &mut Config) {
+    if config.check_vault(name) == true {
+        if check_path(new_path) == true {
+            let og_path = config.get_vault_path(name).unwrap();
+            move_dirctory(name, og_path, new_path);
+            config.update_vault_path(name, new_path);
+            println!("vault {} moved", name);
+        } else {
+            panic!("path doesn't exist");
+        }
+    } else {
+        panic!("vault doesn't exist");
     }
 }

@@ -71,6 +71,11 @@ impl Config {
         self.update_config_file();
     }
 
+    pub fn update_vault_path(&mut self, name: &str, new_path: &str) {
+        self.vaults.insert(name.to_string(), new_path.to_string());
+        self.update_config_file();
+    }
+
     fn update_config_file(&self) {
         confy::store("jot", self).unwrap();
     }
