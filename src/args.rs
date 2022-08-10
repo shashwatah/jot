@@ -93,7 +93,7 @@ pub enum SubCommand {
     REN {
         /// rename a vault (vlt) | note (nte) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: GlobItem,
+        item_type: Item,
         /// name of item to be renamed.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -105,7 +105,7 @@ pub enum SubCommand {
     DEL {
         /// delete a note (nte) | vault (vlt) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: GlobItem,
+        item_type: Item,
         /// name of item to be deleted.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -114,7 +114,7 @@ pub enum SubCommand {
     MOV {
         /// move a note (nte) | vault (vlt) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: GlobItem,
+        item_type: Item,
         /// name of item to be moved.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -140,7 +140,7 @@ pub enum SubCommand {
 }
 
 #[derive(ValueEnum, Clone, Debug)]
-pub enum GlobItem {
+pub enum Item {
     VLT,
     NTE,
     DIR,
