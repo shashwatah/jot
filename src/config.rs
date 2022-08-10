@@ -42,11 +42,11 @@ impl Config {
         &self.vaults
     }
 
-    pub fn get_vault_path(&self, name: &str) -> Option<&String> {
+    pub fn get_vault_locaton(&self, name: &str) -> Option<&String> {
         self.vaults.get(name)
     }
 
-    pub fn check_vault(&self, name: &str) -> bool {
+    pub fn vault_exists(&self, name: &str) -> bool {
         self.vaults.contains_key(name)
     }
 
@@ -55,8 +55,8 @@ impl Config {
         self.update_config_file();
     }
 
-    pub fn add_vault(&mut self, name: String, path: String) {
-        self.vaults.insert(name, path);
+    pub fn add_vault(&mut self, name: String, location: String) {
+        self.vaults.insert(name, location);
         self.update_config_file();
     }
 
@@ -65,14 +65,15 @@ impl Config {
         self.update_config_file();
     }
 
-    pub fn rename_vault(&mut self, name: &str, new_name: &str) {
+    pub fn rename_vault(&mut self, name: &str, new_name: String) {
         let value = self.vaults.remove(name);
-        self.vaults.insert(new_name.to_string(), value.unwrap());
+        self.vaults.insert(new_name, value.unwrap());
         self.update_config_file();
     }
 
-    pub fn update_vault_path(&mut self, name: &str, new_path: &str) {
-        self.vaults.insert(name.to_string(), new_path.to_string());
+    pub fn update_vault_location(&mut self, name: String, new_location: String) {
+        self.vaults
+            .insert(name.to_string(), new_location.to_string());
         self.update_config_file();
     }
 
