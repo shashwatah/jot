@@ -20,67 +20,67 @@ use clap::{AppSettings, Parser, Subcommand, ValueEnum};
 ))]
 pub struct Args {
     #[clap(subcommand)]
-    pub command: Command,
+    pub subcommand: SubCommand,
 }
 
 #[derive(Subcommand, Debug)]
-pub enum Command {
-    /// 📁 list and switch vaults or perform fs operations on them.
+pub enum SubCommand {
+    /// 📝 list and create notes.
+    #[clap(override_usage("jot nts\n    jot nts [note name]"))]
+    NTE {
+        /// name for new note (to be created in the current folder).
+        #[clap(value_parser, name = "note name")]
+        name: Option<String>,
+    },
+    /// 📖 open a note (from the current folder).
+    OPN {
+        #[clap(value_parser, name = "note name")]
+        name: String
+    },
+    /// 📁 list and create vaults.
     #[clap(override_usage(
-        "jot vlt \n    jot vlt <vault name> <vault path> \n    jot vlt <SUBCOMMAND>"
+        "jot vlt \n    jot vlt <vault name> <vault location>"
     ))]
     VLT {
         /// name for new vault.
-        #[clap(value_parser, name = "vault name", requires = "vault path")]
+        #[clap(value_parser, name = "vault name", requires = "vault location")]
         name: Option<String>,
-        /// fs path of new vault.
-        #[clap(value_parser, name = "vault path")]
-        path: Option<String>,
-        #[clap(subcommand)]
-        command: Option<VltCommand>,
+        /// fs path to location of new vault.
+        #[clap(value_parser, name = "vault location")]
+        location: Option<String>,
     },
-    /// 📝 list, create, open, rename, move, and delete notes.
-    #[clap(override_usage("jot nts\n    jot nts [note name]\n    jot nts <SUBCOMMAND>"))]
-    NTS {
-        /// name for new note (to be created in current location).
-        #[clap(value_parser, name = "note name")]
-        name: Option<String>,
-        #[clap(subcommand)]
-        command: Option<NtsCommand>,
+    /// 🚪 enter/switch to a vault.
+    ENT {
+        /// name of the vault to switch to.
+        #[clap(value_parser, name = "vault name")]
+        name: String,
     },
-    /// 📂 perform fs operations on directories or display current vault's tree.
-    #[clap(override_usage("jot dir\n    jot dir [directory name]\n    jot dir <SUBCOMMAND>"))]
+    /// 📂 create folders and display dir tree of the current vault.
+    #[clap(override_usage("jot dir\n    jot dir [folder name]"))]
     DIR {
-        /// name for new directory (to be created in current location).
-        #[clap(value_parser, name = "directory name")]
-        name: Option<String>,
-        #[clap(subcommand)]
-        command: Option<DirCommand>,
+        /// name for new folder (to be created in the current folder).
+        #[clap(value_parser, name = "folder name")]
+        name: Option<String>
     },
-    /// 🔀 switch directories within current vault.
+    /// 🔀 switch folders within current vault.
     CDR {
-        /// path of directory (with current location as root).
-        #[clap(value_parser, name = "directory path")]
-        path: String,
+        /// path to location of folder to switch to (with current folder as root).
+        #[clap(value_parser, name = "folder location")]
+        location: String,
     },
     /// 🗒️ list and open notes from current vault's history.
     #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
-    HST {
-        #[clap(subcommand)]
-        command: Option<HstCommand>,
-        // #[clap(short, action)]
-        // open: bool
-    },
+    HST,
     /// ⏮️ open last accessed note in the current vault.
     LST,
-    /// 🔍 find directories and notes in the current vault.
+    /// 🔍 find folders and notes in the current vault.
     FND {
-        /// regex query string.
-        #[clap(value_parser, name = "query")]
-        query: String,
-        /// query files (fil) or directories (dir).
+        /// query files (fil) or folders (dir).
         #[clap(value_enum, value_parser, name = "query type")]
         query_type: QueryType,
+        /// query string.
+        #[clap(value_parser, name = "query")]
+        query: String,
     },
     /// 📒 list, create and delete memos/quick notes (independent of current vault).
     #[clap(override_usage("jot mem\n    jot mem [content]\n    jot mem <SUBCOMMAND>"))]
@@ -89,122 +89,69 @@ pub enum Command {
         #[clap(value_parser, name = "content")]
         content: Option<String>,
         #[clap(subcommand)]
-        command: Option<MemCommand>,
-        // #[clap(short, action)]
-        // del: bool
+        subcommand: Option<MemSubCommand>
     },
-    /// 🆘 show this help message or help for given command.
-    Help,
-}
-
-#[derive(Subcommand, Debug)]
-#[clap(args_conflicts_with_subcommands = true)]
-pub enum VltCommand {
-    /// 🚪 enter/switch to a vault.
-    ENT {
-        #[clap(name = "vault name")]
-        name: String,
-    },
-    /// 🚮 delete a vault.
-    DEL {
-        #[clap(name = "vault name")]
-        name: String,
-    },
-    /// 🔁 rename a vault.
+    /// 🔁 rename a note/vault/folder.
     REN {
-        #[clap(name = "current name")]
+        /// rename a vault (vlt) | note (nte) | folder (dir).
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: ItemType,
+        /// name of item to be renamed.
+        #[clap(value_parser, name = "name")]
         name: String,
-        #[clap(name = "new name")]
+        /// new name of item.
+        #[clap(value_parser, name = "new name")]
         new_name: String,
     },
-    /// 🗃️ move vault to a new location in the fs.
-    MOV {
-        #[clap(name = "vault name")]
-        name: String,
-        #[clap(name = "new path")]
-        new_path: String,
-    },
-    /// 🆘 show this help message or help for given command.
-    Help,
-}
-
-#[derive(Subcommand, Debug)]
-#[clap(args_conflicts_with_subcommands = true)]
-pub enum NtsCommand {
-    /// 📖 open a note with the editor defined in config.
-    OPN {
-        #[clap(name = "note title")]
-        title: String,
-    },
-    /// 🚮delete a note.
+    /// 🚮 delete a note/vault/folder.
     DEL {
-        #[clap(name = "note title")]
-        title: String,
+        /// delete a note (nte) | vault (vlt) | folder (dir).
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: ItemType,
+        /// name of item to be deleted.
+        #[clap(value_parser, name = "name")]
+        name: String,
     },
-    /// 🔁 rename/retitle a note.
-    REN {
-        #[clap(name = "current title")]
-        title: String,
-        #[clap(name = "new title")]
-        new_title: String,
-    },
-    /// 🗃️ move note to new location (with the current location as root).
+    /// 🗃️ move a note/vault/folder.
     MOV {
-        #[clap(name = "note title")]
-        title: String,
-        #[clap(name = "new location")]
+        /// move a note (nte) | vault (vlt) | folder (dir).
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: ItemType,
+        /// name of item to be moved.
+        #[clap(value_parser, name = "name")]
+        name: String,
+        /// path to new location of item (current location as root in case of note or folder).
+        #[clap(value_parser, name = "new location")]
         new_location: String,
     },
-    /// 🗄️ move note to (root of) a different vault.
+    /// 🗄️ move notes and folders from current vault to a different vault.
     MVV {
-        #[clap(name = "note title")]
-        title: String,
-        #[clap(name = "vault name")]
-        new_location: String,
+        /// move a note (nte) | folder (dir).
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: MvvItemType,
+        /// name of item to be moved.
+        #[clap(value_parser, name = "name")]
+        name: String,
+        /// name of vault to move the item to.
+        #[clap(value_parser, name = "vault name")]
+        vault_name: String,
     },
     /// 🆘 show this help message or help for given command.
     Help,
 }
 
-#[derive(Subcommand, Debug)]
-#[clap(args_conflicts_with_subcommands = true)]
-pub enum DirCommand {
-    /// 🚮 delete a directory.
-    DEL {
-        #[clap(name = "directory name")]
-        name: String,
-    },
-    /// 🔁 rename a directory.
-    REN {
-        #[clap(name = "current name")]
-        name: String,
-        #[clap(name = "new name")]
-        new_name: String,
-    },
-    /// 🗃️ move directory to a new location within current vault.
-    MOV {
-        #[clap(name = "directory name")]
-        name: String,
-        #[clap(name = "new location")]
-        new_location: String,
-    },
-    /// 🗄️ move directory to (root of) a different vault.
-    MVV {
-        #[clap(name = "directory name")]
-        title: String,
-        #[clap(name = "vault name")]
-        new_location: String,
-    },
-    /// 🆘 show this help message or help for given command.
-    Help,
+
+#[derive(ValueEnum, Clone, Debug)]
+pub enum ItemType {
+    VLT, 
+    NTE,
+    DIR, 
 }
 
-#[derive(Subcommand, Debug)]
-pub enum HstCommand {
-    /// 📖 open a note from history.
-    OPN,
-    /// 🆘 show this help message or help for given command.
-    Help,
+#[derive(ValueEnum, Clone, Debug)]
+pub enum MvvItemType {
+    NTE, 
+    DIR,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
@@ -214,8 +161,16 @@ pub enum QueryType {
 }
 
 #[derive(Subcommand, Debug)]
+pub enum HstSubCommand {
+    /// 📖 open a note from history.
+    OPN,
+    /// 🆘 show this help message or help for given command.
+    Help,
+}
+
+#[derive(Subcommand, Debug)]
 #[clap(args_conflicts_with_subcommands = true)]
-pub enum MemCommand {
+pub enum MemSubCommand {
     /// 🚮 choose which memo to delete.
     DEL,
     /// 🆘 show this help message or help for given command.
