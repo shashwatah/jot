@@ -73,9 +73,9 @@ pub enum SubCommand {
     LST,
     /// 🔍 find folders and notes in the current vault.
     FND {
-        /// query files (fil) or folders (dir).
+        /// find notes (nte) or folders (dir).
         #[clap(value_enum, value_parser, name = "query type")]
-        query_type: QueryType,
+        query_type: VaultItem,
         /// query string.
         #[clap(value_parser, name = "query")]
         query: String,
@@ -93,7 +93,7 @@ pub enum SubCommand {
     REN {
         /// rename a vault (vlt) | note (nte) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: ItemType,
+        item_type: GlobItem,
         /// name of item to be renamed.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -105,7 +105,7 @@ pub enum SubCommand {
     DEL {
         /// delete a note (nte) | vault (vlt) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: ItemType,
+        item_type: GlobItem,
         /// name of item to be deleted.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -114,7 +114,7 @@ pub enum SubCommand {
     MOV {
         /// move a note (nte) | vault (vlt) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: ItemType,
+        item_type: GlobItem,
         /// name of item to be moved.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -126,7 +126,7 @@ pub enum SubCommand {
     MVV {
         /// move a note (nte) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
-        item_type: MvvItemType,
+        item_type: VaultItem,
         /// name of item to be moved.
         #[clap(value_parser, name = "name")]
         name: String,
@@ -135,25 +135,20 @@ pub enum SubCommand {
         vault_name: String,
     },
     /// 🆘 show this help message or help for given command.
+
     Help,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
-pub enum ItemType {
+pub enum GlobItem {
     VLT,
     NTE,
     DIR,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
-pub enum MvvItemType {
+pub enum VaultItem {
     NTE,
-    DIR,
-}
-
-#[derive(ValueEnum, Clone, Debug)]
-pub enum QueryType {
-    FIL,
     DIR,
 }
 
