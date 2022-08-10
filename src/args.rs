@@ -35,12 +35,10 @@ pub enum SubCommand {
     /// 📖 open a note (from the current folder).
     OPN {
         #[clap(value_parser, name = "note name")]
-        name: String
+        name: String,
     },
     /// 📁 list and create vaults.
-    #[clap(override_usage(
-        "jot vlt \n    jot vlt <vault name> <vault location>"
-    ))]
+    #[clap(override_usage("jot vlt \n    jot vlt <vault name> <vault location>"))]
     VLT {
         /// name for new vault.
         #[clap(value_parser, name = "vault name", requires = "vault location")]
@@ -60,7 +58,7 @@ pub enum SubCommand {
     DIR {
         /// name for new folder (to be created in the current folder).
         #[clap(value_parser, name = "folder name")]
-        name: Option<String>
+        name: Option<String>,
     },
     /// 🔀 switch folders within current vault.
     CDR {
@@ -89,7 +87,7 @@ pub enum SubCommand {
         #[clap(value_parser, name = "content")]
         content: Option<String>,
         #[clap(subcommand)]
-        subcommand: Option<MemSubCommand>
+        subcommand: Option<MemSubCommand>,
     },
     /// 🔁 rename a note/vault/folder.
     REN {
@@ -140,17 +138,16 @@ pub enum SubCommand {
     Help,
 }
 
-
 #[derive(ValueEnum, Clone, Debug)]
 pub enum ItemType {
-    VLT, 
+    VLT,
     NTE,
-    DIR, 
+    DIR,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum MvvItemType {
-    NTE, 
+    NTE,
     DIR,
 }
 
