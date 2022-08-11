@@ -63,7 +63,6 @@ pub fn delete_vault(name: &str, config: &mut Config) {
         let final_path = create_path_with_name(config.get_vault_locaton(name).unwrap(), name);
         delete_folder(&final_path);
         config.delete_vault(name);
-
         if let Some(vault) = config.get_current_vault() {
             if name == vault {
                 config.update_current_vault(None)

@@ -26,7 +26,6 @@ impl App {
         println!("{:#?}", self.args)
     }
 
-    // absoluut spaghet 🤌
     pub fn handle_args(&mut self) {
         match &self.args.subcommand {
             SubCommand::VLT { name, location } => {

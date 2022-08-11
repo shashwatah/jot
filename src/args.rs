@@ -135,7 +135,6 @@ pub enum SubCommand {
         vault_name: String,
     },
     /// 🆘 show this help message or help for given command.
-
     Help,
 }
 
