@@ -17,10 +17,10 @@ pub fn create_vault(name: &str, location: &str, config: &mut Config) {
             config.add_vault(name.to_string(), location.to_string());
             println!("{} created", name)
         } else {
-            println!("path doesn't exist")
+            panic!("path doesn't exist")
         }
     } else {
-        println!("vault already exists")
+        panic!("vault already exists")
     }
 }
 
@@ -35,22 +35,26 @@ pub fn enter_vault(name: &str, config: &mut Config) {
         config.update_current_vault(Some(name.to_string()));
         println!("switched to {}", name)
     } else {
-        println!("vault doesn't exist")
+        panic!("vault doesn't exist")
     }
 }
 
 pub fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
     // check if vault exists
     if config.vault_exists(name) == true {
-        rename_folder(name, new_name, config.get_vault_locaton(name).unwrap());
-        config.rename_vault(name, new_name.to_string());
-        // check if its the current vault, update if it is
-        if let Some(vault) = config.get_current_vault() {
-            if name == vault {
-                config.update_current_vault(Some(new_name.to_string()));
+        if name != new_name {
+            rename_folder(name, new_name, config.get_vault_locaton(name).unwrap());
+            config.rename_vault(name, new_name.to_string());
+            // check if its the current vault, update if it is
+            if let Some(vault) = config.get_current_vault() {
+                if name == vault {
+                    config.update_current_vault(Some(new_name.to_string()));
+                }
             }
+            println!("vault {} renamed to {}", name, new_name)
+        } else {
+            panic!("new name can't be same as old name")
         }
-        println!("vault {} renamed to {}", name, new_name)
     } else {
         panic!("vault doesn't exist")
     }
@@ -70,7 +74,7 @@ pub fn delete_vault(name: &str, config: &mut Config) {
         }
         println!("{} deleted", name)
     } else {
-        println!("vault doesn't exist")
+        panic!("vault doesn't exist")
     }
 }
 
@@ -78,9 +82,13 @@ pub fn move_vault(name: &str, new_location: &str, config: &mut Config) {
     if config.vault_exists(name) == true {
         if path_exists(new_location) == true {
             let original_location = config.get_vault_locaton(name).unwrap();
-            move_folder(name, original_location, new_location);
-            config.update_vault_location(name.to_string(), new_location.to_string());
-            println!("vault {} moved", name);
+            if new_location != original_location {
+                move_folder(name, original_location, new_location);
+                config.update_vault_location(name.to_string(), new_location.to_string());
+                println!("vault {} moved", name);
+            } else {
+                panic!("new location can't be same as original location")
+            }
         } else {
             panic!("path doesn't exist");
         }
