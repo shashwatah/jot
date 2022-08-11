@@ -36,7 +36,7 @@ impl App {
                             create_vault(name_value, path_value, &mut self.config);
                             return;
                         }
-                    }
+                    },
                     None => {
                         println!("vaults: {:#?}", self.config.get_vaults().keys());
                         match self.config.get_current_vault() {
@@ -45,8 +45,21 @@ impl App {
                         }
                     }
                 }
-            }
+            },
             Command::ENT { name } => enter_vault(name, &mut self.config),
+            Command::DIR { name } => {
+                match name {
+                    Some(name_value) => {
+                        println!("create vault: {}", name_value);
+                        self.display_config();
+                        self.display_args()
+                    },
+                    None => {
+                        self.display_config();
+                        self.display_args()
+                    }
+                }
+            }
             Command::REN {
                 item_type,
                 name,
