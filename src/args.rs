@@ -20,11 +20,11 @@ use clap::{AppSettings, Parser, Subcommand, ValueEnum};
 ))]
 pub struct Args {
     #[clap(subcommand)]
-    pub subcommand: SubCommand,
+    pub command: Command,
 }
 
 #[derive(Subcommand, Debug)]
-pub enum SubCommand {
+pub enum Command {
     /// 📝 list and create notes.
     #[clap(override_usage("jot nts\n    jot nts [note name]"))]
     NTE {
@@ -38,7 +38,7 @@ pub enum SubCommand {
         name: String,
     },
     /// 📁 list and create vaults.
-    #[clap(override_usage("jot vlt \n    jot vlt <vault name> <vault location>"))]
+    #[clap(override_usage("jot vlt\n    jot vlt <vault name> <vault location>"))]
     VLT {
         /// name for new vault.
         #[clap(value_parser, name = "vault name", requires = "vault location")]

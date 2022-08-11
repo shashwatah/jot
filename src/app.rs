@@ -1,4 +1,4 @@
-use crate::args::{Args, Item, SubCommand};
+use crate::args::{Args, Item, Command};
 use crate::config::Config;
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault};
 use clap::Parser;
@@ -27,8 +27,8 @@ impl App {
     }
 
     pub fn handle_args(&mut self) {
-        match &self.args.subcommand {
-            SubCommand::VLT { name, location } => {
+        match &self.args.command {
+            Command::VLT { name, location } => {
                 // if name and path are some -> create vault with name and path
                 match name {
                     Some(name_value) => {
@@ -46,8 +46,8 @@ impl App {
                     }
                 }
             }
-            SubCommand::ENT { name } => enter_vault(name, &mut self.config),
-            SubCommand::REN {
+            Command::ENT { name } => enter_vault(name, &mut self.config),
+            Command::REN {
                 item_type,
                 name,
                 new_name,
@@ -58,14 +58,14 @@ impl App {
                     self.display_args()
                 }
             },
-            SubCommand::DEL { item_type, name } => match item_type {
+            Command::DEL { item_type, name } => match item_type {
                 Item::VLT => delete_vault(name, &mut self.config),
                 _ => {
                     self.display_config();
                     self.display_args()
                 }
             },
-            SubCommand::MOV {
+            Command::MOV {
                 item_type,
                 name,
                 new_location,
