@@ -8,5 +8,6 @@ use app::App;
 
 fn main() {
     let mut app: App = App::new();
+    app.load_current_vault();
     app.handle_args()
 }
