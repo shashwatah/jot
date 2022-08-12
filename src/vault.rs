@@ -62,7 +62,7 @@ pub fn create_vault(name: &str, location: &str, config: &mut Config) {
 pub fn enter_vault(name: &str, config: &mut Config) {
     if config.vault_exists(name) == true {
         if let Some(current_vault) = config.get_current_vault() {
-            if current_vault == name {
+            if name == current_vault {
                 println!("already in {}", name);
                 return;
             }

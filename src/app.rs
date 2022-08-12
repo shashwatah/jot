@@ -28,7 +28,10 @@ impl App {
     }
 
     pub fn display_app_data(&self) {
-        println!("{:#?}\n{:#?}\n{:#?}", self.config, self.current_vault, self.args);
+        println!(
+            "{:#?}\n{:#?}\n{:#?}",
+            self.config, self.current_vault, self.args
+        );
     }
 
     pub fn handle_args(&mut self) {
