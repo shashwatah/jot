@@ -35,10 +35,13 @@ impl Config {
         config
     }
 
-    pub fn get_current_vault(&self) -> &Option<String> {
-        &self.current_vault
+    pub fn get_current_vault(&self) -> Option<&String> {
+        match &self.current_vault {
+            Some(current_vault_name) => Some(current_vault_name),
+            None => None,
+        }
     }
-
+    
     pub fn get_vaults(&self) -> &HashMap<String, String> {
         &self.vaults
     }
