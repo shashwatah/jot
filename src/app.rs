@@ -1,12 +1,13 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
-use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault};
+use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct App {
     config: Config,
+    current_vault: Option<Vault>,
     args: Args,
 }
 
@@ -14,7 +15,15 @@ impl App {
     pub fn new() -> Self {
         App {
             config: Config::load_config(),
+            current_vault: None,
             args: Args::parse(),
+        }
+    }
+
+    pub fn load_current_vault(&mut self) {
+        self.current_vault = match self.config.get_current_vault() {
+            Some(current_vault_name) => Some(Vault::load_data(&self.config, current_vault_name)),
+            None => None,
         }
     }
 
