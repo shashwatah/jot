@@ -13,6 +13,8 @@ pub fn create_vault(name: &str, location: &str, config: &mut Config) {
             // create folder at path
             create_folder(&path_with_name);
             // create .jot inside the folder -> will do this later
+            let jot_path = create_path_with_name(&path_with_name, ".jot");
+            create_folder(&jot_path);
             // add vault to config
             config.add_vault(name.to_string(), location.to_string());
             println!("{} created", name)
