@@ -27,12 +27,8 @@ impl App {
         }
     }
 
-    pub fn display_config(&self) {
-        println!("{:#?}", self.config)
-    }
-
-    pub fn display_args(&self) {
-        println!("{:#?}", self.args)
+    pub fn display_app_data(&self) {
+        println!("{:#?}\n{:#?}\n{:#?}", self.config, self.current_vault, self.args);
     }
 
     pub fn handle_args(&mut self) {
@@ -59,12 +55,10 @@ impl App {
             Command::DIR { name } => match name {
                 Some(name_value) => {
                     println!("create vault: {}", name_value);
-                    self.display_config();
-                    self.display_args()
+                    self.display_app_data();
                 }
                 None => {
-                    self.display_config();
-                    self.display_args()
+                    self.display_app_data();
                 }
             },
             Command::REN {
@@ -74,15 +68,13 @@ impl App {
             } => match item_type {
                 Item::VLT => rename_vault(name, new_name, &mut self.config),
                 _ => {
-                    self.display_config();
-                    self.display_args()
+                    self.display_app_data();
                 }
             },
             Command::DEL { item_type, name } => match item_type {
                 Item::VLT => delete_vault(name, &mut self.config),
                 _ => {
-                    self.display_config();
-                    self.display_args()
+                    self.display_app_data();
                 }
             },
             Command::MOV {
@@ -92,13 +84,11 @@ impl App {
             } => match item_type {
                 Item::VLT => move_vault(name, new_location, &mut self.config),
                 _ => {
-                    self.display_config();
-                    self.display_args()
+                    self.display_app_data();
                 }
             },
             _ => {
-                self.display_config();
-                self.display_args()
+                self.display_app_data();
             }
         }
     }
