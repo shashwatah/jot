@@ -2,6 +2,39 @@ use crate::config::Config;
 use crate::fs::{
     create_folder, create_path_with_name, delete_folder, move_folder, path_exists, rename_folder,
 };
+use serde::{Deserialize, Serialize};
+use std::path::Path;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Vault {
+    current_location: String,
+    last_note: Option<(String, String)>,
+    history: Vec<(String, String)>,
+}
+
+impl Default for Vault {
+    fn default() -> Self {
+        Vault {
+            current_location: ".".to_string(),
+            last_note: None,
+            history: vec![],
+        }
+    }
+}
+
+// using confy right now but will eventually use standard toml parsing
+impl Vault {
+    pub fn load_data(config: &Config, name: &str) -> Self {
+        let vault_path = create_path_with_name(config.get_vault_locaton(name).unwrap(), name);
+        let vault_data_path = Path::new(&vault_path)
+            .join(".jot/data")
+            .to_str()
+            .unwrap()
+            .to_string();
+        let vault: Vault = confy::load_path(vault_data_path).unwrap();
+        vault
+    }
+}
 
 pub fn create_vault(name: &str, location: &str, config: &mut Config) {
     // check if vault name doesn't already exist
