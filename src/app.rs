@@ -1,7 +1,9 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
+use crate::fs::create_path_with_name;
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
+use walkdir::WalkDir;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -61,7 +63,21 @@ impl App {
                     self.display_app_data();
                 }
                 None => {
-                    self.display_app_data();
+                    // will pretty print the tree later, using as-tree right now
+                    // cargo install as-tree -> jot dir | as-tree
+                    if let Some(_) = self.current_vault {
+                        let current_vault_name = self.config.get_current_vault().unwrap();
+                        let current_vault_location =
+                            self.config.get_vault_locaton(current_vault_name).unwrap();
+                        let current_vault_path =
+                            create_path_with_name(current_vault_location, current_vault_name);
+                        for entry in WalkDir::new(current_vault_path)
+                            .into_iter()
+                            .filter_map(|e| e.ok())
+                        {
+                            println!("{}", entry.path().display());
+                        }
+                    }
                 }
             },
             Command::REN {
