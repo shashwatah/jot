@@ -2,13 +2,17 @@ use fs_extra::{dir::CopyOptions, move_items};
 use std::fs::{remove_dir_all, rename, DirBuilder};
 use std::path::Path;
 
+use path_slash::PathExt as _;
+
 pub fn path_exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 
 pub fn create_path_with_name(path: &str, name: &str) -> String {
-    if let Some(path_with_name) = Path::new(path).join(name).to_str() {
-        path_with_name.to_string()
+    if let Some(path_with_name) = Path::new(path).join(name).as_os_str().to_str() {
+        // using path_slash crate to convert system created paths on windows (uses \ instead of /) 
+        // to unix style paths to maintain consistency when printing paths.
+        Path::new(path_with_name).to_slash().unwrap().to_string()
     } else {
         panic!("path string couldn't be generated")
     }
