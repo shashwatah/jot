@@ -8,16 +8,25 @@ pub fn path_exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 
-pub fn create_path_with_name(path: &str, name: &str) -> String {
-    if let Some(path_with_name) = Path::new(path).join(name).to_str() {
-        path_with_name.to_string()
+// join_path only joined two paths
+// join_paths -> recursively joins multiple paths
+pub fn join_paths(mut paths: Vec<&str>) -> String {
+    let first_path = paths[0];
+    if paths.len() > 1 {
+        // retaining every path != the first path in the vec, taken from https://stackoverflow.com/a/40310140/14477608
+        paths.retain(|&x| x != first_path);
+        Path::new(first_path)
+            .join(join_paths(paths))
+            .to_str()
+            .unwrap()
+            .to_string()
     } else {
-        panic!("path string couldn't be generated")
+        Path::new(first_path).to_str().unwrap().to_string()
     }
 }
 
 pub fn create_path_with_fslash(path: &str) -> String {
-    // using path_slash crate to convert system created paths on windows (uses \ instead of /) 
+    // using path_slash crate to convert system created paths on windows (uses \ instead of /)
     // to unix style paths to maintain consistency when printing paths.
     Path::new(path).to_slash().unwrap().to_string()
 }
@@ -31,14 +40,13 @@ pub fn delete_folder(path: &str) {
 }
 
 pub fn rename_folder(name: &str, new_name: &str, path: &str) {
-    let original_path = create_path_with_name(path, name);
-    let new_path = create_path_with_name(path, new_name);
+    let original_path = join_paths(vec![path, name]);
+    let new_path = join_paths(vec![path, new_name]);
     rename(original_path, new_path).unwrap();
 }
 
 pub fn move_folder(name: &str, path: &str, new_path: &str) {
     // using crate: *fs_extra* here but i might implement a custom recursive move function later
-    let original_path = create_path_with_name(path, name);
-    let original_path_vec = vec![original_path];
-    move_items(&original_path_vec, new_path, &CopyOptions::new()).unwrap();
+    let original_path = vec![join_paths(vec![path, name])];
+    move_items(&original_path, new_path, &CopyOptions::new()).unwrap();
 }
