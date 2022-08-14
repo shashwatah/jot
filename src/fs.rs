@@ -9,13 +9,17 @@ pub fn path_exists(path: &str) -> bool {
 }
 
 pub fn create_path_with_name(path: &str, name: &str) -> String {
-    if let Some(path_with_name) = Path::new(path).join(name).as_os_str().to_str() {
-        // using path_slash crate to convert system created paths on windows (uses \ instead of /) 
-        // to unix style paths to maintain consistency when printing paths.
-        Path::new(path_with_name).to_slash().unwrap().to_string()
+    if let Some(path_with_name) = Path::new(path).join(name).to_str() {
+        path_with_name.to_string()
     } else {
         panic!("path string couldn't be generated")
     }
+}
+
+pub fn create_path_with_fslash(path: &str) -> String {
+    // using path_slash crate to convert system created paths on windows (uses \ instead of /) 
+    // to unix style paths to maintain consistency when printing paths.
+    Path::new(path).to_slash().unwrap().to_string()
 }
 
 pub fn create_folder(path: &str) {

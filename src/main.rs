@@ -1,6 +1,7 @@
 mod app;
 mod args;
 mod config;
+mod dir;
 mod fs;
 mod vault;
 
