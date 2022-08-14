@@ -8,12 +8,11 @@ pub fn path_exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 
-// join_path only joined two paths
 // join_paths -> recursively joins multiple paths
 pub fn join_paths(mut paths: Vec<&str>) -> String {
     let first_path = paths[0];
     if paths.len() > 1 {
-        // retaining every path != the first path in the vec, taken from https://stackoverflow.com/a/40310140/14477608
+        // retaining every path != the first path in the vec, taken from so_ans: 40310140/14477608
         paths.retain(|&x| x != first_path);
         Path::new(first_path)
             .join(join_paths(paths))
