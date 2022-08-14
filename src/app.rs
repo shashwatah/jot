@@ -1,6 +1,6 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
-use crate::dir::create_dir;
+use crate::dir::{create_dir, print_dir_tree};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -63,7 +63,7 @@ impl App {
                         &self.config,
                         self.current_vault.as_mut().unwrap(),
                     ),
-                    None => print!("print dir tree"), // None => print_dir_tree(self.current_vault.as_ref().unwrap()),
+                    None => print_dir_tree(&self.config, self.current_vault.as_ref().unwrap()),
                 },
                 None => {
                     panic!("not inside a vault")
