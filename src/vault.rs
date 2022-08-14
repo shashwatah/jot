@@ -81,18 +81,22 @@ pub fn enter_vault(name: &str, config: &mut Config) {
 pub fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
     // check if vault exists
     if config.vault_exists(name) == true {
-        if name != new_name {
-            rename_folder(name, new_name, config.get_vault_locaton(name).unwrap());
-            config.rename_vault(name, new_name.to_string());
-            // check if its the current vault, update if it is
-            if let Some(vault) = config.get_current_vault() {
-                if name == vault {
-                    config.update_current_vault(Some(new_name.to_string()));
+        if config.vault_exists(new_name) != true {
+            if name != new_name {
+                rename_folder(name, new_name, config.get_vault_locaton(name).unwrap());
+                config.rename_vault(name, new_name.to_string());
+                // check if its the current vault, update if it is
+                if let Some(vault) = config.get_current_vault() {
+                    if name == vault {
+                        config.update_current_vault(Some(new_name.to_string()));
+                    }
                 }
+                println!("vault {} renamed to {}", name, new_name)
+            } else {
+                panic!("new name can't be same as old name")
             }
-            println!("vault {} renamed to {}", name, new_name)
         } else {
-            panic!("new name can't be same as old name")
+            panic!("a vault with name same as new name already exists")
         }
     } else {
         panic!("vault doesn't exist")
