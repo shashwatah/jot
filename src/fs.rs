@@ -1,6 +1,6 @@
 use fs_extra::{dir::CopyOptions, move_items};
 use std::fs::{remove_dir_all, rename, DirBuilder};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use path_slash::PathExt as _;
 
@@ -9,19 +9,12 @@ pub fn path_exists(path: &str) -> bool {
 }
 
 // join_paths -> recursively joins multiple paths
-pub fn join_paths(mut paths: Vec<&str>) -> String {
-    let first_path = paths[0];
-    if paths.len() > 1 {
-        // retaining every path != the first path in the vec, taken from so_ans: 40310140/14477608
-        paths.retain(|&x| x != first_path);
-        Path::new(first_path)
-            .join(join_paths(paths))
-            .to_str()
-            .unwrap()
-            .to_string()
-    } else {
-        Path::new(first_path).to_str().unwrap().to_string()
+pub fn join_paths(paths: Vec<&str>) -> String {
+    let mut full_path= PathBuf::new();
+    for path in paths.iter() {
+        full_path.push(path);
     }
+    full_path.to_str().unwrap().to_string()
 }
 
 pub fn create_path_with_fslash(path: &str) -> String {
