@@ -1,9 +1,8 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
-use crate::fs::create_path_with_name;
+use crate::dir::create_dir;
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
-use walkdir::WalkDir;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -57,27 +56,17 @@ impl App {
                 }
             }
             Command::ENT { name } => enter_vault(name, &mut self.config),
-            Command::DIR { name } => match name {
-                Some(name_value) => {
-                    println!("create vault: {}", name_value);
-                    self.display_app_data();
-                }
+            Command::DIR { name } => match self.current_vault {
+                Some(_) => match name {
+                    Some(name_value) => create_dir(
+                        name_value,
+                        &self.config,
+                        self.current_vault.as_mut().unwrap(),
+                    ),
+                    None => print!("print dir tree"), // None => print_dir_tree(self.current_vault.as_ref().unwrap()),
+                },
                 None => {
-                    // will pretty print the tree later, using as-tree right now
-                    // cargo install as-tree -> jot dir | as-tree
-                    if let Some(_) = self.current_vault {
-                        let current_vault_name = self.config.get_current_vault().unwrap();
-                        let current_vault_location =
-                            self.config.get_vault_locaton(current_vault_name).unwrap();
-                        let current_vault_path =
-                            create_path_with_name(current_vault_location, current_vault_name);
-                        for entry in WalkDir::new(current_vault_path)
-                            .into_iter()
-                            .filter_map(|e| e.ok())
-                        {
-                            println!("{}", entry.path().display());
-                        }
-                    }
+                    panic!("not inside a vault")
                 }
             },
             Command::REN {
