@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::fs::{
-    create_folder, create_path_with_name, delete_folder, move_folder, path_exists, rename_folder,
+    create_folder, delete_folder, join_paths, move_folder, path_exists, rename_folder,
 };
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -25,7 +25,7 @@ impl Default for Vault {
 // using confy right now but will eventually use standard toml parsing
 impl Vault {
     pub fn load_data(config: &Config, name: &str) -> Self {
-        let vault_path = create_path_with_name(config.get_vault_locaton(name).unwrap(), name);
+        let vault_path = join_paths(vec![config.get_vault_locaton(name).unwrap(), name]);
         let vault_data_path = Path::new(&vault_path)
             .join(".jot/data")
             .to_str()
@@ -33,6 +33,10 @@ impl Vault {
             .to_string();
         let vault: Vault = confy::load_path(vault_data_path).unwrap();
         vault
+    }
+
+    pub fn get_current_location(&self) -> &str {
+        &self.current_location
     }
 }
 
@@ -42,11 +46,11 @@ pub fn create_vault(name: &str, location: &str, config: &mut Config) {
         // check if path is exists
         if path_exists(location) == true {
             // create path string with name of vault
-            let path_with_name = create_path_with_name(location, name);
+            let path_with_name = join_paths(vec![location, name]);
             // create folder at path
             create_folder(&path_with_name);
             // create .jot inside the folder -> will do this later
-            let jot_path = create_path_with_name(&path_with_name, ".jot");
+            let jot_path = join_paths(vec![&path_with_name, ".jot"]);
             create_folder(&jot_path);
             // add vault to config
             config.add_vault(name.to_string(), location.to_string());
@@ -99,7 +103,7 @@ pub fn delete_vault(name: &str, config: &mut Config) {
     if config.vault_exists(name) == true {
         // using unwrap because vault check has already been performed and the vault
         // definitely exists at this point
-        let final_path = create_path_with_name(config.get_vault_locaton(name).unwrap(), name);
+        let final_path = join_paths(vec![config.get_vault_locaton(name).unwrap(), name]);
         delete_folder(&final_path);
         config.delete_vault(name);
         if let Some(vault) = config.get_current_vault() {

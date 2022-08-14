@@ -41,7 +41,7 @@ impl Config {
             None => None,
         }
     }
-    
+
     pub fn get_vaults(&self) -> &HashMap<String, String> {
         &self.vaults
     }
