@@ -3,19 +3,24 @@ use crate::fs::{
     create_folder, delete_folder, join_paths, move_folder, path_exists, rename_folder,
 };
 use serde::{Deserialize, Serialize};
-use std::path::Path;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
+    name: Option<String>,
+    location: Option<String>,
     current_location: String,
     last_note: Option<(String, String)>,
     history: Vec<(String, String)>,
 }
 
+// by default when a vault is created it doesn't store any data
+// when user enters a vault a data file is generated within the vault
 impl Default for Vault {
     fn default() -> Self {
         Vault {
-            current_location: ".".to_string(),
+            name: None,
+            location: None,
+            current_location: "".to_string(),
             last_note: None,
             history: vec![],
         }
@@ -24,19 +29,52 @@ impl Default for Vault {
 
 // using confy right now but will eventually use standard toml parsing
 impl Vault {
-    pub fn load_data(config: &Config, name: &str) -> Self {
-        let vault_path = join_paths(vec![config.get_vault_locaton(name).unwrap(), name]);
-        let vault_data_path = Path::new(&vault_path)
-            .join(".jot/data")
-            .to_str()
-            .unwrap()
-            .to_string();
-        let vault: Vault = confy::load_path(vault_data_path).unwrap();
+    pub fn load(location: &str, name: &str) -> Self {
+        let data_path = join_paths(vec![location, name, ".jot/data"]);
+        let mut vault: Vault = confy::load_path(data_path).unwrap();
+        // if name or location = None = new data file -> set name and location
+        if let None = vault.name {
+            vault.name = Some(name.to_string());
+            vault.location = Some(location.to_string());
+            vault.update_vault_file()
+        }
         vault
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.name.as_ref().unwrap()
+    }
+
+    pub fn get_location(&self) -> &str {
+        self.location.as_ref().unwrap()
     }
 
     pub fn get_current_location(&self) -> &str {
         &self.current_location
+    }
+
+    pub fn set_name(&mut self, name: &str) {
+        self.name = Some(name.to_string());
+        self.update_vault_file()
+    }
+
+    pub fn set_location(&mut self, location: &str) {
+        self.location = Some(location.to_string());
+        self.update_vault_file()
+    }
+
+    pub fn update_current_location(&mut self, location: &str) {
+        self.current_location = location.to_string();
+        self.update_vault_file()
+    }
+
+    fn update_vault_file(&self) {
+        let file_path = join_paths(vec![
+            self.location.as_ref().unwrap(),
+            self.name.as_ref().unwrap(),
+            ".jot/data",
+        ]);
+        confy::store_path(file_path, self).unwrap()
     }
 }
 
@@ -54,6 +92,8 @@ pub fn create_vault(name: &str, location: &str, config: &mut Config) {
             create_folder(&jot_path);
             // add vault to config
             config.add_vault(name.to_string(), location.to_string());
+            // generate data file by calling load_data on vault
+            Vault::load(location, name);
             println!("{} created", name)
         } else {
             panic!("path doesn't exist")
@@ -81,9 +121,11 @@ pub fn enter_vault(name: &str, config: &mut Config) {
 pub fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
     // check if vault exists
     if config.vault_exists(name) == true {
-        if config.vault_exists(new_name) != true {
-            if name != new_name {
-                rename_folder(name, new_name, config.get_vault_locaton(name).unwrap());
+        if name != new_name {
+            if config.vault_exists(new_name) != true {
+                let vault_location = config.get_vault_locaton(name).unwrap();
+                rename_folder(name, new_name, vault_location);
+                Vault::load(vault_location, new_name).set_name(new_name);
                 config.rename_vault(name, new_name.to_string());
                 // check if its the current vault, update if it is
                 if let Some(vault) = config.get_current_vault() {
@@ -93,10 +135,10 @@ pub fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
                 }
                 println!("vault {} renamed to {}", name, new_name)
             } else {
-                panic!("new name can't be same as old name")
+                panic!("a vault with name same as new name already exists")
             }
         } else {
-            panic!("a vault with name same as new name already exists")
+            panic!("new name can't be same as old name")
         }
     } else {
         panic!("vault doesn't exist")
@@ -127,6 +169,7 @@ pub fn move_vault(name: &str, new_location: &str, config: &mut Config) {
             let original_location = config.get_vault_locaton(name).unwrap();
             if new_location != original_location {
                 move_folder(name, original_location, new_location);
+                Vault::load(new_location, name).set_location(new_location);
                 config.update_vault_location(name.to_string(), new_location.to_string());
                 println!("vault {} moved", name);
             } else {
