@@ -30,7 +30,7 @@ impl Default for Config {
 
 // will eventually use toml parsing with dirs crate
 impl Config {
-    pub fn load_config() -> Self {
+    pub fn load() -> Self {
         let config: Config = confy::load("jot").unwrap();
         config
     }

@@ -1,6 +1,6 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
-use crate::dir::{create_dir, print_dir_tree};
+use crate::dir::{change_dir, create_dir, print_dir_tree};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -15,7 +15,7 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            config: Config::load_config(),
+            config: Config::load(),
             current_vault: None,
             args: Args::parse(),
         }
@@ -23,7 +23,11 @@ impl App {
 
     pub fn load_current_vault(&mut self) {
         self.current_vault = match self.config.get_current_vault() {
-            Some(current_vault_name) => Some(Vault::load_data(&self.config, current_vault_name)),
+            Some(current_vault_name) => {
+                let current_vault_location =
+                    self.config.get_vault_locaton(current_vault_name).unwrap();
+                Some(Vault::load(current_vault_location, current_vault_name))
+            }
             None => None,
         }
     }
@@ -58,17 +62,16 @@ impl App {
             Command::ENT { name } => enter_vault(name, &mut self.config),
             Command::DIR { name } => match self.current_vault {
                 Some(_) => match name {
-                    Some(name_value) => create_dir(
-                        name_value,
-                        &self.config,
-                        self.current_vault.as_mut().unwrap(),
-                    ),
-                    None => print_dir_tree(&self.config, self.current_vault.as_ref().unwrap()),
+                    Some(name_value) => {
+                        create_dir(name_value, self.current_vault.as_mut().unwrap())
+                    }
+                    None => print_dir_tree(self.current_vault.as_ref().unwrap()),
                 },
                 None => {
                     panic!("not inside a vault")
                 }
             },
+            Command::CDR { location } => change_dir(location, self.current_vault.as_mut().unwrap()),
             Command::REN {
                 item_type,
                 name,
