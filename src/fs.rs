@@ -8,16 +8,27 @@ pub fn path_exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 
-// join_paths -> recursively joins multiple paths
 pub fn join_paths(paths: Vec<&str>) -> String {
-    let mut full_path= PathBuf::new();
-    for path in paths.iter() {
+    let mut full_path = PathBuf::new();
+    for path in paths {
         full_path.push(path);
     }
     full_path.to_str().unwrap().to_string()
 }
 
-pub fn create_path_with_fslash(path: &str) -> String {
+pub fn collapse_path(path: &str) -> String {
+    let mut new_path = PathBuf::new();
+    for element in PathBuf::from(path).iter() {
+        if element == ".." {
+            new_path.pop();
+        } else if element != "." {
+            new_path.push(element);
+        }
+    }
+    return new_path.to_str().unwrap().to_string();
+}
+
+pub fn unix_path(path: &str) -> String {
     // using path_slash crate to convert system created paths on windows (uses \ instead of /)
     // to unix style paths to maintain consistency when printing paths.
     Path::new(path).to_slash().unwrap().to_string()
