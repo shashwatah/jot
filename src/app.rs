@@ -1,6 +1,6 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
-use crate::dir::{change_dir, create_dir, print_dir_tree};
+use crate::dir::{change_dir, create_dir, print_dir_tree, rename_dir};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -78,6 +78,7 @@ impl App {
                 new_name,
             } => match item_type {
                 Item::VLT => rename_vault(name, new_name, &mut self.config),
+                Item::DIR => rename_dir(name, new_name, self.current_vault.as_ref().unwrap()),
                 _ => {
                     self.display_app_data();
                 }
