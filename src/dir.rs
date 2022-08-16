@@ -86,7 +86,7 @@ pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
 
 pub fn movev_dir(name: &str, vault: &str, config: &Config, current_vault: &Vault) {
     if vault != current_vault.get_name() {
-        if let Some(new_vault_location) = config.get_vault_locaton(vault) {
+        if let Some(new_vault_location) = config.get_vault_location(vault) {
             let (current_vault_name, current_vault_location, current_location) =
                 current_vault.get_location_data();
 

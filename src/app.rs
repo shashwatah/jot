@@ -27,7 +27,7 @@ impl App {
         self.current_vault = match self.config.get_current_vault() {
             Some(current_vault_name) => {
                 let current_vault_location =
-                    self.config.get_vault_locaton(current_vault_name).unwrap();
+                    self.config.get_vault_location(current_vault_name).unwrap();
                 Some(Vault::load(current_vault_location, current_vault_name))
             }
             None => None,

@@ -46,7 +46,7 @@ impl Config {
         &self.vaults
     }
 
-    pub fn get_vault_locaton(&self, name: &str) -> Option<&String> {
+    pub fn get_vault_location(&self, name: &str) -> Option<&String> {
         self.vaults.get(name)
     }
 
