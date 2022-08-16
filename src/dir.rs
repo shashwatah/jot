@@ -1,8 +1,12 @@
 use crate::fs::{
-    collapse_path, create_folder, delete_folder, join_paths, path_exists, rename_folder, unix_path,
+    collapse_path, create_folder, delete_folder, join_paths, move_folder, path_exists,
+    rename_folder, unix_path,
 };
 use crate::vault::Vault;
 use walkdir::WalkDir;
+
+// these fns assume that the paths generated are valid (folders haven't been tampered with externally)
+// if file/folder not found error is thrown then jot fix (will be added later) can be used
 
 pub fn create_dir(name: &str, current_vault: &mut Vault) {
     let (vault_name, vault_location, current_location) = current_vault.get_location_data();
@@ -66,8 +70,15 @@ pub fn delete_dir(name: &str, current_vault: &Vault) {
     println!("folder {} deleted", name)
 }
 
-// pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
+pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
 
-// }
+    let path = join_paths(vec![vault_location, vault_name, current_location]);
+    let new_path = join_paths(vec![&path, new_location]);
+
+    move_folder(name, &path, &new_path);
+
+    println!("folder {} moved", name)
+}
 
 // pub fn movev_dir() {}
