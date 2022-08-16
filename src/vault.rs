@@ -127,11 +127,11 @@ pub fn enter_vault(name: &str, config: &mut Config) {
 }
 
 pub fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
-    // check if vault exists
-    if config.vault_exists(name) == true {
+    // replacing vault_exists call with get_vault_location (in rename, delete and move)
+    // since it returns an option i.e it does the same thing while also returning vault location
+    if let Some(vault_location) = config.get_vault_location(name) {
         if name != new_name {
             if config.vault_exists(new_name) != true {
-                let vault_location = config.get_vault_location(name).unwrap();
                 rename_folder(name, new_name, vault_location);
                 Vault::load(vault_location, new_name).set_name(new_name);
                 config.rename_vault(name, new_name.to_string());
@@ -154,10 +154,8 @@ pub fn rename_vault(name: &str, new_name: &str, config: &mut Config) {
 }
 
 pub fn delete_vault(name: &str, config: &mut Config) {
-    if config.vault_exists(name) == true {
-        // using unwrap because vault check has already been performed and the vault
-        // definitely exists at this point
-        let final_path = join_paths(vec![config.get_vault_location(name).unwrap(), name]);
+    if let Some(vault_location) = config.get_vault_location(name) {
+        let final_path = join_paths(vec![vault_location, name]);
         delete_folder(&final_path);
         config.delete_vault(name);
         if let Some(vault) = config.get_current_vault() {
@@ -172,9 +170,8 @@ pub fn delete_vault(name: &str, config: &mut Config) {
 }
 
 pub fn move_vault(name: &str, new_location: &str, config: &mut Config) {
-    if config.vault_exists(name) == true {
+    if let Some(original_location) = config.get_vault_location(name) {
         if path_exists(new_location) == true {
-            let original_location = config.get_vault_location(name).unwrap();
             if new_location != original_location {
                 move_folder(name, original_location, new_location);
                 Vault::load(new_location, name).set_location(new_location);
