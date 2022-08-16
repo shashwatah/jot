@@ -1,6 +1,6 @@
 use crate::args::{Args, Command, Item};
 use crate::config::Config;
-use crate::dir::{change_dir, create_dir, print_dir_tree, rename_dir, delete_dir};
+use crate::dir::{change_dir, create_dir, delete_dir, print_dir_tree, rename_dir};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
