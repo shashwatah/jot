@@ -1,4 +1,5 @@
 use core::panic;
+use std::vec;
 
 use crate::config::Config;
 use crate::fs::{
@@ -16,9 +17,13 @@ pub fn create_dir(name: &str, current_vault: &mut Vault) {
 
     let full_path = join_paths(vec![vault_location, vault_name, current_location, name]);
 
-    create_folder(&full_path);
+    if path_exists(&full_path) == false {
+        create_folder(&full_path);
 
-    println!("{} created at {}", name, unix_path(&full_path))
+        println!("{} created", name)
+    } else {
+        panic!("folder named {} already exists", name)        
+    }
 }
 
 pub fn print_dir_tree(current_vault: &Vault) {
@@ -58,9 +63,17 @@ pub fn rename_dir(name: &str, new_name: &str, current_vault: &Vault) {
 
     let path = join_paths(vec![vault_location, vault_name, current_location]);
 
-    rename_folder(name, new_name, &path);
+    if path_exists(&join_paths(vec![&path, new_name])) {
+        panic!("folder named {} already exists", new_name)
+    }
 
-    println!("folder {} renamed to {}", name, new_name)
+    if path_exists(&join_paths(vec![&path, name])){
+        rename_folder(name, new_name, &path);
+
+        println!("folder {} renamed to {}", name, new_name)    
+    } else {
+        panic!("folder doesn't exist");
+    }
 }
 
 pub fn delete_dir(name: &str, current_vault: &Vault) {
@@ -68,9 +81,12 @@ pub fn delete_dir(name: &str, current_vault: &Vault) {
 
     let path = join_paths(vec![vault_location, vault_name, current_location, name]);
 
-    delete_folder(&path);
-
-    println!("folder {} deleted", name)
+    if path_exists(&path) {    
+        delete_folder(&path);
+        println!("folder {} deleted", name)
+    } else {
+        panic!("folder doesn't exist");
+    }
 }
 
 pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
@@ -79,9 +95,20 @@ pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
     let path = join_paths(vec![vault_location, vault_name, current_location]);
     let new_path = join_paths(vec![&path, new_location]);
 
-    move_folder(name, &path, &new_path);
-
-    println!("folder {} moved", name)
+    if path_exists(&join_paths(vec![&path, name])) {
+        if path_exists(&join_paths(vec![&new_path, name])) {
+            panic!("folder named {} already exists at new path", name)
+        }
+        
+        if path_exists(&new_path) == true{
+            move_folder(name, &path, &new_path);
+            println!("folder {} moved", name)
+        } else {
+            panic!("invalid path")
+        }
+    } else {
+        panic!("folder doesn't exist")
+    }
 }
 
 pub fn movev_dir(name: &str, vault: &str, config: &Config, current_vault: &Vault) {
