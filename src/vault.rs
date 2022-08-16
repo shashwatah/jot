@@ -53,6 +53,10 @@ impl Vault {
         &self.current_location
     }
 
+    pub fn get_location_data(&self) -> (&str, &str, &str) {
+        (self.get_name(), self.get_location(), self.get_current_location())
+    }
+
     pub fn set_name(&mut self, name: &str) {
         self.name = Some(name.to_string());
         self.update_vault_file()

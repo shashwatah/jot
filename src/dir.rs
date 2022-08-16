@@ -3,9 +3,7 @@ use crate::vault::Vault;
 use walkdir::WalkDir;
 
 pub fn create_dir(name: &str, current_vault: &mut Vault) {
-    let vault_name = current_vault.get_name();
-    let vault_location = current_vault.get_location();
-    let current_location = current_vault.get_current_location();
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
 
     let full_path = join_paths(vec![vault_location, vault_name, current_location, name]);
 
@@ -15,10 +13,8 @@ pub fn create_dir(name: &str, current_vault: &mut Vault) {
 }
 
 pub fn print_dir_tree(current_vault: &Vault) {
-    let vault_name = current_vault.get_name();
-    let vault_location = current_vault.get_location();
-    let current_location = current_vault.get_current_location();
-
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+    
     let full_path = join_paths(vec![vault_location, vault_name, current_location]);
 
     for entry in WalkDir::new(&full_path).into_iter().filter_map(|e| e.ok()) {
@@ -27,14 +23,12 @@ pub fn print_dir_tree(current_vault: &Vault) {
 }
 
 pub fn change_dir(location: &str, current_vault: &mut Vault) {
-    let vault_name = current_vault.get_name();
-    let vault_location = current_vault.get_location();
-    let current_locaton = current_vault.get_current_location();
-
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+    
     let vault_path = join_paths(vec![vault_location, vault_name]);
     let vault_path = unix_path(&vault_path);
 
-    let full_path = join_paths(vec![&vault_path, current_locaton, location]);
+    let full_path = join_paths(vec![&vault_path, current_location, location]);
     let full_path = collapse_path(&full_path);
     let full_path = unix_path(&full_path);
 
@@ -51,25 +45,29 @@ pub fn change_dir(location: &str, current_vault: &mut Vault) {
 }
 
 pub fn rename_dir(name: &str, new_name: &str, current_vault: &Vault) {
-    let vault_name = current_vault.get_name();
-    let vault_location = current_vault.get_location();
-    let current_location = current_vault.get_current_location();
-
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+    
     let path = join_paths(vec![vault_location, vault_name, current_location]);
+    
     rename_folder(name, new_name, &path);
+    
     println!("folder {} renamed to {}", name, new_name)
 }
 
 
 pub fn delete_dir(name: &str, current_vault: &Vault) {
-    let vault_name = current_vault.get_name();
-    let vault_location = current_vault.get_location();
-    let current_location = current_vault.get_current_location();
-
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+    
     let path = join_paths(vec![vault_location, vault_name, current_location, name]);
+    
     delete_folder(&path);
+    
     println!("folder {} deleted", name)
 }
 
-// pub fn move_dir() {}
+// pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
+
+// }
+
+
 // pub fn movev_dir() {}
