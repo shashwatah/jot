@@ -1,4 +1,4 @@
-use crate::fs::{collapse_path, create_folder, join_paths, path_exists, unix_path, rename_folder};
+use crate::fs::{collapse_path, create_folder, join_paths, path_exists, unix_path, rename_folder, delete_folder};
 use crate::vault::Vault;
 use walkdir::WalkDir;
 
@@ -61,6 +61,15 @@ pub fn rename_dir(name: &str, new_name: &str, current_vault: &Vault) {
 }
 
 
-// pub fn delete_dir() {}
+pub fn delete_dir(name: &str, current_vault: &Vault) {
+    let vault_name = current_vault.get_name();
+    let vault_location = current_vault.get_location();
+    let current_location = current_vault.get_current_location();
+
+    let path = join_paths(vec![vault_location, vault_name, current_location, name]);
+    delete_folder(&path);
+    println!("folder {} deleted", name)
+}
+
 // pub fn move_dir() {}
 // pub fn movev_dir() {}
