@@ -3,7 +3,7 @@ use crate::config::Config;
 use crate::dir::{
     change_dir, create_dir, delete_dir, move_dir, movev_dir, print_dir_tree, rename_dir,
 };
-use crate::note::{create_note, delete_note, rename_note, move_note};
+use crate::note::{create_note, delete_note, rename_note, move_note, movev_note};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -109,13 +109,13 @@ impl App {
                 name,
                 vault_name,
             } => match item_type {
+                VaultItem::NTE => movev_note(name, vault_name, &self.config, self.current_vault.as_ref().unwrap()),
                 VaultItem::DIR => movev_dir(
                     name,
                     vault_name,
                     &self.config,
                     self.current_vault.as_ref().unwrap(),
-                ),
-                _ => self.display_app_data(),
+                )
             },
             _ => {
                 self.display_app_data();
