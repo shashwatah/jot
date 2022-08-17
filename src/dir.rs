@@ -3,7 +3,8 @@ use std::vec;
 
 use crate::config::Config;
 use crate::fs::{
-    collapse_path, create_folder, delete_folder, join_paths, move_item, path_exists, unix_path, rename_item,
+    collapse_path, create_folder, delete_folder, join_paths, move_item, path_exists, rename_item,
+    unix_path,
 };
 use crate::vault::Vault;
 use walkdir::WalkDir;
@@ -21,7 +22,7 @@ pub fn create_dir(name: &str, current_vault: &mut Vault) {
 
         println!("{} created", name)
     } else {
-        panic!("folder named {} already exists", name)        
+        panic!("folder named {} already exists", name)
     }
 }
 
@@ -66,10 +67,10 @@ pub fn rename_dir(name: &str, new_name: &str, current_vault: &Vault) {
         panic!("folder named {} already exists", new_name)
     }
 
-    if path_exists(&join_paths(vec![&path, name])){
+    if path_exists(&join_paths(vec![&path, name])) {
         rename_item(name, new_name, &path);
 
-        println!("folder {} renamed to {}", name, new_name)    
+        println!("folder {} renamed to {}", name, new_name)
     } else {
         panic!("folder doesn't exist");
     }
@@ -80,7 +81,7 @@ pub fn delete_dir(name: &str, current_vault: &Vault) {
 
     let path = join_paths(vec![vault_location, vault_name, current_location, name]);
 
-    if path_exists(&path) {    
+    if path_exists(&path) {
         delete_folder(&path);
         println!("folder {} deleted", name)
     } else {
@@ -102,8 +103,8 @@ pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
         if path_exists(&join_paths(vec![&new_path, name])) {
             panic!("folder named {} already exists at new path", name)
         }
-        
-        if path_exists(&new_path) == true && new_path.contains(&path) == true{
+
+        if path_exists(&new_path) == true && new_path.contains(&path) == true {
             move_item(name, &path, &new_path);
             println!("folder {} moved", name)
         } else {

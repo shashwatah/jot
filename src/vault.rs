@@ -1,7 +1,5 @@
 use crate::config::Config;
-use crate::fs::{
-    create_folder, delete_folder, join_paths, move_item, path_exists, rename_item,
-};
+use crate::fs::{create_folder, delete_folder, join_paths, move_item, path_exists, rename_item};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
