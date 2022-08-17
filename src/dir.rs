@@ -3,7 +3,7 @@ use std::vec;
 
 use crate::config::Config;
 use crate::fs::{
-    collapse_path, create_folder, delete_folder, join_paths, move_folder, path_exists, unix_path, rename_item,
+    collapse_path, create_folder, delete_folder, join_paths, move_item, path_exists, unix_path, rename_item,
 };
 use crate::vault::Vault;
 use walkdir::WalkDir;
@@ -100,7 +100,7 @@ pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
         }
         
         if path_exists(&new_path) == true{
-            move_folder(name, &path, &new_path);
+            move_item(name, &path, &new_path);
             println!("folder {} moved", name)
         } else {
             panic!("invalid path")
@@ -129,7 +129,7 @@ pub fn movev_dir(name: &str, vault: &str, config: &Config, current_vault: &Vault
             }
 
             if path_exists(&join_paths(vec![&path, name])) {
-                move_folder(name, &path, &new_path);
+                move_item(name, &path, &new_path);
                 println!("folder {} moved to {}", name, vault)
             } else {
                 panic!("folder doesn't exist")

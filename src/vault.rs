@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::fs::{
-    create_folder, delete_folder, join_paths, move_folder, path_exists, rename_item,
+    create_folder, delete_folder, join_paths, move_item, path_exists, rename_item,
 };
 use serde::{Deserialize, Serialize};
 
@@ -173,7 +173,7 @@ pub fn move_vault(name: &str, new_location: &str, config: &mut Config) {
     if let Some(original_location) = config.get_vault_location(name) {
         if path_exists(new_location) == true {
             if new_location != original_location {
-                move_folder(name, original_location, new_location);
+                move_item(name, original_location, new_location);
                 Vault::load(new_location, name).set_location(new_location);
                 config.update_vault_location(name.to_string(), new_location.to_string());
                 println!("vault {} moved", name);
