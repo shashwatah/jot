@@ -5,6 +5,7 @@ use std::collections::HashMap;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     editor: String,
+    editor_conflict: bool,
     current_vault: Option<String>,
     vaults: HashMap<String, String>,
 }
@@ -13,6 +14,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             editor: "nvim".to_string(),
+            editor_conflict: true,
             current_vault: None,
             vaults: HashMap::new(),
         }
@@ -24,6 +26,14 @@ impl Config {
     pub fn load() -> Self {
         let config: Config = confy::load("jot").unwrap();
         config
+    }
+
+    pub fn get_editor(&self) -> &str {
+        &self.editor
+    }
+
+    pub fn editor_conflict(&self) -> bool {
+        self.editor_conflict
     }
 
     pub fn get_current_vault(&self) -> Option<&String> {
