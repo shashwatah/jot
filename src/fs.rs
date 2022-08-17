@@ -1,5 +1,5 @@
 use fs_extra::{dir::CopyOptions, move_items};
-use std::fs::{remove_dir_all, rename, DirBuilder};
+use std::fs::{remove_dir_all, remove_file, rename, DirBuilder, File};
 use std::path::{Path, PathBuf};
 
 use path_slash::PathExt as _;
@@ -42,14 +42,22 @@ pub fn delete_folder(path: &str) {
     remove_dir_all(path).unwrap()
 }
 
-pub fn rename_folder(name: &str, new_name: &str, path: &str) {
-    let original_path = join_paths(vec![path, name]);
-    let new_path = join_paths(vec![path, new_name]);
-    rename(original_path, new_path).unwrap();
-}
-
 pub fn move_folder(name: &str, path: &str, new_path: &str) {
     // using crate: *fs_extra* here but i might implement a custom recursive move function later
     let original_path = vec![join_paths(vec![path, name])];
     move_items(&original_path, new_path, &CopyOptions::new()).unwrap();
+}
+
+pub fn create_file(path: &str) {
+    File::create(path).unwrap();
+}
+
+pub fn delete_file(path: &str) {
+    remove_file(path).unwrap();
+}
+
+pub fn rename_item(name: &str, new_name: &str, path: &str) {
+    let original_path = join_paths(vec![path, name]);
+    let new_path = join_paths(vec![path, new_name]);
+    rename(original_path, new_path).unwrap();
 }
