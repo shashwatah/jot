@@ -4,6 +4,7 @@ use crate::fs::{
     unix_path,
 };
 use crate::vault::Vault;
+use std::process::Command;
 
 fn create_note_path(location_data: (&str, &str, &str), name: &str) -> String {
     let (vault_name, vault_location, current_location) = location_data;
@@ -19,6 +20,25 @@ pub fn create_note(name: &str, current_vault: &Vault) {
         print!("note {} created", name)
     } else {
         panic!("note named {} aready exists", name)
+    }
+}
+
+pub fn open_note(name: &str, config: &Config, current_vault: &Vault) {
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+    let name = name.to_string() + ".md";
+    
+    let path = join_paths(vec![vault_location, vault_name, current_location, &name]);
+    
+    if path_exists(&path) == false {
+        panic!("note doesn't exist")
+    } 
+
+    let app = config.get_editor();
+
+    let mut cmd = Command::new(app).arg(path).spawn().unwrap();
+
+    if config.editor_conflict() == true {
+        cmd.wait().unwrap();     
     }
 }
 
