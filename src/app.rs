@@ -3,6 +3,7 @@ use crate::config::Config;
 use crate::dir::{
     change_dir, create_dir, delete_dir, move_dir, movev_dir, print_dir_tree, rename_dir,
 };
+use crate::note::{create_note, delete_note, rename_note};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -43,6 +44,12 @@ impl App {
 
     pub fn handle_args(&mut self) {
         match &self.args.command {
+            Command::NTE { name } => {
+                match name {
+                    Some(name_value) => create_note(name_value, self.current_vault.as_ref().unwrap()),
+                    None => self.display_app_data()
+                }
+            }
             Command::VLT { name, location } => {
                 // if name and path are some -> create vault with name and path
                 match name {
@@ -81,16 +88,12 @@ impl App {
             } => match item_type {
                 Item::VLT => rename_vault(name, new_name, &mut self.config),
                 Item::DIR => rename_dir(name, new_name, self.current_vault.as_ref().unwrap()),
-                _ => {
-                    self.display_app_data();
-                }
+                Item::NTE => rename_note(name, new_name, self.current_vault.as_ref().unwrap())
             },
             Command::DEL { item_type, name } => match item_type {
                 Item::VLT => delete_vault(name, &mut self.config),
                 Item::DIR => delete_dir(name, self.current_vault.as_ref().unwrap()),
-                _ => {
-                    self.display_app_data();
-                }
+                Item::NTE => delete_note(name, self.current_vault.as_ref().unwrap())
             },
             Command::MOV {
                 item_type,
