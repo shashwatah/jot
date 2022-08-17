@@ -3,16 +3,8 @@ use std::collections::HashMap;
 
 #[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize)]
-pub enum FileFormat {
-    Text,
-    Markdown,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     editor: String,
-    format: FileFormat,
     current_vault: Option<String>,
     vaults: HashMap<String, String>,
 }
@@ -21,9 +13,8 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             editor: "nvim".to_string(),
-            format: FileFormat::Markdown,
-            vaults: HashMap::new(),
             current_vault: None,
+            vaults: HashMap::new(),
         }
     }
 }
