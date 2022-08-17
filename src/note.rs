@@ -1,5 +1,5 @@
 use crate::vault::Vault;
-use crate::fs::{create_file, delete_file, join_paths, path_exists, rename_item};
+use crate::fs::{create_file, delete_file, join_paths, path_exists, rename_item, move_item};
 
 fn create_note_path(location_data: (&str, &str, &str), name: &str) -> String {
     let (vault_name, vault_location, current_location) = location_data;
@@ -31,6 +31,20 @@ pub fn rename_note(name: &str, new_name: &str, current_vault: &Vault) {
     println!("note {} renamed to {}", name, new_name)
 }
 
+pub fn move_note(name: &str, new_location: &str, current_vault: &Vault) {
+    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+
+    let path = join_paths(vec![vault_location, vault_name, current_location]);
+    let new_path = join_paths(vec![&path, new_location]);
+
+    if path_exists(&join_paths(vec![&new_path, name])) {
+        panic!("note named {} already exists at new path", name)
+    }
+
+    move_item(name, &path, &new_path);
+    print!("note {} moved", name)
+}
+
 pub fn delete_note(name: &str, current_vault: &Vault ) {
     let full_path = create_note_path(current_vault.get_location_data(), name);
     
@@ -42,5 +56,4 @@ pub fn delete_note(name: &str, current_vault: &Vault ) {
 
 
 // pub fn open_note() {}
-// pub fn move_note() {}
 // pub fn movev_note() {}

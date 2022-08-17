@@ -3,7 +3,7 @@ use crate::config::Config;
 use crate::dir::{
     change_dir, create_dir, delete_dir, move_dir, movev_dir, print_dir_tree, rename_dir,
 };
-use crate::note::{create_note, delete_note, rename_note};
+use crate::note::{create_note, delete_note, rename_note, move_note};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -87,13 +87,13 @@ impl App {
                 new_name,
             } => match item_type {
                 Item::VLT => rename_vault(name, new_name, &mut self.config),
-                Item::DIR => rename_dir(name, new_name, self.current_vault.as_ref().unwrap()),
-                Item::NTE => rename_note(name, new_name, self.current_vault.as_ref().unwrap())
+                Item::NTE => rename_note(name, new_name, self.current_vault.as_ref().unwrap()),
+                Item::DIR => rename_dir(name, new_name, self.current_vault.as_ref().unwrap())
             },
             Command::DEL { item_type, name } => match item_type {
                 Item::VLT => delete_vault(name, &mut self.config),
-                Item::DIR => delete_dir(name, self.current_vault.as_ref().unwrap()),
-                Item::NTE => delete_note(name, self.current_vault.as_ref().unwrap())
+                Item::NTE => delete_note(name, self.current_vault.as_ref().unwrap()),
+                Item::DIR => delete_dir(name, self.current_vault.as_ref().unwrap())
             },
             Command::MOV {
                 item_type,
@@ -101,10 +101,8 @@ impl App {
                 new_location,
             } => match item_type {
                 Item::VLT => move_vault(name, new_location, &mut self.config),
-                Item::DIR => move_dir(name, new_location, self.current_vault.as_ref().unwrap()),
-                _ => {
-                    self.display_app_data();
-                }
+                Item::NTE => move_note(name, new_location, self.current_vault.as_ref().unwrap()),
+                Item::DIR => move_dir(name, new_location, self.current_vault.as_ref().unwrap())
             },
             Command::MVV {
                 item_type,
