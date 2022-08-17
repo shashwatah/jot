@@ -25,18 +25,6 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 pub enum Command {
-    /// 📝 list and create notes.
-    #[clap(override_usage("jot nts\n    jot nts [note name]"))]
-    NTE {
-        /// name for new note (to be created in the current folder).
-        #[clap(value_parser, name = "note name")]
-        name: Option<String>,
-    },
-    /// 📖 open a note (from the current folder).
-    OPN {
-        #[clap(value_parser, name = "note name")]
-        name: String,
-    },
     /// 📁 list and create vaults.
     #[clap(override_usage("jot vlt\n    jot vlt <vault name> <vault location>"))]
     VLT {
@@ -51,6 +39,18 @@ pub enum Command {
     ENT {
         /// name of the vault to switch to.
         #[clap(value_parser, name = "vault name")]
+        name: String,
+    },
+    /// 📝 list and create notes.
+    #[clap(override_usage("jot nts\n    jot nts [note name]"))]
+    NTE {
+        /// name for new note (to be created in the current folder).
+        #[clap(value_parser, name = "note name")]
+        name: Option<String>,
+    },
+    /// 📖 open a note (from the current folder).
+    OPN {
+        #[clap(value_parser, name = "note name")]
         name: String,
     },
     /// 📂 create folders and display dir tree of the current vault.
