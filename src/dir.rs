@@ -3,8 +3,7 @@ use std::vec;
 
 use crate::config::Config;
 use crate::fs::{
-    collapse_path, create_folder, delete_folder, join_paths, move_folder, path_exists,
-    rename_folder, unix_path,
+    collapse_path, create_folder, delete_folder, join_paths, move_folder, path_exists, unix_path, rename_item,
 };
 use crate::vault::Vault;
 use walkdir::WalkDir;
@@ -68,7 +67,7 @@ pub fn rename_dir(name: &str, new_name: &str, current_vault: &Vault) {
     }
 
     if path_exists(&join_paths(vec![&path, name])){
-        rename_folder(name, new_name, &path);
+        rename_item(name, new_name, &path);
 
         println!("folder {} renamed to {}", name, new_name)    
     } else {
