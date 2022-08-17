@@ -92,14 +92,18 @@ pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
     let (vault_name, vault_location, current_location) = current_vault.get_location_data();
 
     let path = join_paths(vec![vault_location, vault_name, current_location]);
+    let path = unix_path(&path);
+
     let new_path = join_paths(vec![&path, new_location]);
+    let new_path = collapse_path(&new_path);
+    let new_path = unix_path(&new_path);
 
     if path_exists(&join_paths(vec![&path, name])) {
         if path_exists(&join_paths(vec![&new_path, name])) {
             panic!("folder named {} already exists at new path", name)
         }
         
-        if path_exists(&new_path) == true{
+        if path_exists(&new_path) == true && new_path.contains(&path) == true{
             move_item(name, &path, &new_path);
             println!("folder {} moved", name)
         } else {
