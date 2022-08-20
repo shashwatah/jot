@@ -8,12 +8,12 @@ pub fn path_exists(path: &str) -> bool {
     Path::new(path).exists()
 }
 
-pub fn join_paths(paths: Vec<&str>) -> String {
+pub fn join_paths(paths: Vec<&str>) -> &str {
     let mut full_path = PathBuf::new();
     for path in paths {
         full_path.push(path);
     }
-    full_path.to_str().unwrap().to_string()
+    full_path.to_str().unwrap()
 }
 
 pub fn collapse_path(path: &str) -> String {

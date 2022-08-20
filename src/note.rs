@@ -6,7 +6,7 @@ use crate::fs::{
 use crate::vault::Vault;
 use std::process::Command;
 
-fn create_note_path(location_data: (&str, &str, &str), name: &str) -> String {
+fn create_note_path(location_data: (&str, &str, &str), name: &str) -> &str {
     let (vault_name, vault_location, current_location) = location_data;
     join_paths(vec![vault_location, vault_name, current_location, name])
 }
@@ -26,19 +26,19 @@ pub fn create_note(name: &str, current_vault: &Vault) {
 pub fn open_note(name: &str, config: &Config, current_vault: &Vault) {
     let (vault_name, vault_location, current_location) = current_vault.get_location_data();
     let name = name.to_string() + ".md";
-    
+
     let path = join_paths(vec![vault_location, vault_name, current_location, &name]);
-    
+
     if path_exists(&path) == false {
         panic!("note doesn't exist")
-    } 
+    }
 
     let app = config.get_editor();
 
     let mut cmd = Command::new(app).arg(path).spawn().unwrap();
 
     if config.editor_conflict() == true {
-        cmd.wait().unwrap();     
+        cmd.wait().unwrap();
     }
 }
 
@@ -89,7 +89,7 @@ pub fn move_note(name: &str, new_location: &str, current_vault: &Vault) {
 
 pub fn movev_note(name: &str, new_vault: &str, config: &Config, current_vault: &Vault) {
     let name = name.to_string() + ".md";
-    
+
     if let Some(new_vault_location) = config.get_vault_location(new_vault) {
         let (current_vault_name, current_vault_location, current_location) =
             current_vault.get_location_data();
