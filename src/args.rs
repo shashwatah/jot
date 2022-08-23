@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{AppSettings, Parser, Subcommand, ValueEnum};
 
 #[derive(Parser, Debug)]
@@ -33,7 +35,7 @@ pub enum Command {
         name: Option<String>,
         /// fs path to location of new vault.
         #[clap(value_parser, name = "vault location")]
-        location: Option<String>,
+        location: Option<PathBuf>,
     },
     /// 🚪 enter/switch to a vault.
     ENT {
@@ -64,7 +66,7 @@ pub enum Command {
     CDR {
         /// path to location of folder to switch to (with current folder as root).
         #[clap(value_parser, name = "folder location")]
-        location: String,
+        location: PathBuf,
     },
     /// 🗒️ list and open notes from current vault's history.
     #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
@@ -120,7 +122,7 @@ pub enum Command {
         name: String,
         /// path to new location of item (current location as root in case of note or folder).
         #[clap(value_parser, name = "new location")]
-        new_location: String,
+        new_location: PathBuf,
     },
     /// 🗄️ move notes and folders from current vault to a different vault.
     MVV {
