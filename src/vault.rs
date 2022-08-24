@@ -94,8 +94,10 @@ pub fn create_vault(name: &String, location: &PathBuf, config: &mut Config) {
     let path = join_paths(vec![location.to_str().unwrap(), name]);
     create_folder(&path);
 
-    Vault::load(name, location);
-    config.add_vault(name.to_owned(), process_path(location));
+    let location = process_path(location);
+
+    Vault::load(name, &location);
+    config.add_vault(name.to_owned(), location);
 
     println!("vault {} created", name)
 }
@@ -174,8 +176,11 @@ pub fn move_vault(name: &String, new_location: &PathBuf, config: &mut Config) {
         }
 
         move_item(name, original_location, new_location);
-        Vault::load(name, new_location).set_location(new_location.to_owned());
-        config.set_vault_location(name, process_path(new_location));
+
+        let new_location = process_path(new_location);
+
+        Vault::load(name, &new_location).set_location(new_location.clone());
+        config.set_vault_location(name, new_location);
 
         println!("vault {} moved", name);
     } else {
