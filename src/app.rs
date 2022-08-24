@@ -6,21 +6,21 @@ use clap::Parser;
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct App {
+    args: Args,
     config: Config,
     vault: Option<Vault>,
-    args: Args,
 }
 
 impl App {
     pub fn new() -> Self {
         App {
+            args: Args::parse(),
             config: Config::load(),
             vault: None,
-            args: Args::parse(),
         }
     }
 
-    pub fn load_current_vault(&mut self) {
+    pub fn load_vault(&mut self) {
         self.vault = if let Some(vault_name) = self.config.get_current_vault() {
             let vault_location = self.config.get_vault_location(vault_name).unwrap();
             Some(Vault::load(vault_name, vault_location))
