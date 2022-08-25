@@ -65,8 +65,8 @@ pub enum Command {
     /// 🔀 switch folders within current vault.
     CDR {
         /// path to location of folder to switch to (with current folder as root).
-        #[clap(value_parser, name = "folder location")]
-        location: PathBuf,
+        #[clap(value_parser, name = "folder path")]
+        path: PathBuf,
     },
     /// 🗒️ list and open notes from current vault's history.
     #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]

@@ -88,7 +88,7 @@ pub fn create_vault(name: &String, location: &PathBuf, config: &mut Config) {
     }
 
     if config.vault_exists(name) {
-        panic!("vault with this name already exists")
+        panic!("vault named {} already exists", name)
     }
 
     let path = join_paths(vec![location.to_str().unwrap(), name]);
@@ -99,17 +99,17 @@ pub fn create_vault(name: &String, location: &PathBuf, config: &mut Config) {
     Vault::load(name, &location);
     config.add_vault(name.to_owned(), location);
 
-    println!("vault {} created", name)
+    print!("vault {} created", name)
 }
 
 pub fn enter_vault(name: &String, config: &mut Config) {
     if !config.vault_exists(name) {
-        panic!("vault doesn't exist")
+        panic!("vault named {} doesn't exist", name)
     }
 
     if let Some(current_vault) = config.get_current_vault() {
         if name == current_vault {
-            return println!("already in {}", name);
+            return print!("already in {}", name);
         }
     }
 
@@ -122,12 +122,12 @@ pub fn rename_vault(name: &String, new_name: &String, config: &mut Config) {
         panic!("not a valid name")
     }
 
-    if name == new_name {
-        panic!("new name can't be same as old name")
+    if new_name == name {
+        panic!("vault is already named {}", name)
     }
 
     if config.vault_exists(new_name) {
-        panic!("a vault with the same name already exists")
+        panic!("vaule named {} already exists", name)
     }
 
     if let Some(location) = config.get_vault_location(name) {
@@ -141,9 +141,9 @@ pub fn rename_vault(name: &String, new_name: &String, config: &mut Config) {
             }
         }
 
-        println!("vault {} renamed to {}", name, new_name)
+        print!("vault {} renamed to {}", name, new_name)
     } else {
-        panic!("vault doesn't exist")
+        panic!("vault {} doesn't exist", name)
     }
 }
 
@@ -159,20 +159,20 @@ pub fn delete_vault(name: &String, config: &mut Config) {
             }
         }
 
-        println!("{} deleted", name)
+        print!("vault {} deleted", name)
     } else {
-        panic!("vault doesn't exist")
+        panic!("vault {} doesn't exist", name)
     }
 }
 
 pub fn move_vault(name: &String, new_location: &PathBuf, config: &mut Config) {
     if let Some(original_location) = config.get_vault_location(name) {
         if new_location == original_location {
-            panic!("new location can't be same as original location")
+            panic!("vault {} already exists in this location", name)
         }
 
         if join_paths(vec![new_location.to_str().unwrap(), name]).exists() {
-            panic!("a folder with the same name already exists in new loction")
+            panic!("a folder named {} already exists in this location", name)
         }
 
         move_item(name, original_location, new_location);
@@ -182,8 +182,8 @@ pub fn move_vault(name: &String, new_location: &PathBuf, config: &mut Config) {
         Vault::load(name, &new_location).set_location(new_location.clone());
         config.set_vault_location(name, new_location);
 
-        println!("vault {} moved", name);
+        print!("vault {} moved", name);
     } else {
-        panic!("vault doesn't exist");
+        panic!("vault {} doesn't exist", name);
     }
 }
