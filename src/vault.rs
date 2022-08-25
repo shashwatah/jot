@@ -32,7 +32,7 @@ impl Vault {
         let mut vault: Vault = confy::load_path(data_path).unwrap();
 
         // if name or location = None = new data file -> set name and location
-        if let None = vault.name {
+        if vault.name.is_none() {
             vault.name = Some(name.to_owned());
             vault.location = Some(location.to_owned());
             vault.store()

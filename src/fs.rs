@@ -16,7 +16,7 @@ pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
 
 // returns new pathbuf -> with slashes formatted according to os & '..'s collapsed
 // use this when storing or displaying paths
-pub fn process_path(path: &PathBuf) -> PathBuf {
+pub fn process_path(path: &Path) -> PathBuf {
     let mut processed_path = PathBuf::new();
 
     for element in path.iter() {
@@ -46,13 +46,13 @@ pub fn delete_file(path: &PathBuf) {
     remove_file(path).unwrap();
 }
 
-pub fn rename_item(name: &str, new_name: &str, location: &PathBuf) {
+pub fn rename_item(name: &str, new_name: &str, location: &Path) {
     let original_path = join_paths(vec![location.to_str().unwrap(), name]);
     let new_path = join_paths(vec![location.to_str().unwrap(), new_name]);
     rename(original_path, new_path).unwrap();
 }
 
-pub fn move_item(name: &str, original_location: &PathBuf, new_location: &PathBuf) {
+pub fn move_item(name: &str, original_location: &Path, new_location: &Path) {
     // using crate: *fs_extra* here but i might implement a custom recursive move function later
     let original_path = vec![join_paths(vec![original_location.to_str().unwrap(), name])];
     move_items(&original_path, new_location, &CopyOptions::new()).unwrap();

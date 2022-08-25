@@ -16,7 +16,7 @@ pub fn create_dir(name: &String, current_vault: &mut Vault) {
         panic!("not a valid name")
     }
 
-    let location = generate_location(&current_vault);
+    let location = generate_location(current_vault);
     let path = join_paths(vec![location, PathBuf::from(name)]);
 
     create_folder(&path);
@@ -51,7 +51,7 @@ pub fn change_dir(path: &PathBuf, current_vault: &mut Vault) {
     }
 
     let mut dest_folder = full_path.replace(vault_path, "");
-    if dest_folder.starts_with(r"\") || dest_folder.starts_with("/") {
+    if dest_folder.starts_with('\\') || dest_folder.starts_with('/') {
         dest_folder = dest_folder[1..].to_string();
     }
     let dest_folder = PathBuf::from(dest_folder);
