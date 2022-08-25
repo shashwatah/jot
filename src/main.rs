@@ -3,6 +3,7 @@ mod args;
 mod config;
 mod dir;
 mod fs;
+mod helpers;
 mod note;
 mod vault;
 

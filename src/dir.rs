@@ -2,14 +2,10 @@ use crate::config::Config;
 use crate::fs::{
     create_folder, delete_folder, join_paths, move_item, process_path, rename_item, valid_name,
 };
+use crate::helpers::generate_location;
 use crate::vault::Vault;
 use std::path::PathBuf;
 use walkdir::WalkDir;
-
-fn generate_location(vault: &Vault) -> PathBuf {
-    let (vault_name, vault_location, folder) = vault.get_path_data();
-    join_paths(vec![vault_location, &PathBuf::from(vault_name), folder])
-}
 
 pub fn create_dir(name: &String, current_vault: &mut Vault) {
     if !valid_name(name) {
