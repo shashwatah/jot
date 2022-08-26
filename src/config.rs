@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 #[allow(dead_code)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -7,7 +7,7 @@ pub struct Config {
     editor: String,
     editor_conflict: bool,
     current_vault: Option<String>,
-    vaults: HashMap<String, String>,
+    vaults: HashMap<String, PathBuf>,
 }
 
 impl Default for Config {
@@ -43,46 +43,45 @@ impl Config {
         }
     }
 
-    pub fn get_vaults(&self) -> &HashMap<String, String> {
+    pub fn get_vaults(&self) -> &HashMap<String, PathBuf> {
         &self.vaults
-    }
-
-    pub fn get_vault_location(&self, name: &str) -> Option<&String> {
-        self.vaults.get(name)
     }
 
     pub fn vault_exists(&self, name: &str) -> bool {
         self.vaults.contains_key(name)
     }
 
-    pub fn update_current_vault(&mut self, vault: Option<String>) {
-        self.current_vault = vault;
-        self.update_config_file();
+    pub fn get_vault_location(&self, name: &str) -> Option<&PathBuf> {
+        self.vaults.get(name)
     }
 
-    pub fn add_vault(&mut self, name: String, location: String) {
+    pub fn set_current_vault(&mut self, vault: Option<String>) {
+        self.current_vault = vault;
+        self.store()
+    }
+
+    pub fn add_vault(&mut self, name: String, location: PathBuf) {
         self.vaults.insert(name, location);
-        self.update_config_file();
+        self.store()
     }
 
     pub fn delete_vault(&mut self, name: &str) {
         self.vaults.remove(name);
-        self.update_config_file();
+        self.store()
     }
 
     pub fn rename_vault(&mut self, name: &str, new_name: String) {
         let value = self.vaults.remove(name);
         self.vaults.insert(new_name, value.unwrap());
-        self.update_config_file();
+        self.store()
     }
 
-    pub fn update_vault_location(&mut self, name: String, new_location: String) {
-        self.vaults
-            .insert(name.to_string(), new_location.to_string());
-        self.update_config_file();
+    pub fn set_vault_location(&mut self, name: &String, new_location: PathBuf) {
+        self.vaults.insert(name.to_owned(), new_location);
+        self.store()
     }
 
-    fn update_config_file(&self) {
+    fn store(&self) {
         confy::store("jot", self).unwrap();
     }
 }

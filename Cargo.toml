@@ -9,6 +9,5 @@ clap = { version = "3.2.15", features = ["derive"] }
 confy = "0.4.0"
 dialoguer = "0.10.1"
 fs_extra = "1.2.0"
-path-slash = "0.2.1"
 serde = { version = "1.0.142", features = ["derive"] }
 walkdir = "2.3.2"

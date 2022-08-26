@@ -1,148 +1,145 @@
-use core::panic;
-use std::vec;
-
 use crate::config::Config;
 use crate::fs::{
-    collapse_path, create_folder, delete_folder, join_paths, move_item, path_exists, rename_item,
-    unix_path,
+    create_folder, delete_folder, join_paths, move_item, process_path, rename_item, valid_name,
 };
+use crate::helpers::generate_location;
 use crate::vault::Vault;
+use std::path::PathBuf;
 use walkdir::WalkDir;
 
-// these fns assume that the paths generated are valid (folders haven't been tampered with externally)
-// if file/folder not found error is thrown then jot fix (will be added later) can be used
+pub fn create_dir(name: &String, current_vault: &mut Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
+    }
 
-pub fn create_dir(name: &str, current_vault: &mut Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+    let location = generate_location(current_vault);
+    let path = join_paths(vec![location, PathBuf::from(name)]);
 
-    let full_path = join_paths(vec![vault_location, vault_name, current_location, name]);
+    create_folder(&path);
+    print!("folder {} created", name);
+}
 
-    if path_exists(&full_path) == false {
-        create_folder(&full_path);
+pub fn dir_tree(current_vault: &Vault) {
+    let location = generate_location(current_vault);
 
-        println!("{} created", name)
-    } else {
-        panic!("folder named {} already exists", name)
+    for entry in WalkDir::new(location).into_iter().filter_map(|e| e.ok()) {
+        println!("{}", entry.path().display());
     }
 }
 
-pub fn print_dir_tree(current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+pub fn change_dir(path: &PathBuf, current_vault: &mut Vault) {
+    let (vault_name, vault_location, folder) = current_vault.get_path_data();
 
-    let full_path = join_paths(vec![vault_location, vault_name, current_location]);
+    let vault_path = join_paths(vec![vault_location.to_str().unwrap(), vault_name]);
 
-    for entry in WalkDir::new(&full_path).into_iter().filter_map(|e| e.ok()) {
-        println!("{}", unix_path(&entry.path().to_str().unwrap().to_string()));
+    let full_path = join_paths(vec![&vault_path, folder, path]);
+    let full_path = process_path(&full_path);
+
+    if !full_path.exists() {
+        panic!("path doesn't exist")
     }
+
+    let vault_path = vault_path.to_str().unwrap();
+    let full_path = full_path.to_str().unwrap();
+
+    if !full_path.contains(vault_path) {
+        panic!("path crosses the bounds of vault")
+    }
+
+    let mut dest_folder = full_path.replace(vault_path, "");
+    if dest_folder.starts_with('\\') || dest_folder.starts_with('/') {
+        dest_folder = dest_folder[1..].to_string();
+    }
+    let dest_folder = PathBuf::from(dest_folder);
+
+    current_vault.set_folder(dest_folder);
+    print!("changed folder");
 }
 
-pub fn change_dir(location: &str, current_vault: &mut Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
+pub fn rename_dir(name: &String, new_name: &String, current_vault: &Vault) {
+    if !valid_name(name) || !valid_name(new_name) {
+        panic!("not a valid name")
+    }
 
-    let vault_path = join_paths(vec![vault_location, vault_name]);
-    let vault_path = unix_path(&vault_path);
+    if new_name == name {
+        panic!("folder is already named {}", name)
+    }
 
-    let full_path = join_paths(vec![&vault_path, current_location, location]);
-    let full_path = collapse_path(&full_path);
-    let full_path = unix_path(&full_path);
+    let location = generate_location(current_vault);
 
-    if path_exists(&full_path) & full_path.contains(&vault_path) {
-        let mut new_location = full_path.replace(&vault_path, "");
-        if new_location.starts_with("/") {
-            new_location = new_location[1..].to_string();
+    rename_item(name, new_name, &location);
+    print!("folder {} renamed to {}", name, new_name)
+}
+
+pub fn delete_dir(name: &String, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
+    }
+
+    let location = generate_location(current_vault);
+    let path = join_paths(vec![location, PathBuf::from(name)]);
+
+    delete_folder(&path);
+    print!("folder {} deleted", name);
+}
+
+pub fn move_dir(name: &String, new_location: &PathBuf, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
+    }
+
+    let vault_path = join_paths(vec![
+        current_vault.get_location().to_str().unwrap(),
+        current_vault.get_name(),
+    ]);
+    let location = join_paths(vec![&vault_path, current_vault.get_folder()]);
+
+    let new_location = join_paths(vec![&location, new_location]);
+    let new_location = process_path(&new_location);
+
+    if new_location == location {
+        panic!("folder {} already exists in this location", name)
+    }
+
+    if join_paths(vec![&new_location, &PathBuf::from(name)]).exists() {
+        panic!("folder named {} already exists in this location", name);
+    }
+
+    if !new_location
+        .to_str()
+        .unwrap()
+        .contains(vault_path.to_str().unwrap())
+    {
+        panic!("location crosses the bounds of vault")
+    }
+
+    move_item(name, &location, &new_location);
+    print!("folder {} moved", name)
+}
+
+pub fn movev_dir(name: &String, vault_name: &String, config: &Config, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
+    }
+
+    if vault_name == current_vault.get_name() {
+        panic!(
+            "folder {} already exists in vault {}, use mov instead",
+            name, vault_name
+        )
+    }
+
+    if let Some(vault_location) = config.get_vault_location(vault_name) {
+        let location = generate_location(current_vault);
+        let new_location = join_paths(vec![vault_location.to_str().unwrap(), vault_name]);
+
+        if join_paths(vec![&new_location, &PathBuf::from(name)]).exists() {
+            panic!("folder named {} already exists in vault", name)
         }
-        current_vault.update_current_location(&new_location);
-        println!("changed dir");
+
+        move_item(name, &location, &new_location);
+        print!("folder {} moved to vault {}", name, vault_name)
     } else {
-        panic!("invalid path")
-    }
-}
-
-pub fn rename_dir(name: &str, new_name: &str, current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
-
-    let path = join_paths(vec![vault_location, vault_name, current_location]);
-
-    if path_exists(&join_paths(vec![&path, new_name])) {
-        panic!("folder named {} already exists", new_name)
-    }
-
-    if path_exists(&join_paths(vec![&path, name])) {
-        rename_item(name, new_name, &path);
-
-        println!("folder {} renamed to {}", name, new_name)
-    } else {
-        panic!("folder doesn't exist");
-    }
-}
-
-pub fn delete_dir(name: &str, current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
-
-    let path = join_paths(vec![vault_location, vault_name, current_location, name]);
-
-    if path_exists(&path) {
-        delete_folder(&path);
-        println!("folder {} deleted", name)
-    } else {
-        panic!("folder doesn't exist");
-    }
-}
-
-pub fn move_dir(name: &str, new_location: &str, current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
-
-    let path = join_paths(vec![vault_location, vault_name, current_location]);
-    let path = unix_path(&path);
-
-    let new_path = join_paths(vec![&path, new_location]);
-    let new_path = collapse_path(&new_path);
-    let new_path = unix_path(&new_path);
-
-    if path_exists(&join_paths(vec![&path, name])) {
-        if path_exists(&join_paths(vec![&new_path, name])) {
-            panic!("folder named {} already exists at new path", name)
-        }
-
-        if path_exists(&new_path) == true && new_path.contains(&path) == true {
-            move_item(name, &path, &new_path);
-            println!("folder {} moved", name)
-        } else {
-            panic!("invalid path")
-        }
-    } else {
-        panic!("folder doesn't exist")
-    }
-}
-
-pub fn movev_dir(name: &str, vault: &str, config: &Config, current_vault: &Vault) {
-    if vault != current_vault.get_name() {
-        if let Some(new_vault_location) = config.get_vault_location(vault) {
-            let (current_vault_name, current_vault_location, current_location) =
-                current_vault.get_location_data();
-
-            let path = join_paths(vec![
-                current_vault_location,
-                current_vault_name,
-                current_location,
-            ]);
-
-            let new_path = join_paths(vec![new_vault_location, vault]);
-
-            if path_exists(&join_paths(vec![&new_path, name])) {
-                panic!("folder named {} already exists in {}", name, vault)
-            }
-
-            if path_exists(&join_paths(vec![&path, name])) {
-                move_item(name, &path, &new_path);
-                println!("folder {} moved to {}", name, vault)
-            } else {
-                panic!("folder doesn't exist")
-            }
-        } else {
-            panic!("vault doesn't exist")
-        }
-    } else {
-        panic!("new vault can't be the same as old one")
+        panic!("vault doesn't exist")
     }
 }
