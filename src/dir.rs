@@ -57,7 +57,7 @@ pub fn change_dir(path: &PathBuf, current_vault: &mut Vault) {
 }
 
 pub fn rename_dir(name: &String, new_name: &String, current_vault: &Vault) {
-    if !valid_name(new_name) {
+    if !valid_name(name) || !valid_name(new_name) {
         panic!("not a valid name")
     }
 
@@ -88,7 +88,11 @@ pub fn move_dir(name: &String, new_location: &PathBuf, current_vault: &Vault) {
         panic!("not a valid name")
     }
 
-    let location = generate_location(current_vault);
+    let vault_path = join_paths(vec![
+        current_vault.get_location().to_str().unwrap(),
+        current_vault.get_name(),
+    ]);
+    let location = join_paths(vec![&vault_path, current_vault.get_folder()]);
 
     let new_location = join_paths(vec![&location, new_location]);
     let new_location = process_path(&new_location);
@@ -104,7 +108,7 @@ pub fn move_dir(name: &String, new_location: &PathBuf, current_vault: &Vault) {
     if !new_location
         .to_str()
         .unwrap()
-        .contains(location.to_str().unwrap())
+        .contains(vault_path.to_str().unwrap())
     {
         panic!("location crosses the bounds of vault")
     }
