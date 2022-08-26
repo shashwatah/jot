@@ -1,129 +1,159 @@
-use crate::config::Config;
-use crate::fs::{
-    collapse_path, create_file, delete_file, join_paths, move_item, path_exists, rename_item,
-    unix_path,
+use crate::{
+    config::Config,
+    fs::{delete_file, join_paths, move_item, process_path, rename_item},
+    helpers::generate_location,
 };
-use crate::vault::Vault;
-use std::process::Command;
+use core::panic;
+use std::{path::PathBuf, process::Command};
 
-fn create_note_path(location_data: (&str, &str, &str), name: &str) -> &str {
-    let (vault_name, vault_location, current_location) = location_data;
-    join_paths(vec![vault_location, vault_name, current_location, name])
-}
+use crate::{
+    fs::{create_file, valid_name},
+    vault::Vault,
+};
 
-pub fn create_note(name: &str, current_vault: &Vault) {
-    let name = name.to_string() + ".md";
-    let full_path = create_note_path(current_vault.get_location_data(), &name);
-
-    if path_exists(&full_path) == false {
-        create_file(&full_path);
-        print!("note {} created", name)
-    } else {
-        panic!("note named {} aready exists", name)
+pub fn create_note(name: &String, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
     }
+
+    let mut name_ext = PathBuf::from(name);
+    name_ext.set_extension("md");
+
+    let location = generate_location(current_vault);
+    let path = join_paths(vec![&location, &name_ext]);
+
+    if path.exists() {
+        panic!("note named {} already exists", name);
+    }
+
+    create_file(&path);
+    print!("note {} created", name);
 }
 
-pub fn open_note(name: &str, config: &Config, current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
-    let name = name.to_string() + ".md";
+// this needs to be improved
+pub fn open_note(name: &String, config: &Config, current_vault: &Vault) {
+    let location = generate_location(current_vault);
 
-    let path = join_paths(vec![vault_location, vault_name, current_location, &name]);
+    let mut name = PathBuf::from(name);
+    name.set_extension("md");
 
-    if path_exists(&path) == false {
+    let path = join_paths(vec![&location, &name]);
+
+    if !path.exists() {
         panic!("note doesn't exist")
     }
 
     let app = config.get_editor();
 
-    let mut cmd = Command::new(app).arg(path).spawn().unwrap();
+    let mut cmd = Command::new(app)
+        .arg(path.to_str().unwrap())
+        .spawn()
+        .unwrap();
 
     if config.editor_conflict() == true {
         cmd.wait().unwrap();
     }
 }
 
-pub fn rename_note(name: &str, new_name: &str, current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
-
-    let name = name.to_string() + ".md";
-    let new_name = new_name.to_string() + ".md";
-
-    if name == new_name {
-        panic!("new name can't be same as old name")
+pub fn rename_note(name: &String, new_name: &String, current_vault: &Vault) {
+    if !valid_name(name) || !valid_name(new_name) {
+        panic!("not a valid name")
     }
 
-    let path = join_paths(vec![vault_location, vault_name, current_location]);
+    if new_name == name {
+        panic!("note is already named {}", name)
+    }
 
-    if path_exists(&join_paths(vec![&path, &new_name])) == true {
+    let location = generate_location(current_vault);
+
+    let name_ext = name.to_owned() + ".md";
+    let new_name_ext = new_name.to_owned() + ".md";
+
+    if join_paths(vec![location.to_str().unwrap(), &new_name_ext]).exists() {
         panic!("note named {} already exists", new_name)
     }
 
-    rename_item(&name, &new_name, &path);
-
-    println!("note {} renamed to {}", name, new_name)
+    rename_item(&name_ext, &new_name_ext, &location);
+    print!("note {} renamed to {}", name, new_name)
 }
 
-pub fn move_note(name: &str, new_location: &str, current_vault: &Vault) {
-    let (vault_name, vault_location, current_location) = current_vault.get_location_data();
-
-    let name = name.to_string() + ".md";
-
-    let path = join_paths(vec![vault_location, vault_name, current_location]);
-    let path = unix_path(&path);
-
-    let new_path = join_paths(vec![&path, new_location]);
-    let new_path = collapse_path(&new_path);
-    let new_path = unix_path(&new_path);
-
-    if path_exists(&join_paths(vec![&new_path, &name])) {
-        panic!("note named {} already exists at new path", name)
+pub fn delete_note(name: &String, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
     }
 
-    if new_path.contains(&path) == false {
-        panic!("invalid path")
+    let mut name_ext = PathBuf::from(name);
+    name_ext.set_extension("md");
+
+    let location = generate_location(current_vault);
+    let path = join_paths(vec![&location, &name_ext]);
+
+    delete_file(&path);
+    print!("note {} deleted", name)
+}
+
+pub fn move_note(name: &String, new_location: &PathBuf, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
     }
 
-    move_item(&name, &path, &new_path);
+    let name_ext = name.to_owned() + ".md";
+
+    let vault_path = join_paths(vec![
+        current_vault.get_location().to_str().unwrap(),
+        current_vault.get_name(),
+    ]);
+    let location = join_paths(vec![&vault_path, current_vault.get_folder()]);
+
+    let new_location = join_paths(vec![&location, new_location]);
+    let new_location = process_path(&new_location);
+
+    if new_location == location {
+        panic!("note {} already exists in this location", name)
+    }
+
+    if join_paths(vec![&new_location, &PathBuf::from(&name_ext)]).exists() {
+        panic!("note named {} already exists in this location", name);
+    }
+
+    if !new_location
+        .to_str()
+        .unwrap()
+        .contains(vault_path.to_str().unwrap())
+    {
+        panic!("location crosses the bounds of vault")
+    }
+
+    move_item(&name_ext, &location, &new_location);
     print!("note {} moved", name)
 }
 
-pub fn movev_note(name: &str, new_vault: &str, config: &Config, current_vault: &Vault) {
-    let name = name.to_string() + ".md";
-
-    if let Some(new_vault_location) = config.get_vault_location(new_vault) {
-        let (current_vault_name, current_vault_location, current_location) =
-            current_vault.get_location_data();
-
-        if current_vault_name == new_vault {
-            panic!("new vault can't be the same as old vault");
-        }
-
-        let new_path = join_paths(vec![new_vault_location, new_vault]);
-
-        // this will be bypassed if the user enters a path instead of name for a note
-        if path_exists(&join_paths(vec![&new_path, &name])) == true {
-            panic!("note named {} already exists in vault {}", name, new_vault)
-        }
-
-        let original_path = join_paths(vec![
-            current_vault_location,
-            current_vault_name,
-            current_location,
-        ]);
-
-        move_item(&name, &original_path, &new_path);
-        print!("note {} moved to {}", name, new_vault)
-    } else {
-        panic!("vault {} doesn't exist", new_vault)
+pub fn movev_note(name: &String, vault_name: &str, config: &Config, current_vault: &Vault) {
+    if !valid_name(name) {
+        panic!("not a valid name")
     }
-}
 
-pub fn delete_note(name: &str, current_vault: &Vault) {
-    let name = name.to_string() + ".md";
+    if vault_name == current_vault.get_name() {
+        panic!(
+            "note {} already exists in vault {}, use mov instead",
+            name, vault_name
+        )
+    }
 
-    let full_path = create_note_path(current_vault.get_location_data(), &name);
+    let mut name_ext = PathBuf::from(&name);
+    name_ext.set_extension("md");
 
-    delete_file(&full_path);
+    if let Some(vault_location) = config.get_vault_location(vault_name) {
+        let location = generate_location(current_vault);
+        let new_location = join_paths(vec![vault_location.to_str().unwrap(), vault_name]);
 
-    print!("note {} deleted", name)
+        if join_paths(vec![&new_location, &name_ext]).exists() {
+            panic!("note named {} already exists in vault", name)
+        }
+
+        move_item(name_ext.to_str().unwrap(), &location, &new_location);
+        print!("note {} moved to vault {}", name, vault_name)
+    } else {
+        panic!("vault doesn't exist")
+    }
 }

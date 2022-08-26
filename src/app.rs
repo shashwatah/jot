@@ -1,6 +1,7 @@
 use crate::args::{Args, Command, Item, VaultItem};
 use crate::config::Config;
 use crate::dir::{change_dir, create_dir, delete_dir, dir_tree, move_dir, movev_dir, rename_dir};
+use crate::note::{create_note, delete_note, move_note, movev_note, open_note, rename_note};
 use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
 use clap::Parser;
 
@@ -36,13 +37,14 @@ impl App {
 
     pub fn handle_args(&mut self) {
         match &self.args.command {
-            // Command::NTE { name } => match name {
-            //     Some(name_value) => create_note(name_value, self.current_vault.as_ref().unwrap()),
-            //     None => self.display_app_data(),
-            // },
-            // Command::OPN { name } => {
-            //     open_note(name, &self.config, self.current_vault.as_ref().unwrap())
-            // }
+            Command::NTE { name } => {
+                if let Some(name) = name {
+                    create_note(name, self.vault.as_ref().unwrap())
+                } else {
+                    self.display_app_data()
+                }
+            }
+            Command::OPN { name } => open_note(name, &self.config, self.vault.as_ref().unwrap()),
             Command::VLT { name, location } => {
                 // name is some (i.e. location is also some) => create_vault
                 if let Some(name) = name {
@@ -51,9 +53,9 @@ impl App {
                     // list vaults fn
                     println!("vaults: {:#?}", self.config.get_vaults().keys());
                     if let Some(vault) = self.config.get_current_vault() {
-                        println!("current vault: {}", vault)
+                        print!("current vault: {}", vault)
                     } else {
-                        panic!("not inside a vault")
+                        print!("not inside a vault")
                     }
                 }
             }
@@ -76,15 +78,13 @@ impl App {
                 new_name,
             } => match item_type {
                 Item::VLT => rename_vault(name, new_name, &mut self.config),
-                // Item::NTE => rename_note(name, new_name, self.current_vault.as_ref().unwrap()),
+                Item::NTE => rename_note(name, new_name, self.vault.as_ref().unwrap()),
                 Item::DIR => rename_dir(name, new_name, self.vault.as_ref().unwrap()),
-                _ => self.display_app_data(),
             },
             Command::DEL { item_type, name } => match item_type {
                 Item::VLT => delete_vault(name, &mut self.config),
-                // Item::NTE => delete_note(name, self.current_vault.as_ref().unwrap()),
+                Item::NTE => delete_note(name, self.vault.as_ref().unwrap()),
                 Item::DIR => delete_dir(name, self.vault.as_ref().unwrap()),
-                _ => self.display_app_data(),
             },
             Command::MOV {
                 item_type,
@@ -92,25 +92,20 @@ impl App {
                 new_location,
             } => match item_type {
                 Item::VLT => move_vault(name, new_location, &mut self.config),
-                // Item::NTE => move_note(name, new_location, self.current_vault.as_ref().unwrap()),
+                Item::NTE => move_note(name, new_location, self.vault.as_ref().unwrap()),
                 Item::DIR => move_dir(name, new_location, self.vault.as_ref().unwrap()),
-                _ => self.display_app_data(),
             },
             Command::MVV {
                 item_type,
                 name,
                 vault_name,
             } => match item_type {
-                // VaultItem::NTE => movev_note(
-                //     name,
-                //     vault_name,
-                //     &self.config,
-                //     self.current_vault.as_ref().unwrap(),
-                // ),
+                VaultItem::NTE => {
+                    movev_note(name, vault_name, &self.config, self.vault.as_ref().unwrap())
+                }
                 VaultItem::DIR => {
                     movev_dir(name, vault_name, &self.config, self.vault.as_ref().unwrap())
                 }
-                _ => self.display_app_data(),
             },
             _ => {
                 self.display_app_data();
