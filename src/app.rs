@@ -37,15 +37,15 @@ impl App {
 
     pub fn handle_args(&mut self) {
         match &self.args.command {
-            Command::NTE { name } => {
+            Command::Nt { name } => {
                 if let Some(name) = name {
                     create_note(name, self.vault.as_ref().unwrap())
                 } else {
                     self.display_app_data()
                 }
             }
-            Command::OPN { name } => open_note(name, &self.config, self.vault.as_ref().unwrap()),
-            Command::VLT { name, location } => {
+            Command::Op { name } => open_note(name, &self.config, self.vault.as_ref().unwrap()),
+            Command::Vl { name, location } => {
                 // name is some (i.e. location is also some) => create_vault
                 if let Some(name) = name {
                     create_vault(name, location.as_ref().unwrap(), &mut self.config)
@@ -59,51 +59,48 @@ impl App {
                     }
                 }
             }
-            Command::ENT { name } => enter_vault(name, &mut self.config),
-            Command::DIR { name } => {
+            Command::En { name } => enter_vault(name, &mut self.config),
+            Command::Dr { name } => {
                 if let Some(vault) = &mut self.vault {
-                    if let Some(name) = name {
-                        create_dir(name, vault)
-                    } else {
-                        dir_tree(vault)
-                    }
+                    create_dir(name, vault)
                 } else {
                     panic!("not inside a vault")
                 }
             }
-            Command::CDR { path } => change_dir(path, self.vault.as_mut().unwrap()),
-            Command::REN {
+            Command::Cd { path } => change_dir(path, self.vault.as_mut().unwrap()),
+            Command::Ls => dir_tree(self.vault.as_ref().unwrap()),
+            Command::Rn {
                 item_type,
                 name,
                 new_name,
             } => match item_type {
-                Item::VLT => rename_vault(name, new_name, &mut self.config),
-                Item::NTE => rename_note(name, new_name, self.vault.as_ref().unwrap()),
-                Item::DIR => rename_dir(name, new_name, self.vault.as_ref().unwrap()),
+                Item::Vt => rename_vault(name, new_name, &mut self.config),
+                Item::Nt => rename_note(name, new_name, self.vault.as_ref().unwrap()),
+                Item::Dr => rename_dir(name, new_name, self.vault.as_ref().unwrap()),
             },
-            Command::DEL { item_type, name } => match item_type {
-                Item::VLT => delete_vault(name, &mut self.config),
-                Item::NTE => delete_note(name, self.vault.as_ref().unwrap()),
-                Item::DIR => delete_dir(name, self.vault.as_ref().unwrap()),
+            Command::Dl { item_type, name } => match item_type {
+                Item::Vt => delete_vault(name, &mut self.config),
+                Item::Nt => delete_note(name, self.vault.as_ref().unwrap()),
+                Item::Dr => delete_dir(name, self.vault.as_ref().unwrap()),
             },
-            Command::MOV {
+            Command::Mv {
                 item_type,
                 name,
                 new_location,
             } => match item_type {
-                Item::VLT => move_vault(name, new_location, &mut self.config),
-                Item::NTE => move_note(name, new_location, self.vault.as_ref().unwrap()),
-                Item::DIR => move_dir(name, new_location, self.vault.as_ref().unwrap()),
+                Item::Vt => move_vault(name, new_location, &mut self.config),
+                Item::Nt => move_note(name, new_location, self.vault.as_ref().unwrap()),
+                Item::Dr => move_dir(name, new_location, self.vault.as_ref().unwrap()),
             },
-            Command::MVV {
+            Command::Vm {
                 item_type,
                 name,
                 vault_name,
             } => match item_type {
-                VaultItem::NTE => {
+                VaultItem::Nt => {
                     movev_note(name, vault_name, &self.config, self.vault.as_ref().unwrap())
                 }
-                VaultItem::DIR => {
+                VaultItem::Dr => {
                     movev_dir(name, vault_name, &self.config, self.vault.as_ref().unwrap())
                 }
             },

@@ -114,7 +114,7 @@ pub fn enter_vault(name: &String, config: &mut Config) {
     }
 
     config.set_current_vault(Some(name.to_owned()));
-    println!("switched to {}", name)
+    print!("switched to {}", name)
 }
 
 pub fn rename_vault(name: &String, new_name: &String, config: &mut Config) {

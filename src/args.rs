@@ -29,7 +29,7 @@ pub struct Args {
 pub enum Command {
     /// 📁 list and create vaults.
     #[clap(override_usage("jot vlt\n    jot vlt <vault name> <vault location>"))]
-    VLT {
+    Vl {
         /// name for new vault.
         #[clap(value_parser, name = "vault name", requires = "vault location")]
         name: Option<String>,
@@ -38,43 +38,45 @@ pub enum Command {
         location: Option<PathBuf>,
     },
     /// 🚪 enter/switch to a vault.
-    ENT {
+    En {
         /// name of the vault to switch to.
         #[clap(value_parser, name = "vault name")]
         name: String,
     },
     /// 📝 list and create notes.
     #[clap(override_usage("jot nts\n    jot nts [note name]"))]
-    NTE {
+    Nt {
         /// name for new note (to be created in the current folder).
         #[clap(value_parser, name = "note name")]
         name: Option<String>,
     },
     /// 📖 open a note (from the current folder).
-    OPN {
+    Op {
         #[clap(value_parser, name = "note name")]
         name: String,
     },
-    /// 📂 create folders and display dir tree of the current vault.
+    /// 📂 create folder
     #[clap(override_usage("jot dir\n    jot dir [folder name]"))]
-    DIR {
+    Dr {
         /// name for new folder (to be created in the current folder).
         #[clap(value_parser, name = "folder name")]
-        name: Option<String>,
+        name: String,
     },
     /// 🔀 switch folders within current vault.
-    CDR {
+    Cd {
         /// path to location of folder to switch to (with current folder as root).
         #[clap(value_parser, name = "folder path")]
         path: PathBuf,
     },
+    /// List dir tree of current location 
+    Ls,
     /// 🗒️ list and open notes from current vault's history.
     #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
-    HST,
+    Hs,
     /// ⏮️ open last accessed note in the current vault.
-    LST,
+    Lt,
     /// 🔍 find folders and notes in the current vault.
-    FND {
+    Fn {
         /// find notes (nte) or folders (dir).
         #[clap(value_enum, value_parser, name = "query type")]
         query_type: VaultItem,
@@ -84,7 +86,7 @@ pub enum Command {
     },
     /// 📒 list, create and delete memos/quick notes (independent of current vault).
     #[clap(override_usage("jot mem\n    jot mem [content]\n    jot mem <SUBCOMMAND>"))]
-    MEM {
+    Qn {
         /// content for new memo.
         #[clap(value_parser, name = "content")]
         content: Option<String>,
@@ -92,7 +94,7 @@ pub enum Command {
         subcommand: Option<MemSubCommand>,
     },
     /// 🔁 rename a note/vault/folder.
-    REN {
+    Rn {
         /// rename a vault (vlt) | note (nte) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
         item_type: Item,
@@ -104,7 +106,7 @@ pub enum Command {
         new_name: String,
     },
     /// 🚮 delete a note/vault/folder.
-    DEL {
+    Dl {
         /// delete a note (nte) | vault (vlt) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
         item_type: Item,
@@ -113,7 +115,7 @@ pub enum Command {
         name: String,
     },
     /// 🗃️ move a note/vault/folder.
-    MOV {
+    Mv {
         /// move a note (nte) | vault (vlt) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
         item_type: Item,
@@ -125,7 +127,7 @@ pub enum Command {
         new_location: PathBuf,
     },
     /// 🗄️ move notes and folders from current vault to a different vault.
-    MVV {
+    Vm {
         /// move a note (nte) | folder (dir).
         #[clap(value_enum, value_parser, name = "item type")]
         item_type: VaultItem,
@@ -142,21 +144,21 @@ pub enum Command {
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum Item {
-    VLT,
-    NTE,
-    DIR,
+    Vt,
+    Nt,
+    Dr,
 }
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum VaultItem {
-    NTE,
-    DIR,
+    Nt,
+    Dr,
 }
 
 #[derive(Subcommand, Debug)]
 pub enum HstSubCommand {
     /// 📖 open a note from history.
-    OPN,
+    Op,
     /// 🆘 show this help message or help for given command.
     Help,
 }
@@ -165,7 +167,7 @@ pub enum HstSubCommand {
 #[clap(args_conflicts_with_subcommands = true)]
 pub enum MemSubCommand {
     /// 🚮 choose which memo to delete.
-    DEL,
+    Dl,
     /// 🆘 show this help message or help for given command.
     Help,
 }
