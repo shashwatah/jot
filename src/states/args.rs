@@ -43,19 +43,19 @@ pub enum Command {
         #[clap(value_parser, name = "vault name")]
         name: String,
     },
-    /// 📝 list and create notes.
+    /// 📝 create notes.
     #[clap(override_usage("jot nts\n    jot nts [note name]"))]
     Nt {
         /// name for new note (to be created in the current folder).
         #[clap(value_parser, name = "note name")]
-        name: Option<String>,
+        name: String,
     },
     /// 📖 open a note (from the current folder).
     Op {
         #[clap(value_parser, name = "note name")]
         name: String,
     },
-    /// 📂 create folder
+    /// 📂 create folders.
     #[clap(override_usage("jot dir\n    jot dir [folder name]"))]
     Dr {
         /// name for new folder (to be created in the current folder).
@@ -68,7 +68,7 @@ pub enum Command {
         #[clap(value_parser, name = "folder path")]
         path: PathBuf,
     },
-    /// List dir tree of current location 
+    /// 📃 List dir tree of current location
     Ls,
     /// 🗒️ list and open notes from current vault's history.
     #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]

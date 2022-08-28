@@ -1,9 +1,8 @@
-use crate::config::Config;
 use crate::fs::{
     create_folder, delete_folder, join_paths, move_item, process_path, rename_item, valid_name,
 };
 use crate::helpers::generate_location;
-use crate::vault::Vault;
+use crate::states::{config::Config, vault::Vault};
 use std::path::PathBuf;
 use walkdir::WalkDir;
 

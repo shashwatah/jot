@@ -1,8 +1,8 @@
-use crate::args::{Args, Command, Item, VaultItem};
-use crate::config::Config;
 use crate::dir::{change_dir, create_dir, delete_dir, dir_tree, move_dir, movev_dir, rename_dir};
 use crate::note::{create_note, delete_note, move_note, movev_note, open_note, rename_note};
-use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault, Vault};
+use crate::states::args::{Args, Command, Item, VaultItem};
+use crate::states::{config::Config, vault::Vault};
+use crate::vault::{create_vault, delete_vault, enter_vault, move_vault, rename_vault};
 use clap::Parser;
 
 #[allow(dead_code)]
@@ -37,13 +37,7 @@ impl App {
 
     pub fn handle_args(&mut self) {
         match &self.args.command {
-            Command::Nt { name } => {
-                if let Some(name) = name {
-                    create_note(name, self.vault.as_ref().unwrap())
-                } else {
-                    self.display_app_data()
-                }
-            }
+            Command::Nt { name } => create_note(name, self.vault.as_ref().unwrap()),
             Command::Op { name } => open_note(name, &self.config, self.vault.as_ref().unwrap()),
             Command::Vl { name, location } => {
                 // name is some (i.e. location is also some) => create_vault

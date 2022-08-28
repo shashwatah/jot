@@ -1,15 +1,10 @@
-use crate::{
-    config::Config,
-    fs::{delete_file, join_paths, move_item, process_path, rename_item},
-    helpers::generate_location,
+use crate::fs::{
+    create_file, delete_file, join_paths, move_item, process_path, rename_item, valid_name,
 };
-use core::panic;
+use crate::helpers::generate_location;
+use crate::states::config::Config;
+use crate::states::vault::Vault;
 use std::{path::PathBuf, process::Command};
-
-use crate::{
-    fs::{create_file, valid_name},
-    vault::Vault,
-};
 
 pub fn create_note(name: &String, current_vault: &Vault) {
     if !valid_name(name) {

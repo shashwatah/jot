@@ -1,4 +1,5 @@
-use crate::{fs::join_paths, vault::Vault};
+use crate::fs::join_paths;
+use crate::states::vault::Vault;
 use std::path::PathBuf;
 
 pub fn generate_location(vault: &Vault) -> PathBuf {
