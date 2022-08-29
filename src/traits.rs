@@ -5,11 +5,15 @@ use std::fmt::Debug;
 use serde::{Serialize, de::DeserializeOwned};
 
 pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
-    fn path() -> PathBuf;
+    fn path(&self) -> PathBuf;
 
     fn load() -> Self {
-        let path = <Self as FileIO>::path();
+        let path = <Self as FileIO>::path(&Self::default());
      
+        <Self as FileIO>::load_path(path)   
+    } 
+
+    fn load_path(path: PathBuf) -> Self {
         match read_to_string(&path) {
             Ok(file_string) => {
                 if let Ok(file_data) = toml::from_str::<Self>(&file_string) {
@@ -24,10 +28,10 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
             },
             Err(_) => panic!("couldn't load file")
         }
-    } 
-    
+    }
+
     fn store(&self) {
-        let path = <Self as FileIO>::path();
+        let path = <Self as FileIO>::path(self);
 
         let mut file = File::options().write(true).truncate(true).open(path).unwrap();
 
@@ -47,7 +51,6 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
     }
 
     fn write(file: &mut File, data: &Self) {
-        print!("{:#?}", data);
         let data_string = toml::to_string_pretty(&data).unwrap();
 
         file.write_all(data_string.as_bytes()).unwrap();
