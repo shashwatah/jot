@@ -1,17 +1,17 @@
 use crate::traits::FileIO;
-use std::path::PathBuf;
-use serde::{Serialize, Deserialize};
 use directories::ProjectDirs;
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    editor: String
+    editor: String,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
-            editor: "nvim".to_string()
+            editor: "nvim".to_string(),
         }
     }
 }
@@ -24,12 +24,12 @@ impl FileIO for Config {
             path
         } else {
             panic!("config path couldn't be generated")
-        }       
+        }
     }
 }
 
 impl Config {
-    pub fn get_editor(&self) -> &String{
+    pub fn get_editor(&self) -> &String {
         &self.editor
     }
 

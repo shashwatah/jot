@@ -1,13 +1,13 @@
-use crate::traits::FileIO;
+use crate::{traits::FileIO, utils::join_paths};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
     name: Option<String>,
     location: Option<PathBuf>,
-    folder: PathBuf, 
-    history: Vec<(String, PathBuf)>
+    folder: PathBuf,
+    history: Vec<(String, PathBuf)>,
 }
 
 impl Default for Vault {
@@ -16,18 +16,18 @@ impl Default for Vault {
             name: None,
             location: None,
             folder: PathBuf::new(),
-            history: vec![]
+            history: vec![],
         }
     }
 }
 
 impl FileIO for Vault {
     fn path(&self) -> PathBuf {
-        let mut path = PathBuf::new();
-        path.push(self.get_location());
-        path.push(self.get_name());
-        path.push(".jot/data");
-        path
+        join_paths(vec![
+            self.get_location().to_str().unwrap(),
+            self.get_name(),
+            ".jot/data",
+        ])
     }
 }
 

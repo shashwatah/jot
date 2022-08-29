@@ -1,19 +1,19 @@
 use crate::traits::FileIO;
-use std::{collections::HashMap, path::PathBuf};
-use serde::{Serialize, Deserialize};
 use directories::ProjectDirs;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Data {
     current_vault: Option<String>,
-    vaults: HashMap<String, PathBuf>
+    vaults: HashMap<String, PathBuf>,
 }
 
 impl Default for Data {
     fn default() -> Self {
         Data {
-            current_vault: None, 
-            vaults: HashMap::new()
+            current_vault: None,
+            vaults: HashMap::new(),
         }
     }
 }
@@ -71,5 +71,5 @@ impl Data {
     pub fn set_vault_location(&mut self, name: &String, new_location: PathBuf) {
         self.vaults.insert(name.to_owned(), new_location);
         self.store()
-    }   
+    }
 }

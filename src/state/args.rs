@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use clap::{AppSettings, Parser, Subcommand, ValueEnum};
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[clap(global_setting(AppSettings::HidePossibleValuesInHelp))]
