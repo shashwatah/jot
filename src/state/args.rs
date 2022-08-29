@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-
 use clap::{AppSettings, Parser, Subcommand, ValueEnum};
 
 #[derive(Parser, Debug)]
@@ -144,7 +143,7 @@ pub enum Command {
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum Item {
-    Vt,
+    Vl,
     Nt,
     Dr,
 }

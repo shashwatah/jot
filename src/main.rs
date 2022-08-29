@@ -1,15 +1,10 @@
 mod app;
-mod dir;
-mod fs;
-mod helpers;
-mod note;
-mod states;
-mod vault;
+mod state;
+mod traits;
+mod utils;
 
-use app::App;
+use crate::app::App;
 
 fn main() {
-    let mut app: App = App::new();
-    app.load_vault();
-    app.handle_args()
+    let mut app = App::new();
 }
