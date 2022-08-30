@@ -39,6 +39,8 @@ impl Vaults {
         }
     }
 
+    pub fn list(&self) {}
+
     pub fn ref_current(&self) -> &CurrentVault {
         self.current.as_ref().expect("not inside a vault")
     }
@@ -48,21 +50,20 @@ impl Vaults {
             panic!("vault {} already exists", name)
         }
 
-        let path = create_item(Item::Vl, name, location);
-
+        let location = process_path(location);
+        let path = create_item(Item::Vl, name, &location);
         let data_path = join_paths(vec![path.to_str().unwrap(), ".jot/data"]); 
 
         let mut vault = Vault::load_path(data_path);
         vault.set_name(name.to_owned());
-        vault.set_location(process_path(location));
+        vault.set_location(process_path(&location));
         vault.store();
 
-        self.data.add_vault(name.to_owned(), location.to_owned());
+        self.data.add_vault(name.to_owned(), location);
 
         print!("vault {} created", name)
     }
 
-    pub fn list(&self) {}
     
     fn remove_vault(&self) {}
     fn rename_vault(&self) {}

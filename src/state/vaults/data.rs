@@ -5,14 +5,14 @@ use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Data {
-    current_vault: Option<String>,
+    current: Option<String>,
     vaults: HashMap<String, PathBuf>,
 }
 
 impl Default for Data {
     fn default() -> Self {
         Data {
-            current_vault: None,
+            current: None,
             vaults: HashMap::new(),
         }
     }
@@ -32,11 +32,11 @@ impl FileIO for Data {
 
 impl Data {
     pub fn get_current_vault(&self) -> Option<&String> {
-        self.current_vault.as_ref()
+        self.current.as_ref()
     }
 
     pub fn set_current_vault(&mut self, vault: Option<String>) {
-        self.current_vault = vault;
+        self.current = vault;
         self.store()
     }
 
