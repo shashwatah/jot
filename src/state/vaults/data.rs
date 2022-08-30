@@ -22,7 +22,7 @@ impl FileIO for Data {
     fn path(&self) -> PathBuf {
         if let Some(dirs) = ProjectDirs::from("com", "", "jot") {
             let mut path = dirs.data_dir().to_path_buf();
-            path.push("data");
+            path.push("vaults");
             path
         } else {
             panic!("current path couldn't be generated")

@@ -1,4 +1,5 @@
-use clap::{AppSettings, Parser, Subcommand, ValueEnum};
+use crate::types::{Item, VaultItem};
+use clap::{AppSettings, Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -139,19 +140,6 @@ pub enum Command {
     },
     /// 🆘 show this help message or help for given command.
     Help,
-}
-
-#[derive(ValueEnum, Clone, Debug)]
-pub enum Item {
-    Vl,
-    Nt,
-    Dr,
-}
-
-#[derive(ValueEnum, Clone, Debug)]
-pub enum VaultItem {
-    Nt,
-    Dr,
 }
 
 #[derive(Subcommand, Debug)]
