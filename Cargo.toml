@@ -5,11 +5,9 @@ edition = "2021"
 authors = ["araekiel"]
 
 [dependencies]
-clap = { version = "3.2.15", features = ["derive"] }
-confy = "0.4.0"
-dialoguer = "0.10.1"
-directories = "4.0.1"
-fs_extra = "1.2.0"
 serde = { version = "1.0.142", features = ["derive"] }
 toml = "0.5.9"
+clap = { version = "3.2.15", features = ["derive"] }
+directories = "4.0.1"
+fs_extra = "1.2.0"
 walkdir = "2.3.2"
