@@ -25,7 +25,7 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
                 }
             }
             Err(ref err) if err.kind() == ErrorKind::NotFound => {
-                let data = <Self as FileIO>::create(path);
+                let data = <Self as FileIO>::create_file(path);
                 return data;
             }
             Err(_) => panic!("couldn't load file"),
@@ -41,22 +41,22 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
             .open(path)
             .unwrap();
 
-        <Self as FileIO>::write(&mut file, self)
+        <Self as FileIO>::write_file(&mut file, self)
     }
 
-    fn create(path: PathBuf) -> Self {
+    fn create_file(path: PathBuf) -> Self {
         create_dir_all(&path.parent().unwrap()).unwrap();
 
         let mut file = File::options().create(true).write(true).open(path).unwrap();
 
         let data = Self::default();
 
-        <Self as FileIO>::write(&mut file, &data);
+        <Self as FileIO>::write_file(&mut file, &data);
 
         data
     }
 
-    fn write(file: &mut File, data: &Self) {
+    fn write_file(file: &mut File, data: &Self) {
         let data_string = toml::to_string_pretty(&data).unwrap();
 
         file.write_all(data_string.as_bytes()).unwrap();
