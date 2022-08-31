@@ -1,6 +1,7 @@
 use crate::types::Item;
+use fs_extra::{dir::CopyOptions, move_items};
+use std::fs::{remove_dir_all, remove_file, rename, DirBuilder, File};
 use std::path::{Path, PathBuf};
-use std::fs::{DirBuilder, File};
 
 fn valid_name(name: &str) -> bool {
     name.chars().all(|char| !r#"\/?%*:|"<>"#.contains(char))
@@ -31,7 +32,67 @@ pub fn process_path(path: &Path) -> PathBuf {
 }
 
 // creates item(folders(dr & vl) and md files) and returns path to created item
-pub fn create_item(item_type: Item, name: &str, location: &PathBuf) -> PathBuf{
+// might rename this later
+pub fn create_item(item_type: Item, name: &str, location: &PathBuf) -> PathBuf {
+    let path = generate_item_path(&item_type, name, location);
+
+    if let Item::Nt = item_type {
+        File::options()
+            .create_new(true)
+            .write(true)
+            .open(&path)
+            .unwrap();
+    } else {
+        DirBuilder::new().create(&path).unwrap();
+    }
+
+    path
+}
+
+pub fn remove_item(item_type: Item, name: &str, location: &PathBuf) {
+    let path = generate_item_path(&item_type, name, location);
+
+    if let Item::Nt = item_type {
+        remove_file(path).unwrap();
+    } else {
+        remove_dir_all(path).unwrap();
+    }
+}
+
+pub fn rename_item(item_type: Item, name: &str, new_name: &str, location: &PathBuf) -> PathBuf {
+    if new_name == name {
+        panic!("new name can't be same as old name")
+    }
+
+    let original_path = generate_item_path(&item_type, name, location);
+    let new_path = generate_item_path(&item_type, new_name, location);
+
+    rename(original_path, &new_path).unwrap();
+    new_path
+}
+
+pub fn move_item(
+    item_type: Item,
+    name: &str,
+    original_location: &PathBuf,
+    new_location: &PathBuf,
+) -> PathBuf {
+    if new_location == original_location {
+        panic!("new location can't be same as original location")
+    }
+
+    let new_path = generate_item_path(&item_type, name, new_location);
+    if new_path.exists() {
+        panic!("{} already exists in new location", name)
+    }
+
+    let original_path = vec![generate_item_path(&item_type, name, original_location)];
+    move_items(&original_path, &new_location, &CopyOptions::new()).unwrap();
+
+    new_path
+}
+
+fn generate_item_path(item_type: &Item, name: &str, location: &PathBuf) -> PathBuf {
     if !valid_name(name) {
         panic!("not a valid name")
     }
@@ -40,9 +101,6 @@ pub fn create_item(item_type: Item, name: &str, location: &PathBuf) -> PathBuf{
 
     if let Item::Nt = item_type {
         path.set_extension("md");
-        File::create(&path).unwrap();
-    } else {
-        DirBuilder::new().create(&path).unwrap();
     }
 
     path
