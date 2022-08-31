@@ -44,7 +44,7 @@ impl Vaults {
         }
     }
 
-    pub fn list(&self) {}
+    pub fn list_vaults(&self) {}
 
     pub fn ref_current(&self) -> &CurrentVault {
         self.current.as_ref().expect("not inside a vault")
@@ -72,6 +72,7 @@ impl Vaults {
     pub fn remove_vault(&mut self, name: &String) {
         if let Some(vault_location) = self.data.get_vault_location(name) {
             remove_item(Item::Vl, name, vault_location);
+            self.data.remove_vault(name);
 
             if let Some(current_vault_name) = self.data.get_current_vault() {
                 if name == current_vault_name {
