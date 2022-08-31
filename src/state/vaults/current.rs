@@ -3,7 +3,7 @@ use crate::{
     types::VaultItem,
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
-use std::path::PathBuf;
+use std::{path::PathBuf, process::Command};
 use walkdir::WalkDir;
 
 impl CurrentVault {
@@ -37,18 +37,16 @@ impl CurrentVault {
     }
 
     pub fn move_vault_item(&self, item_type: VaultItem, name: &String, new_location: &PathBuf) {
-        let original_location = self.generate_location();
+        let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
+        let original_location = join_paths(vec![&vault_path, self.get_folder()]);
 
         let new_location = join_paths(vec![&original_location, new_location]);
         let new_location = process_path(&new_location);
 
-        let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
-        if !new_location
-            .to_str()
-            .unwrap()
-            .contains(vault_path.to_str().unwrap())
-        {
-            panic!("location crosses the bounds of vault")
+        let vault_path = vault_path.to_str().unwrap();
+
+        if !new_location.to_str().unwrap().contains(vault_path) {
+            panic!("path crosses the bounds of vault")
         }
 
         move_item(item_type.to_item(), name, &original_location, &new_location);
@@ -83,6 +81,53 @@ impl CurrentVault {
             name,
             vault_name
         )
+    }
+
+    pub fn open_note(&self, name: &String, editor_data: (&String, bool)) {
+        let location = self.generate_location();
+        let mut path = join_paths(vec![location.to_str().unwrap(), name]);
+        path.set_extension("md");
+
+        if !path.exists() {
+            panic!("note {} doesn't exist", name)
+        }
+
+        let (editor, conflict) = editor_data;
+
+        let mut cmd = Command::new(editor)
+            .arg(path.to_str().unwrap())
+            .spawn()
+            .unwrap();
+
+        if conflict {
+            cmd.wait().unwrap();
+        }
+    }
+
+    pub fn change_folder(&mut self, path: &PathBuf) {
+        let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
+        let new_location = join_paths(vec![&vault_path, self.get_folder(), path]);
+
+        if !new_location.exists() {
+            panic!("path doesn't exist")
+        }
+
+        let new_location = process_path(&new_location);
+        let new_location = new_location.to_str().unwrap();
+        let vault_path = vault_path.to_str().unwrap();
+
+        if !new_location.contains(vault_path) {
+            panic!("path crosses the bounds of vault")
+        }
+
+        let mut destination_folder = new_location.replace(vault_path, "");
+        if destination_folder.starts_with(r"\") || destination_folder.starts_with("/") {
+            destination_folder = destination_folder[1..].to_string();
+        }
+        let destination_folder = PathBuf::from(destination_folder);
+
+        self.set_folder(destination_folder);
+        print!("changed folder");
     }
 
     fn generate_location(&self) -> PathBuf {

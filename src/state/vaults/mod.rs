@@ -44,10 +44,24 @@ impl Vaults {
         }
     }
 
-    pub fn list_vaults(&self) {}
+    pub fn list_vaults(&self) {
+        let current_vault_name = self.data.get_current_vault();
+
+        for vault_name in self.data.get_vaults().keys() {
+            if current_vault_name.is_some() && vault_name == current_vault_name.unwrap() {
+                println!("👉 {}", vault_name)
+            } else {
+                println!("   {}", vault_name)
+            }
+        }
+    }
 
     pub fn ref_current(&self) -> &CurrentVault {
         self.current.as_ref().expect("not inside a vault")
+    }
+
+    pub fn mut_current(&mut self) -> &mut CurrentVault {
+        self.current.as_mut().expect("not inside a vault")
     }
 
     pub fn create_vault(&mut self, name: &String, location: &PathBuf) {
@@ -132,5 +146,20 @@ impl Vaults {
         } else {
             panic!("vault {} doesn't exist", vault_name)
         }
+    }
+
+    pub fn enter_vault(&mut self, name: &String) {
+        if !self.data.vault_exists(name) {
+            panic!("vault {} doesn't exist", name)
+        }
+
+        if let Some(current_vault_name) = self.data.get_current_vault() {
+            if name == current_vault_name {
+                return print!("already in {}", name);
+            }
+        }
+
+        self.data.set_current_vault(Some(name.to_owned()));
+        print!("entered {}", name)
     }
 }
