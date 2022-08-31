@@ -6,12 +6,14 @@ use std::path::PathBuf;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     editor: String,
+    conflict: bool,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
             editor: "nvim".to_string(),
+            conflict: true,
         }
     }
 }
@@ -29,12 +31,7 @@ impl FileIO for Config {
 }
 
 impl Config {
-    pub fn get_editor(&self) -> &String {
-        &self.editor
-    }
-
-    pub fn set_editor(&mut self, editor: String) {
-        self.editor = editor;
-        self.store()
+    pub fn get_editor_data(&self) -> (&String, bool) {
+        (&self.editor, self.conflict)
     }
 }
