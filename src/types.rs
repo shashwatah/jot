@@ -1,15 +1,25 @@
 // temporary parking for these types
 
 use crate::{traits::FileIO, utils::join_paths};
+use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use clap::ValueEnum;
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum Item {
     Vl,
     Nt,
     Dr,
+}
+
+impl Item {
+    pub fn to_vault_item(&self) -> VaultItem {
+        match self {
+            Item::Vl => panic!("invalid variant"),
+            Item::Dr => VaultItem::Dr,
+            Item::Nt => VaultItem::Nt,
+        }
+    }
 }
 
 #[derive(ValueEnum, Clone, Debug)]
