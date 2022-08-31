@@ -15,9 +15,17 @@ pub enum Item {
 impl Item {
     pub fn to_vault_item(&self) -> VaultItem {
         match self {
-            Item::Vl => panic!("invalid variant"),
-            Item::Dr => VaultItem::Dr,
+            Item::Vl => VaultItem::Dr,
             Item::Nt => VaultItem::Nt,
+            Item::Dr => VaultItem::Dr,
+        }
+    }
+
+    pub fn full(&self) -> &str {
+        match self {
+            Item::Vl => "vault",
+            Item::Nt => "note",
+            Item::Dr => "folder",
         }
     }
 }
@@ -26,6 +34,22 @@ impl Item {
 pub enum VaultItem {
     Nt,
     Dr,
+}
+
+impl VaultItem {
+    pub fn to_item(&self) -> Item {
+        match self {
+            VaultItem::Nt => Item::Nt,
+            VaultItem::Dr => Item::Dr,
+        }
+    }
+
+    pub fn full(&self) -> &str {
+        match self {
+            VaultItem::Nt => "note",
+            VaultItem::Dr => "folder",
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

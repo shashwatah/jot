@@ -78,12 +78,20 @@ pub fn move_item(
     new_location: &PathBuf,
 ) -> PathBuf {
     if new_location == original_location {
-        panic!("new location can't be same as original location")
+        panic!(
+            "{} {} already exists in this location",
+            item_type.full(),
+            name
+        )
     }
 
     let new_path = generate_item_path(&item_type, name, new_location);
     if new_path.exists() {
-        panic!("{} already exists in new location", name)
+        panic!(
+            "a {} named {} already exists in new location",
+            item_type.to_vault_item().full(),
+            name
+        )
     }
 
     let original_path = vec![generate_item_path(&item_type, name, original_location)];

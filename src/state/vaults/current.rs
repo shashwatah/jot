@@ -1,6 +1,6 @@
 pub use crate::types::Vault as CurrentVault;
 use crate::{
-    types::{Item, VaultItem},
+    types::VaultItem,
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
 use std::path::PathBuf;
@@ -11,28 +11,28 @@ impl CurrentVault {
     }
 
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
-        let (location, item_type, item_type_full) = self.parse_item_data(&item_type);
+        let location = self.generate_location();
 
-        create_item(item_type, name, &location);
-        print!("{} {} created", item_type_full, name)
+        create_item(item_type.to_item(), name, &location);
+        print!("{} {} created", item_type.full(), name)
     }
 
     pub fn remove_vault_item(&self, item_type: VaultItem, name: &String) {
-        let (location, item_type, item_type_full) = self.parse_item_data(&item_type);
+        let location = self.generate_location();
 
-        remove_item(item_type, name, &location);
-        print!("{} {} removed", item_type_full, name)
+        remove_item(item_type.to_item(), name, &location);
+        print!("{} {} removed", item_type.full(), name)
     }
 
     pub fn rename_vault_item(&self, item_type: VaultItem, name: &String, new_name: &String) {
-        let (location, item_type, item_type_full) = self.parse_item_data(&item_type);
+        let location = self.generate_location();
 
-        rename_item(item_type, name, new_name, &location);
-        print!("{} {} renamed to {}", item_type_full, name, new_name)
+        rename_item(item_type.to_item(), name, new_name, &location);
+        print!("{} {} renamed to {}", item_type.full(), name, new_name)
     }
 
     pub fn move_vault_item(&self, item_type: VaultItem, name: &String, new_location: &PathBuf) {
-        let (original_location, item_type, item_type_full) = self.parse_item_data(&item_type);
+        let original_location = self.generate_location();
 
         let new_location = join_paths(vec![&original_location, new_location]);
         let new_location = process_path(&new_location);
@@ -46,9 +46,9 @@ impl CurrentVault {
             panic!("location crosses the bounds of vault")
         }
 
-        move_item(item_type, name, &original_location, &new_location);
+        move_item(item_type.to_item(), name, &original_location, &new_location);
 
-        print!("{} {} moved", item_type_full, name)
+        print!("{} {} moved", item_type.full(), name)
     }
 
     pub fn vmove_vault_item(
@@ -58,34 +58,34 @@ impl CurrentVault {
         vault_name: &String,
         vault_location: &PathBuf,
     ) {
-        let (original_location, item_type, item_type_full) = self.parse_item_data(item_type);
+        let original_location = self.generate_location();
 
         if vault_name == self.get_name() {
             panic!(
                 "{} {} already exists in vault {}",
-                item_type_full, name, vault_name
+                item_type.full(),
+                name,
+                vault_name
             )
         }
 
         let new_location = join_paths(vec![vault_location.to_str().unwrap(), vault_name]);
-        move_item(item_type, name, &original_location, &new_location);
+        move_item(item_type.to_item(), name, &original_location, &new_location);
 
-        print!("{} {} moved to vault {}", item_type_full, name, vault_name)
+        print!(
+            "{} {} moved to vault {}",
+            item_type.full(),
+            name,
+            vault_name
+        )
     }
 
-    fn parse_item_data(&self, item_type: &VaultItem) -> (PathBuf, Item, &str) {
+    fn generate_location(&self) -> PathBuf {
         let (current_vault_name, current_vault_location, folder) = self.get_path_data();
-        let location = join_paths(vec![
+        join_paths(vec![
             current_vault_location,
             &PathBuf::from(current_vault_name),
             folder,
-        ]);
-
-        let (item_type, item_type_full) = match item_type {
-            VaultItem::Dr => (Item::Dr, "folder"),
-            VaultItem::Nt => (Item::Nt, "note"),
-        };
-
-        (location, item_type, item_type_full)
+        ])
     }
 }
