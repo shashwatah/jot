@@ -57,7 +57,7 @@ impl Data {
         self.store()
     }
 
-    pub fn delete_vault(&mut self, name: &str) {
+    pub fn remove_vault(&mut self, name: &str) {
         self.vaults.remove(name);
         self.store()
     }

@@ -4,10 +4,15 @@ use crate::{
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
 use std::path::PathBuf;
+use walkdir::WalkDir;
 
 impl CurrentVault {
-    pub fn folder(&self) {
-        print!("{}:{}", self.get_name(), self.get_folder().display());
+    pub fn list(&self) {
+        let location = self.generate_location();
+
+        for entry in WalkDir::new(location).into_iter().filter_map(|e| e.ok()) {
+            println!("{}", entry.path().display());
+        }
     }
 
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
