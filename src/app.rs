@@ -1,28 +1,94 @@
-use crate::state::{args::Args, config::Config, data::Data, vault::Vault};
+use crate::{
+    state::{
+        args::{Args, Command},
+        config::Config,
+        vaults::Vaults,
+    },
+    traits::FileIO,
+    types::{Item, VaultItem},
+};
 use clap::Parser;
 
 pub struct App {
     args: Args,
     config: Config,
-    data: Data,
-    vault: Option<Vault>
+    vaults: Vaults,
 }
 
 impl App {
     pub fn new() -> Self {
         App {
             args: Args::parse(),
-            config: Config {},
-            data: Data {},
-            vault: None
+            config: Config::load(),
+            vaults: Vaults::load(),
         }
     }
 
-    pub fn handle_args(&self) {}
+    pub fn display_app_state(&self) {
+        println!("{:#?}\n{:#?}\n{:#?}", self.args, self.config, self.vaults);
+    }
 
-    fn load_vault(&mut self) {}
-    fn create_vault(&self) {}
-    fn remove_vault(&self) {}
-    fn rename_vault(&self) {}
-    fn move_vault(&self) {}
+    pub fn handle_args(&mut self) {
+        match &self.args.command {
+            Command::Vl { name, location } => {
+                if let (Some(name), Some(location)) = (name, location) {
+                    self.vaults.create_vault(name, location)
+                } else {
+                    self.vaults.list_vaults()
+                }
+            }
+            Command::En { name } => self.vaults.enter_vault(name),
+            Command::Nt { name } => self
+                .vaults
+                .ref_current()
+                .create_vault_item(VaultItem::Nt, &name),
+            Command::Op { name } => self
+                .vaults
+                .ref_current()
+                .open_note(name, self.config.get_editor_data()),
+            Command::Dr { name } => self
+                .vaults
+                .ref_current()
+                .create_vault_item(VaultItem::Dr, &name),
+            Command::Cd { path } => self.vaults.mut_current().change_folder(path),
+            Command::Dl { item_type, name } => match item_type {
+                Item::Vl => self.vaults.remove_vault(name),
+                Item::Nt | Item::Dr => self
+                    .vaults
+                    .ref_current()
+                    .remove_vault_item(item_type.to_vault_item(), name),
+            },
+            Command::Rn {
+                item_type,
+                name,
+                new_name,
+            } => match item_type {
+                Item::Vl => self.vaults.rename_vault(name, new_name),
+                Item::Nt | Item::Dr => self.vaults.ref_current().rename_vault_item(
+                    item_type.to_vault_item(),
+                    name,
+                    new_name,
+                ),
+            },
+            Command::Mv {
+                item_type,
+                name,
+                new_location,
+            } => match item_type {
+                Item::Vl => self.vaults.move_vault(name, new_location),
+                Item::Nt | Item::Dr => self.vaults.ref_current().move_vault_item(
+                    item_type.to_vault_item(),
+                    name,
+                    new_location,
+                ),
+            },
+            Command::Vm {
+                item_type,
+                name,
+                vault_name,
+            } => self.vaults.move_to_vault(item_type, name, vault_name),
+            Command::Ls => self.vaults.ref_current().list(),
+            _ => self.display_app_state(),
+        }
+    }
 }
