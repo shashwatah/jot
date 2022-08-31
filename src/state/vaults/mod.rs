@@ -50,7 +50,7 @@ impl Vaults {
         self.current.as_ref().expect("not inside a vault")
     }
 
-    pub fn create(&mut self, name: &String, location: &PathBuf) {
+    pub fn create_vault(&mut self, name: &String, location: &PathBuf) {
         if self.data.vault_exists(name) {
             panic!("vault {} already exists", name)
         }
@@ -69,7 +69,7 @@ impl Vaults {
         print!("vault {} created", name)
     }
 
-    pub fn remove(&mut self, name: &String) {
+    pub fn remove_vault(&mut self, name: &String) {
         if let Some(vault_location) = self.data.get_vault_location(name) {
             remove_item(Item::Vl, name, vault_location);
 
@@ -85,7 +85,7 @@ impl Vaults {
         }
     }
 
-    pub fn rename(&mut self, name: &String, new_name: &String) {
+    pub fn rename_vault(&mut self, name: &String, new_name: &String) {
         if self.data.vault_exists(new_name) {
             panic!("vault named {} already exists", new_name)
         }
@@ -109,7 +109,7 @@ impl Vaults {
         }
     }
 
-    pub fn mov(&mut self, name: &String, new_location: &PathBuf) {
+    pub fn move_vault(&mut self, name: &String, new_location: &PathBuf) {
         if let Some(original_location) = self.data.get_vault_location(name) {
             let new_path = move_item(Item::Vl, name, original_location, &new_location);
             let data_path = join_paths(vec![new_path.to_str().unwrap(), ".jot/data"]);
@@ -127,7 +127,7 @@ impl Vaults {
     pub fn move_to_vault(&self, item_type: &VaultItem, name: &String, vault_name: &String) {
         if let Some(vault_location) = self.data.get_vault_location(vault_name) {
             self.ref_current()
-                .vmove(item_type, name, vault_name, vault_location)
+                .vmove_vault_item(item_type, name, vault_name, vault_location)
         } else {
             panic!("vault {} doesn't exist", vault_name)
         }

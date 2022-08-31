@@ -10,28 +10,28 @@ impl CurrentVault {
         print!("{}:{}", self.get_name(), self.get_folder().display());
     }
 
-    pub fn create(&self, item_type: VaultItem, name: &String) {
+    pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
         let (location, item_type, item_type_full) = self.parse_item_data(&item_type);
 
         create_item(item_type, name, &location);
         print!("{} {} created", item_type_full, name)
     }
 
-    pub fn remove(&self, item_type: VaultItem, name: &String) {
+    pub fn remove_vault_item(&self, item_type: VaultItem, name: &String) {
         let (location, item_type, item_type_full) = self.parse_item_data(&item_type);
 
         remove_item(item_type, name, &location);
         print!("{} {} removed", item_type_full, name)
     }
 
-    pub fn rename(&self, item_type: VaultItem, name: &String, new_name: &String) {
+    pub fn rename_vault_item(&self, item_type: VaultItem, name: &String, new_name: &String) {
         let (location, item_type, item_type_full) = self.parse_item_data(&item_type);
 
         rename_item(item_type, name, new_name, &location);
         print!("{} {} renamed to {}", item_type_full, name, new_name)
     }
 
-    pub fn mov(&self, item_type: VaultItem, name: &String, new_location: &PathBuf) {
+    pub fn move_vault_item(&self, item_type: VaultItem, name: &String, new_location: &PathBuf) {
         let (original_location, item_type, item_type_full) = self.parse_item_data(&item_type);
 
         let new_location = join_paths(vec![&original_location, new_location]);
@@ -51,7 +51,7 @@ impl CurrentVault {
         print!("{} {} moved", item_type_full, name)
     }
 
-    pub fn vmove(
+    pub fn vmove_vault_item(
         &self,
         item_type: &VaultItem,
         name: &String,
