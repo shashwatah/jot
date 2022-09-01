@@ -69,13 +69,13 @@ impl Vaults {
             panic!("vault {} already exists", name)
         }
 
-        let location = process_path(location);
+        let location = process_path(&location);
         let path = create_item(Item::Vl, name, &location);
         let data_path = join_paths(vec![path.to_str().unwrap(), ".jot/data"]);
 
         let mut vault = Vault::load_path(data_path);
         vault.set_name(name.to_owned());
-        vault.set_location(process_path(&location));
+        vault.set_location(location.to_owned());
         vault.store();
 
         self.data.add_vault(name.to_owned(), location);
@@ -129,7 +129,7 @@ impl Vaults {
             let new_path = move_item(Item::Vl, name, original_location, &new_location);
             let data_path = join_paths(vec![new_path.to_str().unwrap(), ".jot/data"]);
 
-            let new_location = process_path(new_location);
+            let new_location = process_path(&new_location);
             Vault::load_path(data_path).set_location(new_location.to_owned());
             self.data.set_vault_location(name, new_location);
 

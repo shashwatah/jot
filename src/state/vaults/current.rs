@@ -10,8 +10,11 @@ impl CurrentVault {
     pub fn list(&self) {
         let location = self.generate_location();
 
-        for entry in WalkDir::new(location).into_iter().filter_map(|e| e.ok()) {
-            println!("{}", entry.path().display());
+        for entry in WalkDir::new(&location).into_iter().filter_map(|e| e.ok()) {
+            println!(
+                "{}",
+                entry.path().strip_prefix(&location).unwrap().display()
+            );
         }
     }
 
@@ -40,12 +43,9 @@ impl CurrentVault {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
         let original_location = join_paths(vec![&vault_path, self.get_folder()]);
 
-        let new_location = join_paths(vec![&original_location, new_location]);
-        let new_location = process_path(&new_location);
+        let new_location = process_path(&join_paths(vec![&original_location, new_location]));
 
-        let vault_path = vault_path.to_str().unwrap();
-
-        if !new_location.to_str().unwrap().contains(vault_path) {
+        if !new_location.starts_with(vault_path) {
             panic!("path crosses the bounds of vault")
         }
 
@@ -106,25 +106,21 @@ impl CurrentVault {
 
     pub fn change_folder(&mut self, path: &PathBuf) {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
-        let new_location = join_paths(vec![&vault_path, self.get_folder(), path]);
+        let new_location = process_path(&join_paths(vec![&vault_path, self.get_folder(), path]));
 
         if !new_location.exists() {
             panic!("path doesn't exist")
         }
 
-        let new_location = process_path(&new_location);
-        let new_location = new_location.to_str().unwrap();
-        let vault_path = vault_path.to_str().unwrap();
-
-        if !new_location.contains(vault_path) {
+        if !new_location.starts_with(&vault_path) {
             panic!("path crosses the bounds of vault")
         }
 
-        let mut destination_folder = new_location.replace(vault_path, "");
-        if destination_folder.starts_with(r"\") || destination_folder.starts_with("/") {
-            destination_folder = destination_folder[1..].to_string();
+        let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();
+        if destination_folder.starts_with("/") {
+            destination_folder = destination_folder.strip_prefix("/").unwrap();
         }
-        let destination_folder = PathBuf::from(destination_folder);
+        let destination_folder = destination_folder.to_path_buf();
 
         self.set_folder(destination_folder);
         print!("changed folder");

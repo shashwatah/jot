@@ -17,6 +17,7 @@ pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
 
 // returns new pathbuf -> with slashes formatted according to os & '..'s collapsed
 // use this when storing or displaying paths
+// not using canonicalize because it returns \\?\C:\*path* on windows
 pub fn process_path(path: &Path) -> PathBuf {
     let mut processed_path = PathBuf::new();
 
