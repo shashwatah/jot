@@ -7,14 +7,76 @@ use std::{path::PathBuf, process::Command};
 use walkdir::WalkDir;
 
 impl CurrentVault {
+    // god help anyone who ever stumbles on this
     pub fn list(&self) {
-        let location = self.generate_location();
+        let mut current = self.generate_location();
 
-        for entry in WalkDir::new(&location).into_iter().filter_map(|e| e.ok()) {
-            println!(
-                "{}",
-                entry.path().strip_prefix(&location).unwrap().display()
-            );
+        let mut level = 0;
+
+        if self.get_folder().to_str().unwrap() != "" {
+            println!("{} > {}", self.get_name(), self.get_folder().display());
+        } else {
+            println!("{}", self.get_name());
+        }
+
+        let length = WalkDir::new(&current)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .count();
+        for (count, entry) in WalkDir::new(&current)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .enumerate()
+        {
+            let entry_name = entry.path().file_stem().unwrap().to_str().unwrap();
+
+            if entry_name == self.get_name()
+                || entry_name == ".jot"
+                || entry.path().ends_with(".jot/data")
+            {
+                continue;
+            }
+
+            let folder_name = self.get_folder().file_name();
+            if folder_name.is_some() {
+                if entry_name == folder_name.unwrap().to_str().unwrap() {
+                    continue;
+                }
+            }
+
+            if entry.path().is_dir() {
+                if entry.path().starts_with(&current) {
+                    level += 1;
+                    current.push(entry_name);
+                } else {
+                    let mut anc = entry.path().ancestors();
+
+                    loop {
+                        let a = anc.next().unwrap();
+
+                        current.pop();
+                        level -= 1;
+
+                        if a.starts_with(&current) {
+                            level += 1;
+                            current.push(entry_name);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for i in 0..level {
+                if length - count == 1 {
+                    print!("└──")
+                } else if level - i == 1 {
+                    print!("├──")
+                } else {
+                    print!("│  ")
+                }
+            }
+
+            println!("{}", entry_name);
         }
     }
 
@@ -117,7 +179,7 @@ impl CurrentVault {
         }
 
         let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();
-        if destination_folder.starts_with("/") {
+        if destination_folder.has_root() {
             destination_folder = destination_folder.strip_prefix("/").unwrap();
         }
         let destination_folder = destination_folder.to_path_buf();
