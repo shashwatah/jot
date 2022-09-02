@@ -9,15 +9,15 @@ use std::path::PathBuf;
 pub enum Item {
     Vl,
     Nt,
-    Dr,
+    Fd,
 }
 
 impl Item {
     pub fn to_vault_item(&self) -> VaultItem {
         match self {
-            Item::Vl => VaultItem::Dr,
+            Item::Vl => VaultItem::Fd,
             Item::Nt => VaultItem::Nt,
-            Item::Dr => VaultItem::Dr,
+            Item::Fd => VaultItem::Fd,
         }
     }
 
@@ -25,7 +25,7 @@ impl Item {
         match self {
             Item::Vl => "vault",
             Item::Nt => "note",
-            Item::Dr => "folder",
+            Item::Fd => "folder",
         }
     }
 }
@@ -33,21 +33,21 @@ impl Item {
 #[derive(ValueEnum, Clone, Debug)]
 pub enum VaultItem {
     Nt,
-    Dr,
+    Fd,
 }
 
 impl VaultItem {
     pub fn to_item(&self) -> Item {
         match self {
             VaultItem::Nt => Item::Nt,
-            VaultItem::Dr => Item::Dr,
+            VaultItem::Fd => Item::Fd,
         }
     }
 
     pub fn full(&self) -> &str {
         match self {
             VaultItem::Nt => "note",
-            VaultItem::Dr => "folder",
+            VaultItem::Fd => "folder",
         }
     }
 }

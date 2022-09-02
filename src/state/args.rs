@@ -57,7 +57,7 @@ pub enum Command {
     },
     /// 📂 create folders.
     #[clap(override_usage("jot dir\n    jot dir [folder name]"))]
-    Dr {
+    Fd {
         /// name for new folder (to be created in the current folder).
         #[clap(value_parser, name = "folder name")]
         name: String,
@@ -68,30 +68,14 @@ pub enum Command {
         #[clap(value_parser, name = "folder path")]
         path: PathBuf,
     },
-    /// 📃 List dir tree of current location
-    Ls,
-    /// 🗒️ list and open notes from current vault's history.
-    #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
-    Hs,
-    /// ⏮️ open last accessed note in the current vault.
-    Lt,
-    /// 🔍 find folders and notes in the current vault.
-    Fn {
-        /// find notes (nte) or folders (dir).
-        #[clap(value_enum, value_parser, name = "query type")]
-        query_type: VaultItem,
-        /// query string.
-        #[clap(value_parser, name = "query")]
-        query: String,
-    },
-    /// 📒 list, create and delete memos/quick notes (independent of current vault).
-    #[clap(override_usage("jot mem\n    jot mem [content]\n    jot mem <SUBCOMMAND>"))]
-    Qn {
-        /// content for new memo.
-        #[clap(value_parser, name = "content")]
-        content: Option<String>,
-        #[clap(subcommand)]
-        subcommand: Option<MemSubCommand>,
+    /// 🚮 delete a note/vault/folder.
+    Rm {
+        /// delete a note (nte) | vault (vlt) | folder (dir).
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: Item,
+        /// name of item to be deleted.
+        #[clap(value_parser, name = "name")]
+        name: String,
     },
     /// 🔁 rename a note/vault/folder.
     Rn {
@@ -104,15 +88,6 @@ pub enum Command {
         /// new name of item.
         #[clap(value_parser, name = "new name")]
         new_name: String,
-    },
-    /// 🚮 delete a note/vault/folder.
-    Dl {
-        /// delete a note (nte) | vault (vlt) | folder (dir).
-        #[clap(value_enum, value_parser, name = "item type")]
-        item_type: Item,
-        /// name of item to be deleted.
-        #[clap(value_parser, name = "name")]
-        name: String,
     },
     /// 🗃️ move a note/vault/folder.
     Mv {
@@ -137,6 +112,31 @@ pub enum Command {
         /// name of vault to move the item to.
         #[clap(value_parser, name = "vault name")]
         vault_name: String,
+    },
+    /// 📃 List dir tree of current location
+    Ls,
+    /// 🔍 find folders and notes in the current vault.
+    Fn {
+        /// find notes (nte) or folders (dir).
+        #[clap(value_enum, value_parser, name = "query type")]
+        query_type: VaultItem,
+        /// query string.
+        #[clap(value_parser, name = "query")]
+        query: String,
+    },
+    /// 🗒️ list and open notes from current vault's history.
+    #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
+    Hs,
+    /// ⏮️ open last accessed note in the current vault.
+    Lt,
+    /// 📒 list, create and delete memos/quick notes (independent of current vault).
+    #[clap(override_usage("jot mem\n    jot mem [content]\n    jot mem <SUBCOMMAND>"))]
+    Qn {
+        /// content for new memo.
+        #[clap(value_parser, name = "content")]
+        content: Option<String>,
+        #[clap(subcommand)]
+        subcommand: Option<MemSubCommand>,
     },
     /// 🆘 show this help message or help for given command.
     Help,

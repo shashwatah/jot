@@ -15,9 +15,9 @@ impl CurrentVault {
             println!("{} > {}", self.get_name(), folder.display());
         }
 
-        let location = self.generate_location();  
+        let location = self.generate_location();
         self.rec_list(1, location);
-    }   
+    }
 
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
         let location = self.generate_location();
@@ -160,9 +160,9 @@ impl CurrentVault {
             }
 
             println!("{}", entry_name);
-            
+
             if entry.is_dir() {
-                self.rec_list(level+1, entry)
+                self.rec_list(level + 1, entry)
             }
         }
     }

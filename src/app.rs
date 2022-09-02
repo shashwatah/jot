@@ -46,14 +46,14 @@ impl App {
                 .vaults
                 .ref_current()
                 .open_note(name, self.config.get_editor_data()),
-            Command::Dr { name } => self
+            Command::Fd { name } => self
                 .vaults
                 .ref_current()
-                .create_vault_item(VaultItem::Dr, &name),
+                .create_vault_item(VaultItem::Fd, &name),
             Command::Cd { path } => self.vaults.mut_current().change_folder(path),
-            Command::Dl { item_type, name } => match item_type {
+            Command::Rm { item_type, name } => match item_type {
                 Item::Vl => self.vaults.remove_vault(name),
-                Item::Nt | Item::Dr => self
+                Item::Nt | Item::Fd => self
                     .vaults
                     .ref_current()
                     .remove_vault_item(item_type.to_vault_item(), name),
@@ -64,7 +64,7 @@ impl App {
                 new_name,
             } => match item_type {
                 Item::Vl => self.vaults.rename_vault(name, new_name),
-                Item::Nt | Item::Dr => self.vaults.ref_current().rename_vault_item(
+                Item::Nt | Item::Fd => self.vaults.ref_current().rename_vault_item(
                     item_type.to_vault_item(),
                     name,
                     new_name,
@@ -76,7 +76,7 @@ impl App {
                 new_location,
             } => match item_type {
                 Item::Vl => self.vaults.move_vault(name, new_location),
-                Item::Nt | Item::Dr => self.vaults.ref_current().move_vault_item(
+                Item::Nt | Item::Fd => self.vaults.ref_current().move_vault_item(
                     item_type.to_vault_item(),
                     name,
                     new_location,
