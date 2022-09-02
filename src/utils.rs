@@ -123,6 +123,37 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &PathBuf) 
     }
 }
 
+pub fn rec_list(level: u8, path: PathBuf) {
+    let length = path.read_dir().unwrap().count();
+
+    for (count, entry) in path.read_dir().unwrap().enumerate() {
+        let entry = entry.unwrap().path();
+        let entry_name = entry.file_stem().unwrap().to_str().unwrap();
+
+        if entry_name == ".jot" {
+            continue;
+        }
+
+        for i in 0..level {
+            if level - i == 1 {
+                if length - count == 1 {
+                    print!("└── ")
+                } else {
+                    print!("├── ")
+                }
+            } else {
+                print!("│   ")
+            }
+        }
+
+        println!("{}", entry_name);
+
+        if entry.is_dir() {
+            rec_list(level + 1, entry)
+        }
+    }
+}
+
 fn generate_item_path(item_type: &Item, name: &str, location: &PathBuf) -> PathBuf {
     if !valid_name(name) {
         panic!("not a valid name")

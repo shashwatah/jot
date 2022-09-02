@@ -2,7 +2,8 @@ pub use crate::types::Vault as CurrentVault;
 use crate::{
     types::VaultItem,
     utils::{
-        create_item, join_paths, move_item, process_path, remove_item, rename_item, run_editor,
+        create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
+        run_editor,
     },
 };
 use std::path::PathBuf;
@@ -18,7 +19,7 @@ impl CurrentVault {
         }
 
         let location = self.generate_location();
-        self.rec_list(1, location);
+        rec_list(1, location);
     }
 
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
@@ -120,36 +121,5 @@ impl CurrentVault {
             &PathBuf::from(current_vault_name),
             folder,
         ])
-    }
-
-    fn rec_list(&self, level: u8, path: PathBuf) {
-        let length = path.read_dir().unwrap().count();
-
-        for (count, entry) in path.read_dir().unwrap().enumerate() {
-            let entry = entry.unwrap().path();
-            let entry_name = entry.file_stem().unwrap().to_str().unwrap();
-
-            if entry_name == ".jot" {
-                continue;
-            }
-
-            for i in 0..level {
-                if level - i == 1 {
-                    if length - count == 1 {
-                        print!("└── ")
-                    } else {
-                        print!("├── ")
-                    }
-                } else {
-                    print!("│   ")
-                }
-            }
-
-            println!("{}", entry_name);
-
-            if entry.is_dir() {
-                self.rec_list(level + 1, entry)
-            }
-        }
     }
 }
