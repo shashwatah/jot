@@ -4,81 +4,20 @@ use crate::{
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
 use std::{path::PathBuf, process::Command};
-use walkdir::WalkDir;
 
 impl CurrentVault {
-    // god help anyone who ever stumbles on this
     pub fn list(&self) {
-        let mut current = self.generate_location();
+        let folder = self.get_folder();
 
-        let mut level = 0;
-
-        if self.get_folder().to_str().unwrap() != "" {
-            println!("{} > {}", self.get_name(), self.get_folder().display());
-        } else {
+        if folder.as_os_str().is_empty() {
             println!("{}", self.get_name());
+        } else {
+            println!("{} > {}", self.get_name(), folder.display());
         }
 
-        let length = WalkDir::new(&current)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .count();
-        for (count, entry) in WalkDir::new(&current)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .enumerate()
-        {
-            let entry_name = entry.path().file_stem().unwrap().to_str().unwrap();
-
-            if entry_name == self.get_name()
-                || entry_name == ".jot"
-                || entry.path().ends_with(".jot/data")
-            {
-                continue;
-            }
-
-            let folder_name = self.get_folder().file_name();
-            if folder_name.is_some() {
-                if entry_name == folder_name.unwrap().to_str().unwrap() {
-                    continue;
-                }
-            }
-
-            if entry.path().is_dir() {
-                if entry.path().starts_with(&current) {
-                    level += 1;
-                    current.push(entry_name);
-                } else {
-                    let mut anc = entry.path().ancestors();
-
-                    loop {
-                        let a = anc.next().unwrap();
-
-                        current.pop();
-                        level -= 1;
-
-                        if a.starts_with(&current) {
-                            level += 1;
-                            current.push(entry_name);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            for i in 0..level {
-                if length - count == 1 {
-                    print!("└──")
-                } else if level - i == 1 {
-                    print!("├──")
-                } else {
-                    print!("│  ")
-                }
-            }
-
-            println!("{}", entry_name);
-        }
-    }
+        let location = self.generate_location();  
+        self.rec_list(1, location);
+    }   
 
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
         let location = self.generate_location();
@@ -195,5 +134,36 @@ impl CurrentVault {
             &PathBuf::from(current_vault_name),
             folder,
         ])
+    }
+
+    fn rec_list(&self, level: u8, path: PathBuf) {
+        let length = path.read_dir().unwrap().count();
+
+        for (count, entry) in path.read_dir().unwrap().enumerate() {
+            let entry = entry.unwrap().path();
+            let entry_name = entry.file_stem().unwrap().to_str().unwrap();
+
+            if entry_name == ".jot" {
+                continue;
+            }
+
+            for i in 0..level {
+                if level - i == 1 {
+                    if length - count == 1 {
+                        print!("└── ")
+                    } else {
+                        print!("├── ")
+                    }
+                } else {
+                    print!("│   ")
+                }
+            }
+
+            println!("{}", entry_name);
+            
+            if entry.is_dir() {
+                self.rec_list(level+1, entry)
+            }
+        }
     }
 }
