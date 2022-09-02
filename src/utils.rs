@@ -1,7 +1,10 @@
 use crate::types::Item;
 use fs_extra::{dir::CopyOptions, move_items};
-use std::fs::{remove_dir_all, remove_file, rename, DirBuilder, File};
-use std::path::{Path, PathBuf};
+use std::{
+    fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 fn valid_name(name: &str) -> bool {
     name.chars().all(|char| !r#"\/?%*:|"<>"#.contains(char))
@@ -99,6 +102,25 @@ pub fn move_item(
     move_items(&original_path, &new_location, &CopyOptions::new()).unwrap();
 
     new_path
+}
+
+pub fn run_editor(editor_data: (&String, bool), name: &str, location: &PathBuf) {
+    let path = generate_item_path(&Item::Nt, name, location);
+
+    if !path.exists() {
+        panic!("note {} doesn't exist", name)
+    }
+
+    let (editor, conflict) = editor_data;
+
+    let mut cmd = Command::new(editor)
+        .arg(path.to_str().unwrap())
+        .spawn()
+        .unwrap();
+
+    if conflict {
+        cmd.wait().unwrap();
+    }
 }
 
 fn generate_item_path(item_type: &Item, name: &str, location: &PathBuf) -> PathBuf {

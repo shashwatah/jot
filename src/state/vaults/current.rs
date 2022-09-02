@@ -1,9 +1,11 @@
 pub use crate::types::Vault as CurrentVault;
 use crate::{
     types::VaultItem,
-    utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
+    utils::{
+        create_item, join_paths, move_item, process_path, remove_item, rename_item, run_editor,
+    },
 };
-use std::{path::PathBuf, process::Command};
+use std::path::PathBuf;
 
 impl CurrentVault {
     pub fn list(&self) {
@@ -86,23 +88,7 @@ impl CurrentVault {
 
     pub fn open_note(&self, name: &String, editor_data: (&String, bool)) {
         let location = self.generate_location();
-        let mut path = join_paths(vec![location.to_str().unwrap(), name]);
-        path.set_extension("md");
-
-        if !path.exists() {
-            panic!("note {} doesn't exist", name)
-        }
-
-        let (editor, conflict) = editor_data;
-
-        let mut cmd = Command::new(editor)
-            .arg(path.to_str().unwrap())
-            .spawn()
-            .unwrap();
-
-        if conflict {
-            cmd.wait().unwrap();
-        }
+        run_editor(editor_data, name, &location);
     }
 
     pub fn change_folder(&mut self, path: &PathBuf) {
