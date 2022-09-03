@@ -45,7 +45,7 @@ impl App {
             Command::Nt { name } => self
                 .vaults
                 .ref_current()
-                .create_vault_item(VaultItem::Nt, &name),
+                .create_vault_item(VaultItem::Nt, name),
             Command::Op { name } => self
                 .vaults
                 .ref_current()
@@ -53,7 +53,7 @@ impl App {
             Command::Fd { name } => self
                 .vaults
                 .ref_current()
-                .create_vault_item(VaultItem::Fd, &name),
+                .create_vault_item(VaultItem::Fd, name),
             Command::Cd { path } => self.vaults.mut_current().change_folder(path),
             Command::Rm { item_type, name } => match item_type {
                 Item::Vl => self.vaults.remove_vault(name),

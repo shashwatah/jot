@@ -3,19 +3,10 @@ use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, path::PathBuf};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Data {
     current: Option<String>,
     vaults: HashMap<String, PathBuf>,
-}
-
-impl Default for Data {
-    fn default() -> Self {
-        Data {
-            current: None,
-            vaults: HashMap::new(),
-        }
-    }
 }
 
 impl FileIO for Data {
@@ -68,7 +59,7 @@ impl Data {
         self.store()
     }
 
-    pub fn set_vault_location(&mut self, name: &String, new_location: PathBuf) {
+    pub fn set_vault_location(&mut self, name: &str, new_location: PathBuf) {
         self.vaults.insert(name.to_owned(), new_location);
         self.store()
     }

@@ -19,14 +19,13 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
         match read_to_string(&path) {
             Ok(file_string) => {
                 if let Ok(file_data) = toml::from_str::<Self>(&file_string) {
-                    return file_data;
+                    file_data
                 } else {
                     panic!("couldn't parse data")
                 }
             }
             Err(ref err) if err.kind() == ErrorKind::NotFound => {
-                let data = <Self as FileIO>::create_file(path);
-                return data;
+                <Self as FileIO>::create_file(path)
             }
             Err(_) => panic!("couldn't load file"),
         }

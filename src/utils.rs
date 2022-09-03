@@ -37,7 +37,7 @@ pub fn process_path(path: &Path) -> PathBuf {
 
 // creates item(folders(dr & vl) and md files) and returns path to created item
 // might rename this later
-pub fn create_item(item_type: Item, name: &str, location: &PathBuf) -> PathBuf {
+pub fn create_item(item_type: Item, name: &str, location: &Path) -> PathBuf {
     let path = generate_item_path(&item_type, name, location);
 
     if let Item::Nt = item_type {
@@ -53,7 +53,7 @@ pub fn create_item(item_type: Item, name: &str, location: &PathBuf) -> PathBuf {
     path
 }
 
-pub fn remove_item(item_type: Item, name: &str, location: &PathBuf) {
+pub fn remove_item(item_type: Item, name: &str, location: &Path) {
     let path = generate_item_path(&item_type, name, location);
 
     if let Item::Nt = item_type {
@@ -63,7 +63,7 @@ pub fn remove_item(item_type: Item, name: &str, location: &PathBuf) {
     }
 }
 
-pub fn rename_item(item_type: Item, name: &str, new_name: &str, location: &PathBuf) -> PathBuf {
+pub fn rename_item(item_type: Item, name: &str, new_name: &str, location: &Path) -> PathBuf {
     if new_name == name {
         panic!("new name can't be same as old name")
     }
@@ -79,7 +79,7 @@ pub fn move_item(
     item_type: Item,
     name: &str,
     original_location: &PathBuf,
-    new_location: &PathBuf,
+    new_location: &Path,
 ) -> PathBuf {
     if new_location == original_location {
         panic!(
@@ -104,7 +104,7 @@ pub fn move_item(
     new_path
 }
 
-pub fn run_editor(editor_data: (&String, bool), name: &str, location: &PathBuf) {
+pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) {
     let path = generate_item_path(&Item::Nt, name, location);
 
     if !path.exists() {
@@ -143,12 +143,10 @@ pub fn rec_list(level: u8, was_last: bool, path: PathBuf) {
                 } else {
                     print!("├── ")
                 }
+            } else if was_last {
+                print!("    ")
             } else {
-                if was_last {
-                    print!("    ")
-                } else {
-                    print!("│   ")
-                }
+                print!("│   ")
             }
         }
 
@@ -160,7 +158,7 @@ pub fn rec_list(level: u8, was_last: bool, path: PathBuf) {
     }
 }
 
-fn generate_item_path(item_type: &Item, name: &str, location: &PathBuf) -> PathBuf {
+fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> PathBuf {
     if !valid_name(name) {
         panic!("not a valid name")
     }

@@ -82,7 +82,7 @@ impl Config {
         &self.conflict
     }
 
-    fn set_conflict(&mut self, conflict: &String) {
+    fn set_conflict(&mut self, conflict: &str) {
         self.conflict = conflict.parse().unwrap();
         self.store()
     }

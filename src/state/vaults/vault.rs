@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
@@ -76,28 +76,28 @@ impl Vault {
 }
 
 impl Vault {
-    pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
+    pub fn create_vault_item(&self, item_type: VaultItem, name: &str) {
         let location = self.generate_location();
 
         create_item(item_type.to_item(), name, &location);
         print!("{} {} created", item_type.full(), name)
     }
 
-    pub fn remove_vault_item(&self, item_type: VaultItem, name: &String) {
+    pub fn remove_vault_item(&self, item_type: VaultItem, name: &str) {
         let location = self.generate_location();
 
         remove_item(item_type.to_item(), name, &location);
         print!("{} {} removed", item_type.full(), name)
     }
 
-    pub fn rename_vault_item(&self, item_type: VaultItem, name: &String, new_name: &String) {
+    pub fn rename_vault_item(&self, item_type: VaultItem, name: &str, new_name: &str) {
         let location = self.generate_location();
 
         rename_item(item_type.to_item(), name, new_name, &location);
         print!("{} {} renamed to {}", item_type.full(), name, new_name)
     }
 
-    pub fn move_vault_item(&self, item_type: VaultItem, name: &String, new_location: &PathBuf) {
+    pub fn move_vault_item(&self, item_type: VaultItem, name: &str, new_location: &PathBuf) {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
         let original_location = join_paths(vec![&vault_path, self.get_folder()]);
 
@@ -115,9 +115,9 @@ impl Vault {
     pub fn vmove_vault_item(
         &self,
         item_type: &VaultItem,
-        name: &String,
-        vault_name: &String,
-        vault_location: &PathBuf,
+        name: &str,
+        vault_name: &str,
+        vault_location: &Path,
     ) {
         let original_location = self.generate_location();
 
@@ -141,7 +141,7 @@ impl Vault {
         )
     }
 
-    pub fn open_note(&self, name: &String, editor_data: (&String, bool)) {
+    pub fn open_note(&self, name: &str, editor_data: (&String, bool)) {
         let location = self.generate_location();
         run_editor(editor_data, name, &location);
     }

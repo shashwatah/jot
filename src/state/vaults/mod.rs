@@ -6,7 +6,7 @@ use crate::{
     traits::FileIO,
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
-use std::path::PathBuf;
+use std::path::Path;
 
 use data::Data;
 use vault::Vault;
@@ -59,7 +59,7 @@ impl Vaults {
                     self.data.get_vault_location(vault_name).unwrap().display()
                 )
             } else {
-                println!("");
+                println!();
             }
         }
     }
@@ -72,12 +72,12 @@ impl Vaults {
         self.current.as_mut().expect("not inside a vault")
     }
 
-    pub fn create_vault(&mut self, name: &String, location: &PathBuf) {
+    pub fn create_vault(&mut self, name: &str, location: &Path) {
         if self.data.vault_exists(name) {
             panic!("vault {} already exists", name)
         }
 
-        let location = process_path(&location);
+        let location = process_path(location);
         let path = create_item(Item::Vl, name, &location);
         let data_path = join_paths(vec![path.to_str().unwrap(), ".jot/data"]);
 
@@ -91,7 +91,7 @@ impl Vaults {
         print!("vault {} created", name)
     }
 
-    pub fn remove_vault(&mut self, name: &String) {
+    pub fn remove_vault(&mut self, name: &str) {
         if let Some(vault_location) = self.data.get_vault_location(name) {
             remove_item(Item::Vl, name, vault_location);
             self.data.remove_vault(name);
@@ -108,7 +108,7 @@ impl Vaults {
         }
     }
 
-    pub fn rename_vault(&mut self, name: &String, new_name: &String) {
+    pub fn rename_vault(&mut self, name: &str, new_name: &str) {
         if self.data.vault_exists(new_name) {
             panic!("vault named {} already exists", new_name)
         }
@@ -132,12 +132,12 @@ impl Vaults {
         }
     }
 
-    pub fn move_vault(&mut self, name: &String, new_location: &PathBuf) {
+    pub fn move_vault(&mut self, name: &str, new_location: &Path) {
         if let Some(original_location) = self.data.get_vault_location(name) {
-            let new_path = move_item(Item::Vl, name, original_location, &new_location);
+            let new_path = move_item(Item::Vl, name, original_location, new_location);
             let data_path = join_paths(vec![new_path.to_str().unwrap(), ".jot/data"]);
 
-            let new_location = process_path(&new_location);
+            let new_location = process_path(new_location);
             Vault::load_path(data_path).set_location(new_location.to_owned());
             self.data.set_vault_location(name, new_location);
 
@@ -147,7 +147,7 @@ impl Vaults {
         }
     }
 
-    pub fn move_to_vault(&self, item_type: &VaultItem, name: &String, vault_name: &String) {
+    pub fn move_to_vault(&self, item_type: &VaultItem, name: &str, vault_name: &str) {
         if let Some(vault_location) = self.data.get_vault_location(vault_name) {
             self.ref_current()
                 .vmove_vault_item(item_type, name, vault_name, vault_location)
@@ -156,7 +156,7 @@ impl Vaults {
         }
     }
 
-    pub fn enter_vault(&mut self, name: &String) {
+    pub fn enter_vault(&mut self, name: &str) {
         if !self.data.vault_exists(name) {
             panic!("vault {} doesn't exist", name)
         }
