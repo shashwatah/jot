@@ -1,4 +1,4 @@
-use crate::types::{Item, VaultItem};
+use crate::enums::{ConfigType, Item, VaultItem};
 use clap::{AppSettings, Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -115,46 +115,13 @@ pub enum Command {
     },
     /// 📃 List dir tree of current location
     Ls,
-    /// 🔍 find folders and notes in the current vault.
-    Fn {
-        /// find notes (nte) or folders (dir).
-        #[clap(value_enum, value_parser, name = "query type")]
-        query_type: VaultItem,
-        /// query string.
-        #[clap(value_parser, name = "query")]
-        query: String,
+    /// Config
+    Cf {
+        #[clap(value_enum, value_parser, name = "config type")]
+        config_type: ConfigType,
+        #[clap(value_parser, name = "config value")]
+        value: Option<String>,
     },
-    /// 🗒️ list and open notes from current vault's history.
-    #[clap(override_usage("jot hst\n    jot hst [SUBCOMMAND]"))]
-    Hs,
-    /// ⏮️ open last accessed note in the current vault.
-    Lt,
-    /// 📒 list, create and delete memos/quick notes (independent of current vault).
-    #[clap(override_usage("jot mem\n    jot mem [content]\n    jot mem <SUBCOMMAND>"))]
-    Qn {
-        /// content for new memo.
-        #[clap(value_parser, name = "content")]
-        content: Option<String>,
-        #[clap(subcommand)]
-        subcommand: Option<MemSubCommand>,
-    },
-    /// 🆘 show this help message or help for given command.
-    Help,
-}
-
-#[derive(Subcommand, Debug)]
-pub enum HstSubCommand {
-    /// 📖 open a note from history.
-    Op,
-    /// 🆘 show this help message or help for given command.
-    Help,
-}
-
-#[derive(Subcommand, Debug)]
-#[clap(args_conflicts_with_subcommands = true)]
-pub enum MemSubCommand {
-    /// 🚮 choose which memo to delete.
-    Dl,
     /// 🆘 show this help message or help for given command.
     Help,
 }

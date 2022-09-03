@@ -1,11 +1,11 @@
 use crate::{
+    enums::{Item, VaultItem},
     state::{
         args::{Args, Command},
         config::Config,
         vaults::Vaults,
     },
     traits::FileIO,
-    types::{Item, VaultItem},
 };
 use clap::Parser;
 
@@ -88,6 +88,13 @@ impl App {
                 vault_name,
             } => self.vaults.move_to_vault(item_type, name, vault_name),
             Command::Ls => self.vaults.ref_current().list(),
+            Command::Cf { config_type, value } => {
+                if let Some(value) = value {
+                    self.config.set_config(config_type, value)
+                } else {
+                    self.config.display_config(config_type)
+                }
+            }
             _ => self.display_app_state(),
         }
     }
