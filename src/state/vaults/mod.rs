@@ -43,14 +43,23 @@ impl Vaults {
         }
     }
 
-    pub fn list_vaults(&self) {
+    pub fn list_vaults(&self, show_loc: &bool) {
         let current_vault_name = self.data.get_current_vault();
 
         for vault_name in self.data.get_vaults().keys() {
             if current_vault_name.is_some() && vault_name == current_vault_name.unwrap() {
-                println!("👉 {}", vault_name)
+                print!("👉 {}", vault_name)
             } else {
-                println!("   {}", vault_name)
+                print!("   {}", vault_name)
+            }
+
+            if *show_loc {
+                println!(
+                    " \t {}",
+                    self.data.get_vault_location(vault_name).unwrap().display()
+                )
+            } else {
+                println!("");
             }
         }
     }

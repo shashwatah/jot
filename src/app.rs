@@ -30,11 +30,15 @@ impl App {
 
     pub fn handle_args(&mut self) {
         match &self.args.command {
-            Command::Vl { name, location } => {
+            Command::Vl {
+                show_loc,
+                name,
+                location,
+            } => {
                 if let (Some(name), Some(location)) = (name, location) {
                     self.vaults.create_vault(name, location)
                 } else {
-                    self.vaults.list_vaults()
+                    self.vaults.list_vaults(show_loc)
                 }
             }
             Command::En { name } => self.vaults.enter_vault(name),

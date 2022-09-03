@@ -30,6 +30,9 @@ pub enum Command {
     /// 📁 list and create vaults.
     #[clap(override_usage("jot vlt\n    jot vlt <vault name> <vault location>"))]
     Vl {
+        /// show locations
+        #[clap(parse(from_flag), short = 'l')]
+        show_loc: bool,
         /// name for new vault.
         #[clap(value_parser, name = "vault name", requires = "vault location")]
         name: Option<String>,
