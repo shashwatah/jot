@@ -9,19 +9,6 @@ use crate::{
 use std::path::PathBuf;
 
 impl CurrentVault {
-    pub fn list(&self) {
-        let folder = self.get_folder();
-
-        if folder.as_os_str().is_empty() {
-            println!("{}", self.get_name());
-        } else {
-            println!("{} > {}", self.get_name(), folder.display());
-        }
-
-        let location = self.generate_location();
-        rec_list(1, location);
-    }
-
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
         let location = self.generate_location();
 
@@ -112,6 +99,19 @@ impl CurrentVault {
 
         self.set_folder(destination_folder);
         print!("changed folder");
+    }
+
+    pub fn list(&self) {
+        let folder = self.get_folder();
+
+        if folder.as_os_str().is_empty() {
+            println!("{}", self.get_name());
+        } else {
+            println!("{} > {}", self.get_name(), folder.display());
+        }
+
+        let location = self.generate_location();
+        rec_list(1, true, location);
     }
 
     fn generate_location(&self) -> PathBuf {

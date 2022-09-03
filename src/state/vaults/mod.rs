@@ -6,7 +6,6 @@ use crate::{
     types::{Item, Vault, VaultItem},
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
-use core::panic;
 use std::path::PathBuf;
 
 use current::CurrentVault;

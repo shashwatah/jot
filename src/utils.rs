@@ -123,7 +123,7 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &PathBuf) 
     }
 }
 
-pub fn rec_list(level: u8, path: PathBuf) {
+pub fn rec_list(level: u8, was_last: bool, path: PathBuf) {
     let length = path.read_dir().unwrap().count();
 
     for (count, entry) in path.read_dir().unwrap().enumerate() {
@@ -134,22 +134,28 @@ pub fn rec_list(level: u8, path: PathBuf) {
             continue;
         }
 
+        let is_last = length - count == 1;
+
         for i in 0..level {
             if level - i == 1 {
-                if length - count == 1 {
+                if is_last {
                     print!("└── ")
                 } else {
                     print!("├── ")
                 }
             } else {
-                print!("│   ")
+                if was_last {
+                    print!("    ")
+                } else {
+                    print!("│   ")
+                }
             }
         }
 
         println!("{}", entry_name);
 
         if entry.is_dir() {
-            rec_list(level + 1, entry)
+            rec_list(level + 1, is_last, entry)
         }
     }
 }
