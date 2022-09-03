@@ -1,7 +1,7 @@
 mod app;
+mod enums;
 mod state;
 mod traits;
-mod types;
 mod utils;
 
 use crate::app::App;
