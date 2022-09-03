@@ -1,14 +1,81 @@
-pub use crate::types::Vault as CurrentVault;
 use crate::{
-    types::VaultItem,
+    enums::VaultItem,
+    traits::FileIO,
     utils::{
         create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
         run_editor,
     },
 };
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-impl CurrentVault {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Vault {
+    name: Option<String>,
+    location: Option<PathBuf>,
+    folder: PathBuf,
+    history: Vec<(String, PathBuf)>,
+}
+
+impl Default for Vault {
+    fn default() -> Self {
+        Vault {
+            name: None,
+            location: None,
+            folder: PathBuf::new(),
+            history: vec![],
+        }
+    }
+}
+
+impl FileIO for Vault {
+    fn path(&self) -> PathBuf {
+        join_paths(vec![
+            self.get_location().to_str().unwrap(),
+            self.get_name(),
+            ".jot/data",
+        ])
+    }
+}
+
+impl Vault {
+    pub fn get_name(&self) -> &String {
+        self.name.as_ref().unwrap()
+    }
+
+    pub fn set_name(&mut self, name: String) {
+        self.name = Some(name);
+        if self.location.is_some() {
+            self.store()
+        }
+    }
+
+    pub fn get_location(&self) -> &PathBuf {
+        self.location.as_ref().unwrap()
+    }
+
+    pub fn set_location(&mut self, location: PathBuf) {
+        self.location = Some(location);
+        if self.name.is_some() {
+            self.store()
+        }
+    }
+
+    pub fn get_folder(&self) -> &PathBuf {
+        &self.folder
+    }
+
+    pub fn set_folder(&mut self, folder: PathBuf) {
+        self.folder = folder;
+        self.store()
+    }
+
+    pub fn get_path_data(&self) -> (&String, &PathBuf, &PathBuf) {
+        (self.get_name(), self.get_location(), self.get_folder())
+    }
+}
+
+impl Vault {
     pub fn create_vault_item(&self, item_type: VaultItem, name: &String) {
         let location = self.generate_location();
 

@@ -1,19 +1,19 @@
-pub mod current;
 pub mod data;
+pub mod vault;
 
 use crate::{
+    enums::{Item, VaultItem},
     traits::FileIO,
-    types::{Item, Vault, VaultItem},
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
 use std::path::PathBuf;
 
-use current::CurrentVault;
 use data::Data;
+use vault::Vault;
 
 #[derive(Debug)]
 pub struct Vaults {
-    current: Option<CurrentVault>,
+    current: Option<Vault>,
     data: Data,
 }
 
@@ -37,7 +37,7 @@ impl Vaults {
                 ".jot/data",
             ]);
 
-            Some(CurrentVault::load_path(path))
+            Some(Vault::load_path(path))
         } else {
             None
         }
@@ -55,11 +55,11 @@ impl Vaults {
         }
     }
 
-    pub fn ref_current(&self) -> &CurrentVault {
+    pub fn ref_current(&self) -> &Vault {
         self.current.as_ref().expect("not inside a vault")
     }
 
-    pub fn mut_current(&mut self) -> &mut CurrentVault {
+    pub fn mut_current(&mut self) -> &mut Vault {
         self.current.as_mut().expect("not inside a vault")
     }
 
