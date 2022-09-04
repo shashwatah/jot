@@ -178,7 +178,7 @@ impl Vault {
         }
 
         let location = self.generate_location();
-        rec_list(1, true, location);
+        rec_list(vec![true], location);
     }
 
     fn generate_location(&self) -> PathBuf {
