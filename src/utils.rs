@@ -123,7 +123,7 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) {
     }
 }
 
-pub fn rec_list(mut was_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
+pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
     let length = path.read_dir().unwrap().count();
 
     for (count, entry) in path.read_dir().unwrap().enumerate() {
@@ -136,8 +136,8 @@ pub fn rec_list(mut was_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
 
         let is_last = length - count == 1;
 
-        for level in 0..was_last.len() {
-            let level_diff = was_last.len() - level;
+        for level in 0..were_last.len() {
+            let level_diff = were_last.len() - level;
 
             if level_diff == 1 {
                 if is_last {
@@ -146,7 +146,7 @@ pub fn rec_list(mut was_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
                     print!("├── ")
                 }
             } else {
-                if was_last[level + 1] {
+                if were_last[level + 1] {
                     print!("    ")
                 } else {
                     print!("│   ")
@@ -157,13 +157,13 @@ pub fn rec_list(mut was_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
         println!("{}", entry_name);
 
         if entry.is_dir() {
-            was_last.push(is_last);
-            was_last = rec_list(was_last, entry);
-            was_last.pop();
+            were_last.push(is_last);
+            were_last = rec_list(were_last, entry);
+            were_last.pop();
         }
     }
 
-    was_last
+    were_last
 }
 
 fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> PathBuf {
