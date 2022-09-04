@@ -136,22 +136,18 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
 
         let is_last = length - count == 1;
 
-        for level in 0..were_last.len() {
-            let level_diff = were_last.len() - level;
-
-            if level_diff == 1 {
-                if is_last {
-                    print!("└── ")
-                } else {
-                    print!("├── ")
-                }
+        for level in 0..were_last.len() - 1 {
+            if were_last[level + 1] {
+                print!("    ")
             } else {
-                if were_last[level + 1] {
-                    print!("    ")
-                } else {
-                    print!("│   ")
-                }
+                print!("│   ")
             }
+        }
+
+        if is_last {
+            print!("└── ")
+        } else {
+            print!("├── ")
         }
 
         println!("{}", entry_name);
