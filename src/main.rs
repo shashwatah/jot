@@ -1,5 +1,6 @@
 mod app;
 mod enums;
+mod error;
 mod state;
 mod traits;
 mod utils;
