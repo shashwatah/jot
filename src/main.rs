@@ -1,6 +1,7 @@
 mod app;
 mod enums;
 mod error;
+mod output;
 mod state;
 mod traits;
 mod utils;
@@ -9,5 +10,8 @@ use crate::app::App;
 
 fn main() {
     let mut app = App::new();
-    app.handle_args();
+
+    if let Err(error) = app.handle_args() {
+        println!("{}", error)
+    }
 }

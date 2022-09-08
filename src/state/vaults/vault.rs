@@ -1,5 +1,6 @@
 use crate::{
     enums::VaultItem,
+    error::Error,
     traits::FileIO,
     utils::{
         create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
@@ -7,7 +8,10 @@ use crate::{
     },
 };
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+use std::{
+    io::{Error as IOError, ErrorKind},
+    path::{Path, PathBuf},
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
@@ -76,40 +80,56 @@ impl Vault {
 }
 
 impl Vault {
-    pub fn create_vault_item(&self, item_type: VaultItem, name: &str) {
+    pub fn create_vault_item(&self, item_type: VaultItem, name: &str) -> Result<(), Error> {
         let location = self.generate_location();
 
-        create_item(item_type.to_item(), name, &location);
-        print!("{} {} created", item_type.full(), name)
+        create_item(item_type.to_item(), name, &location)?;
+        print!("{} {} created", item_type.full(), name);
+
+        Ok(())
     }
 
-    pub fn remove_vault_item(&self, item_type: VaultItem, name: &str) {
+    pub fn remove_vault_item(&self, item_type: VaultItem, name: &str) -> Result<(), Error> {
         let location = self.generate_location();
 
-        remove_item(item_type.to_item(), name, &location);
-        print!("{} {} removed", item_type.full(), name)
+        remove_item(item_type.to_item(), name, &location)?;
+        print!("{} {} removed", item_type.full(), name);
+
+        Ok(())
     }
 
-    pub fn rename_vault_item(&self, item_type: VaultItem, name: &str, new_name: &str) {
+    pub fn rename_vault_item(
+        &self,
+        item_type: VaultItem,
+        name: &str,
+        new_name: &str,
+    ) -> Result<(), Error> {
         let location = self.generate_location();
 
-        rename_item(item_type.to_item(), name, new_name, &location);
-        print!("{} {} renamed to {}", item_type.full(), name, new_name)
+        rename_item(item_type.to_item(), name, new_name, &location)?;
+        print!("{} {} renamed to {}", item_type.full(), name, new_name);
+        Ok(())
     }
 
-    pub fn move_vault_item(&self, item_type: VaultItem, name: &str, new_location: &PathBuf) {
+    pub fn move_vault_item(
+        &self,
+        item_type: VaultItem,
+        name: &str,
+        new_location: &PathBuf,
+    ) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
         let original_location = join_paths(vec![&vault_path, self.get_folder()]);
 
         let new_location = process_path(&join_paths(vec![&original_location, new_location]));
 
         if !new_location.starts_with(vault_path) {
-            panic!("path crosses the bounds of vault")
+            return Err(Error::PathOutOfBounds);
         }
 
-        move_item(item_type.to_item(), name, &original_location, &new_location);
+        move_item(item_type.to_item(), name, &original_location, &new_location)?;
 
-        print!("{} {} moved", item_type.full(), name)
+        print!("{} {} moved", item_type.full(), name);
+        Ok(())
     }
 
     pub fn vmove_vault_item(
@@ -118,11 +138,11 @@ impl Vault {
         name: &str,
         vault_name: &str,
         vault_location: &Path,
-    ) {
+    ) -> Result<(), Error> {
         let original_location = self.generate_location();
 
         if vault_name == self.get_name() {
-            panic!(
+            print!(
                 "{} {} already exists in vault {}",
                 item_type.full(),
                 name,
@@ -131,31 +151,36 @@ impl Vault {
         }
 
         let new_location = join_paths(vec![vault_location.to_str().unwrap(), vault_name]);
-        move_item(item_type.to_item(), name, &original_location, &new_location);
+        move_item(item_type.to_item(), name, &original_location, &new_location)?;
 
         print!(
             "{} {} moved to vault {}",
             item_type.full(),
             name,
             vault_name
-        )
+        );
+        Ok(())
     }
 
-    pub fn open_note(&self, name: &str, editor_data: (&String, bool)) {
+    pub fn open_note(&self, name: &str, editor_data: (&String, bool)) -> Result<(), Error> {
         let location = self.generate_location();
-        run_editor(editor_data, name, &location);
+        run_editor(editor_data, name, &location)?;
+        Ok(())
     }
 
-    pub fn change_folder(&mut self, path: &PathBuf) {
+    pub fn change_folder(&mut self, path: &PathBuf) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
         let new_location = process_path(&join_paths(vec![&vault_path, self.get_folder(), path]));
 
         if !new_location.exists() {
-            panic!("path doesn't exist")
+            return Err(Error::FSError(IOError::new(
+                ErrorKind::NotFound,
+                "cannot find the path specified",
+            )));
         }
 
         if !new_location.starts_with(&vault_path) {
-            panic!("path crosses the bounds of vault")
+            return Err(Error::PathOutOfBounds);
         }
 
         let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();
@@ -166,6 +191,7 @@ impl Vault {
 
         self.set_folder(destination_folder);
         print!("changed folder");
+        Ok(())
     }
 
     pub fn list(&self) {

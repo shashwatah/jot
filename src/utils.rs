@@ -1,7 +1,8 @@
-use crate::enums::Item;
+use crate::{enums::Item, error::Error};
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
+    io::{Error as IOError, ErrorKind},
     path::{Path, PathBuf},
     process::Command,
 };
@@ -37,42 +38,45 @@ pub fn process_path(path: &Path) -> PathBuf {
 
 // creates item(folders(dr & vl) and md files) and returns path to created item
 // might rename this later
-pub fn create_item(item_type: Item, name: &str, location: &Path) -> PathBuf {
-    let path = generate_item_path(&item_type, name, location);
+pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
+    let path = generate_item_path(&item_type, name, location)?;
 
     if let Item::Nt = item_type {
-        File::options()
-            .create_new(true)
-            .write(true)
-            .open(&path)
-            .unwrap();
+        File::options().create_new(true).write(true).open(&path)?;
     } else {
-        DirBuilder::new().create(&path).unwrap();
+        DirBuilder::new().create(&path)?;
     }
 
-    path
+    Ok(path)
 }
 
-pub fn remove_item(item_type: Item, name: &str, location: &Path) {
-    let path = generate_item_path(&item_type, name, location);
+pub fn remove_item(item_type: Item, name: &str, location: &Path) -> Result<(), Error> {
+    let path = generate_item_path(&item_type, name, location)?;
 
     if let Item::Nt = item_type {
-        remove_file(path).unwrap();
+        remove_file(path)?;
     } else {
-        remove_dir_all(path).unwrap();
+        remove_dir_all(path)?;
     }
+
+    Ok(())
 }
 
-pub fn rename_item(item_type: Item, name: &str, new_name: &str, location: &Path) -> PathBuf {
+pub fn rename_item(
+    item_type: Item,
+    name: &str,
+    new_name: &str,
+    location: &Path,
+) -> Result<PathBuf, Error> {
     if new_name == name {
-        panic!("new name can't be same as old name")
+        return Err(Error::SameName);
     }
 
-    let original_path = generate_item_path(&item_type, name, location);
-    let new_path = generate_item_path(&item_type, new_name, location);
+    let original_path = generate_item_path(&item_type, name, location)?;
+    let new_path = generate_item_path(&item_type, new_name, location)?;
 
-    rename(original_path, &new_path).unwrap();
-    new_path
+    rename(original_path, &new_path)?;
+    Ok(new_path)
 }
 
 pub fn move_item(
@@ -80,47 +84,44 @@ pub fn move_item(
     name: &str,
     original_location: &PathBuf,
     new_location: &Path,
-) -> PathBuf {
+) -> Result<PathBuf, Error> {
     if new_location == original_location {
-        panic!(
-            "{} {} already exists in this location",
-            item_type.full(),
-            name
-        )
+        return Err(Error::SameLocation(item_type));
     }
 
-    let new_path = generate_item_path(&item_type, name, new_location);
+    let new_path = generate_item_path(&item_type, name, new_location)?;
     if new_path.exists() {
-        panic!(
-            "a {} named {} already exists in new location",
-            item_type.to_vault_item().full(),
-            name
-        )
+        return Err(Error::ItemAlreadyExists(
+            item_type.to_vault_item(),
+            name.to_owned(),
+        ));
     }
 
-    let original_path = vec![generate_item_path(&item_type, name, original_location)];
-    move_items(&original_path, &new_location, &CopyOptions::new()).unwrap();
+    let original_path = vec![generate_item_path(&item_type, name, original_location)?];
+    move_items(&original_path, &new_location, &CopyOptions::new()).expect("move_items err");
 
-    new_path
+    Ok(new_path)
 }
 
-pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) {
-    let path = generate_item_path(&Item::Nt, name, location);
+pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> Result<(), Error> {
+    let path = generate_item_path(&Item::Nt, name, location)?;
 
     if !path.exists() {
-        panic!("note {} doesn't exist", name)
+        return Err(Error::FSError(IOError::new(
+            ErrorKind::NotFound,
+            format!("note {} doesn't exist", name),
+        )));
     }
 
     let (editor, conflict) = editor_data;
 
-    let mut cmd = Command::new(editor)
-        .arg(path.to_str().unwrap())
-        .spawn()
-        .unwrap();
+    let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
 
     if conflict {
-        cmd.wait().unwrap();
+        cmd.wait()?;
     }
+
+    Ok(())
 }
 
 pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
@@ -162,9 +163,9 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
     were_last
 }
 
-fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> PathBuf {
+fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
     if !valid_name(name) {
-        panic!("not a valid name")
+        return Err(Error::InvalidName(name.to_owned()));
     }
 
     let mut path = join_paths(vec![location.to_str().unwrap(), name]);
@@ -173,5 +174,5 @@ fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> PathBuf 
         path.set_extension("md");
     }
 
-    path
+    Ok(path)
 }

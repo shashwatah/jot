@@ -1,5 +1,6 @@
 use crate::{
     enums::{Item, VaultItem},
+    error::Error,
     state::{
         args::{Args, Command},
         config::Config,
@@ -28,7 +29,7 @@ impl App {
         println!("{:#?}\n{:#?}\n{:#?}", self.args, self.config, self.vaults);
     }
 
-    pub fn handle_args(&mut self) {
+    pub fn handle_args(&mut self) -> Result<(), Error> {
         match &self.args.command {
             Command::Vl {
                 show_loc,
@@ -36,62 +37,62 @@ impl App {
                 location,
             } => {
                 if let (Some(name), Some(location)) = (name, location) {
-                    self.vaults.create_vault(name, location)
+                    self.vaults.create_vault(name, location)?
                 } else {
                     self.vaults.list_vaults(show_loc)
                 }
             }
-            Command::En { name } => self.vaults.enter_vault(name),
+            Command::En { name } => self.vaults.enter_vault(name)?,
             Command::Nt { name } => self
                 .vaults
-                .ref_current()
-                .create_vault_item(VaultItem::Nt, name),
+                .ref_current()?
+                .create_vault_item(VaultItem::Nt, name)?,
             Command::Op { name } => self
                 .vaults
-                .ref_current()
-                .open_note(name, self.config.get_editor_data()),
+                .ref_current()?
+                .open_note(name, self.config.get_editor_data())?,
             Command::Fd { name } => self
                 .vaults
-                .ref_current()
-                .create_vault_item(VaultItem::Fd, name),
-            Command::Cd { path } => self.vaults.mut_current().change_folder(path),
+                .ref_current()?
+                .create_vault_item(VaultItem::Fd, name)?,
+            Command::Cd { path } => self.vaults.mut_current()?.change_folder(path)?,
             Command::Rm { item_type, name } => match item_type {
-                Item::Vl => self.vaults.remove_vault(name),
+                Item::Vl => self.vaults.remove_vault(name)?,
                 Item::Nt | Item::Fd => self
                     .vaults
-                    .ref_current()
-                    .remove_vault_item(item_type.to_vault_item(), name),
+                    .ref_current()?
+                    .remove_vault_item(item_type.to_vault_item(), name)?,
             },
             Command::Rn {
                 item_type,
                 name,
                 new_name,
             } => match item_type {
-                Item::Vl => self.vaults.rename_vault(name, new_name),
-                Item::Nt | Item::Fd => self.vaults.ref_current().rename_vault_item(
+                Item::Vl => self.vaults.rename_vault(name, new_name)?,
+                Item::Nt | Item::Fd => self.vaults.ref_current()?.rename_vault_item(
                     item_type.to_vault_item(),
                     name,
                     new_name,
-                ),
+                )?,
             },
             Command::Mv {
                 item_type,
                 name,
                 new_location,
             } => match item_type {
-                Item::Vl => self.vaults.move_vault(name, new_location),
-                Item::Nt | Item::Fd => self.vaults.ref_current().move_vault_item(
+                Item::Vl => self.vaults.move_vault(name, new_location)?,
+                Item::Nt | Item::Fd => self.vaults.ref_current()?.move_vault_item(
                     item_type.to_vault_item(),
                     name,
                     new_location,
-                ),
+                )?,
             },
             Command::Vm {
                 item_type,
                 name,
                 vault_name,
-            } => self.vaults.move_to_vault(item_type, name, vault_name),
-            Command::Ls => self.vaults.ref_current().list(),
+            } => self.vaults.move_to_vault(item_type, name, vault_name)?,
+            Command::Ls => self.vaults.ref_current()?.list(),
             Command::Cf { config_type, value } => {
                 if let Some(value) = value {
                     self.config.set_config(config_type, value)
@@ -101,5 +102,7 @@ impl App {
             }
             _ => self.display_app_state(),
         }
+
+        Ok(())
     }
 }
