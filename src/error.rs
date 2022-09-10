@@ -42,6 +42,7 @@ impl Display for Error {
                 Error::VaultNotFound(name) => format!("vault {} doesn't exist", name),
                 Error::NotInsideVault => "not inside a vault".to_string(),
                 Error::OutOfBounds => "path crosses the bounds of vault".to_string(),
+                Error::EditorNotFound => "editor not found".to_string(),
                 Error::Undefined(error) => format!("undefined error: {}", error),
                 _ => "error msg not set".to_string(),
             }

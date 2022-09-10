@@ -16,9 +16,9 @@ impl Item {
         }
     }
 
-    pub fn full(&self) -> &str {
+    pub fn fs_name(&self) -> &str {
         match self {
-            Item::Vl => "vault",
+            Item::Vl => "folder",
             Item::Nt => "note",
             Item::Fd => "folder",
         }
