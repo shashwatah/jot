@@ -2,7 +2,6 @@ use crate::{enums::Item, error::Error};
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
-    io::{Error as IOError, ErrorKind},
     path::{Path, PathBuf},
     process::Command,
 };
@@ -36,23 +35,46 @@ pub fn process_path(path: &Path) -> PathBuf {
     processed_path
 }
 
-// creates item(folders(dr & vl) and md files) and returns path to created item
-// might rename this later
 pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
     let path = generate_item_path(&item_type, name, location)?;
 
+    if let Err(error) = create_item_collect(&item_type, &path) {
+        return Err(match error.kind() {
+            std::io::ErrorKind::NotFound => Error::PathNotFound,
+            std::io::ErrorKind::AlreadyExists => {
+                Error::ItemAlreadyExists(item_type, name.to_owned())
+            }
+            _ => Error::Undefined(error),
+        });
+    }
+
+    Ok(path)
+}
+
+fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
     if let Item::Nt = item_type {
         File::options().create_new(true).write(true).open(&path)?;
     } else {
         DirBuilder::new().create(&path)?;
     }
 
-    Ok(path)
+    Ok(())
 }
 
 pub fn remove_item(item_type: Item, name: &str, location: &Path) -> Result<(), Error> {
     let path = generate_item_path(&item_type, name, location)?;
 
+    if let Err(error) = remove_item_collect(&item_type, &path) {
+        return Err(match error.kind() {
+            std::io::ErrorKind::NotFound => Error::ItemNotFound(item_type, name.to_owned()),
+            _ => Error::Undefined(error),
+        });
+    }
+
+    Ok(())
+}
+
+fn remove_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
     if let Item::Nt = item_type {
         remove_file(path)?;
     } else {
@@ -75,7 +97,13 @@ pub fn rename_item(
     let original_path = generate_item_path(&item_type, name, location)?;
     let new_path = generate_item_path(&item_type, new_name, location)?;
 
-    rename(original_path, &new_path)?;
+    if let Err(error) = rename(original_path, &new_path) {
+        return Err(match error.kind() {
+            std::io::ErrorKind::NotFound => Error::ItemNotFound(item_type, name.to_owned()),
+            _ => Error::Undefined(error),
+        });
+    }
+
     Ok(new_path)
 }
 
@@ -86,19 +114,16 @@ pub fn move_item(
     new_location: &Path,
 ) -> Result<PathBuf, Error> {
     if new_location == original_location {
-        return Err(Error::SameLocation(item_type));
+        return Err(Error::SameLocation);
     }
 
     let new_path = generate_item_path(&item_type, name, new_location)?;
     if new_path.exists() {
-        return Err(Error::ItemAlreadyExists(
-            item_type.to_vault_item(),
-            name.to_owned(),
-        ));
+        return Err(Error::ItemAlreadyExists(item_type, name.to_owned()));
     }
 
     let original_path = vec![generate_item_path(&item_type, name, original_location)?];
-    move_items(&original_path, &new_location, &CopyOptions::new()).expect("move_items err");
+    move_items(&original_path, &new_location, &CopyOptions::new())?;
 
     Ok(new_path)
 }
@@ -107,14 +132,22 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> 
     let path = generate_item_path(&Item::Nt, name, location)?;
 
     if !path.exists() {
-        return Err(Error::FSError(IOError::new(
-            ErrorKind::NotFound,
-            format!("note {} doesn't exist", name),
-        )));
+        return Err(Error::ItemNotFound(Item::Nt, name.to_string()));
     }
 
     let (editor, conflict) = editor_data;
 
+    if let Err(error) = run_editor_collect(editor, conflict, &path) {
+        return Err(match error.kind() {
+            std::io::ErrorKind::NotFound => Error::EditorNotFound,
+            _ => Error::Undefined(error),
+        });
+    }
+
+    Ok(())
+}
+
+fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), std::io::Error> {
     let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
 
     if conflict {
@@ -165,7 +198,7 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
 
 fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
     if !valid_name(name) {
-        return Err(Error::InvalidName(name.to_owned()));
+        return Err(Error::InvalidName);
     }
 
     let mut path = join_paths(vec![location.to_str().unwrap(), name]);

@@ -8,10 +8,7 @@ use crate::{
     },
 };
 use serde::{Deserialize, Serialize};
-use std::{
-    io::{Error as IOError, ErrorKind},
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
@@ -123,7 +120,7 @@ impl Vault {
         let new_location = process_path(&join_paths(vec![&original_location, new_location]));
 
         if !new_location.starts_with(vault_path) {
-            return Err(Error::PathOutOfBounds);
+            return Err(Error::OutOfBounds);
         }
 
         move_item(item_type.to_item(), name, &original_location, &new_location)?;
@@ -173,14 +170,11 @@ impl Vault {
         let new_location = process_path(&join_paths(vec![&vault_path, self.get_folder(), path]));
 
         if !new_location.exists() {
-            return Err(Error::FSError(IOError::new(
-                ErrorKind::NotFound,
-                "cannot find the path specified",
-            )));
+            return Err(Error::PathNotFound);
         }
 
         if !new_location.starts_with(&vault_path) {
-            return Err(Error::PathOutOfBounds);
+            return Err(Error::OutOfBounds);
         }
 
         let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();

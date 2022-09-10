@@ -1,34 +1,25 @@
-use crate::enums::{Item, VaultItem};
+use crate::enums::Item;
 use std::fmt::Display;
-use std::io::{Error as IOError, ErrorKind};
-
-// writing boilerplate error code atm, will probably replace this with thiserror in future
 
 #[allow(unused)]
 #[derive(Debug)]
 pub enum Error {
-    FSError(IOError), // converted from io::std::Error > namely NotFound & AlreadyExists
-    FileError,        // errors concering FileIO trait
-    InternalError(String), // internal errors: unwrap calls that fail, internal err result matches
-    InvalidName(String),
+    InternalError, // internal errors: unwrap calls that fail, internal err result matches
+    FileError,     // errors concering FileIO trait
+    MoveError(String), // this will be removed upon switching to custom recursive move fn
+    InvalidName,
     SameName,
-    SameLocation(Item),
+    SameLocation,
+    PathNotFound,
+    ItemAlreadyExists(Item, String),
+    ItemNotFound(Item, String),
     VaultAlreadyExists(String),
     VaultNotFound(String),
     NotInsideVault,
-    PathOutOfBounds,
-    ItemAlreadyExists(VaultItem, String),
+    OutOfBounds,
     EditorNotFound,
-    Misc,
+    Undefined(std::io::Error),
 }
-
-/*
-    errors that are not exactly errors:
-        already in vault {} -- upon en_vault
-        {item} {}  already exists in vault {} -- upon v_move
-        {item} {} already exist in this location -- upon move
-
-*/
 
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -36,30 +27,34 @@ impl Display for Error {
             f,
             "{}",
             match self {
-                Error::FSError(io_err) => io_err.to_string().to_ascii_lowercase(),
-                Error::SameName => "new can't be same as old name".to_string(),
-                Error::SameLocation(item_type) =>
-                    format!("{} already exists in this location", item_type.full()),
+                Error::InvalidName => "invalid name".to_string(),
+                Error::SameName => "new name is same as old name".to_string(),
+                Error::SameLocation => "new location is same as old location".to_string(),
+                Error::PathNotFound => "couldn't find the path specified".to_string(),
+                Error::ItemAlreadyExists(item_type, name) => format!(
+                    "a {} named {} already exists in this location",
+                    item_type.fs_name(),
+                    name
+                ),
+                Error::ItemNotFound(item_type, name) =>
+                    format!("{} {} not found", item_type.fs_name(), name),
                 Error::VaultAlreadyExists(name) => format!("vault {} already exists", name),
                 Error::VaultNotFound(name) => format!("vault {} doesn't exist", name),
                 Error::NotInsideVault => "not inside a vault".to_string(),
-                Error::PathOutOfBounds => "path crosses the bounds of vault".to_string(),
-                Error::ItemAlreadyExists(item_type, name) => format!(
-                    "a {} named {} already exists in this location",
-                    item_type.full(),
-                    name
-                ),
-                Error::Misc | _ => "not set".to_string(),
+                Error::OutOfBounds => "path crosses the bounds of vault".to_string(),
+                Error::Undefined(error) => format!("undefined error: {}", error),
+                _ => "error msg not set".to_string(),
             }
         )
     }
 }
 
-impl From<std::io::Error> for Error {
-    fn from(error: std::io::Error) -> Self {
-        match error.kind() {
-            ErrorKind::NotFound | ErrorKind::AlreadyExists => Error::FSError(error),
-            _ => Error::Misc,
+impl From<fs_extra::error::Error> for Error {
+    fn from(error: fs_extra::error::Error) -> Self {
+        let mut error = error.to_string().to_lowercase();
+        if let Some(dot) = error.find(".") {
+            error.replace_range(dot.., "");
         }
+        Error::MoveError(error)
     }
 }
