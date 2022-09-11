@@ -1,17 +1,18 @@
 mod app;
 mod enums;
-mod error;
 mod output;
 mod state;
 mod traits;
 mod utils;
 
-use crate::app::App;
-
+use crate::{app::App, output::Output};
 fn main() {
     let mut app = App::new();
-
-    if let Err(error) = app.handle_args() {
-        println!("{}", error)
-    }
+    println!(
+        "{}",
+        match app.handle_args() {
+            Ok(msg) => Output::Message(msg),
+            Err(err) => Output::Error(err),
+        }
+    );
 }

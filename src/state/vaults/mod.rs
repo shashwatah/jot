@@ -3,13 +3,13 @@ pub mod vault;
 
 use crate::{
     enums::{Item, VaultItem},
-    error::Error,
+    output::error::Error,
     traits::FileIO,
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
-use std::path::Path;
-
+use colored::Colorize;
 use data::Data;
+use std::path::Path;
 use vault::Vault;
 
 #[derive(Debug)]
@@ -49,7 +49,7 @@ impl Vaults {
 
         for vault_name in self.data.get_vaults().keys() {
             if current_vault_name.is_some() && vault_name == current_vault_name.unwrap() {
-                print!("👉 {}", vault_name)
+                print!("👉 {}", vault_name.blue())
             } else {
                 print!("   {}", vault_name)
             }
@@ -66,19 +66,19 @@ impl Vaults {
     }
 
     pub fn ref_current(&self) -> Result<&Vault, Error> {
-        if self.current.is_some() {
-            Ok(self.current.as_ref().unwrap())
-        } else {
-            Err(Error::NotInsideVault)
+        if self.current.is_none() {
+            return Err(Error::NotInsideVault);
         }
+
+        Ok(self.current.as_ref().unwrap())
     }
 
     pub fn mut_current(&mut self) -> Result<&mut Vault, Error> {
-        if self.current.is_some() {
-            Ok(self.current.as_mut().unwrap())
-        } else {
-            Err(Error::NotInsideVault)
+        if self.current.is_none() {
+            return Err(Error::NotInsideVault);
         }
+
+        Ok(self.current.as_mut().unwrap())
     }
 
     pub fn create_vault(&mut self, name: &str, location: &Path) -> Result<(), Error> {
@@ -97,7 +97,6 @@ impl Vaults {
 
         self.data.add_vault(name.to_owned(), location);
 
-        print!("vault {} created", name);
         Ok(())
     }
 
@@ -112,7 +111,6 @@ impl Vaults {
                 }
             }
 
-            print!("vault {} removed", name);
             Ok(())
         } else {
             Err(Error::VaultNotFound(name.to_owned()))
@@ -137,7 +135,6 @@ impl Vaults {
                 }
             }
 
-            print!("vault {} renamed to {}", name, new_name);
             Ok(())
         } else {
             Err(Error::VaultNotFound(name.to_owned()))
@@ -153,7 +150,6 @@ impl Vaults {
             Vault::load_path(data_path).set_location(new_location.to_owned());
             self.data.set_vault_location(name, new_location);
 
-            print!("vault {} moved", name);
             Ok(())
         } else {
             Err(Error::VaultNotFound(name.to_owned()))
@@ -169,6 +165,7 @@ impl Vaults {
         if let Some(vault_location) = self.data.get_vault_location(vault_name) {
             self.ref_current()?
                 .vmove_vault_item(item_type, name, vault_name, vault_location)?;
+
             Ok(())
         } else {
             Err(Error::VaultNotFound(name.to_owned()))
@@ -182,13 +179,12 @@ impl Vaults {
 
         if let Some(current_vault_name) = self.data.get_current_vault() {
             if name == current_vault_name {
-                print!("already in {}", name);
-                return Ok(());
+                return Err(Error::AlreadyInVault(name.to_owned()));
             }
         }
 
         self.data.set_current_vault(Some(name.to_owned()));
-        print!("entered {}", name);
+
         Ok(())
     }
 }

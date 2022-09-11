@@ -1,6 +1,6 @@
 use crate::{
     enums::VaultItem,
-    error::Error,
+    output::error::Error,
     traits::FileIO,
     utils::{
         create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
@@ -81,7 +81,6 @@ impl Vault {
         let location = self.generate_location();
 
         create_item(item_type.to_item(), name, &location)?;
-        print!("{} {} created", item_type.full(), name);
 
         Ok(())
     }
@@ -90,7 +89,6 @@ impl Vault {
         let location = self.generate_location();
 
         remove_item(item_type.to_item(), name, &location)?;
-        print!("{} {} removed", item_type.full(), name);
 
         Ok(())
     }
@@ -104,7 +102,7 @@ impl Vault {
         let location = self.generate_location();
 
         rename_item(item_type.to_item(), name, new_name, &location)?;
-        print!("{} {} renamed to {}", item_type.full(), name, new_name);
+
         Ok(())
     }
 
@@ -125,7 +123,6 @@ impl Vault {
 
         move_item(item_type.to_item(), name, &original_location, &new_location)?;
 
-        print!("{} {} moved", item_type.full(), name);
         Ok(())
     }
 
@@ -150,17 +147,12 @@ impl Vault {
         let new_location = join_paths(vec![vault_location.to_str().unwrap(), vault_name]);
         move_item(item_type.to_item(), name, &original_location, &new_location)?;
 
-        print!(
-            "{} {} moved to vault {}",
-            item_type.full(),
-            name,
-            vault_name
-        );
         Ok(())
     }
 
     pub fn open_note(&self, name: &str, editor_data: (&String, bool)) -> Result<(), Error> {
         let location = self.generate_location();
+
         run_editor(editor_data, name, &location)?;
         Ok(())
     }
@@ -184,7 +176,7 @@ impl Vault {
         let destination_folder = destination_folder.to_path_buf();
 
         self.set_folder(destination_folder);
-        print!("changed folder");
+
         Ok(())
     }
 

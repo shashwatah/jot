@@ -16,11 +16,15 @@ impl Item {
         }
     }
 
-    pub fn fs_name(&self) -> &str {
+    pub fn fs_name(&self) -> String {
+        self.to_vault_item().full()
+    }
+
+    pub fn full(&self) -> String {
         match self {
-            Item::Vl => "folder",
-            Item::Nt => "note",
-            Item::Fd => "folder",
+            Item::Vl => "vault".to_string(),
+            Item::Nt => "note".to_string(),
+            Item::Fd => "folder".to_string(),
         }
     }
 }
@@ -39,10 +43,10 @@ impl VaultItem {
         }
     }
 
-    pub fn full(&self) -> &str {
+    pub fn full(&self) -> String {
         match self {
-            VaultItem::Nt => "note",
-            VaultItem::Fd => "folder",
+            VaultItem::Nt => "note".to_string(),
+            VaultItem::Fd => "folder".to_string(),
         }
     }
 }
@@ -51,4 +55,13 @@ impl VaultItem {
 pub enum ConfigType {
     Editor,
     Conflict,
+}
+
+impl ConfigType {
+    pub fn to_str(&self) -> &str {
+        match self {
+            ConfigType::Editor => "editor",
+            ConfigType::Conflict => "conflict",
+        }
+    }
 }

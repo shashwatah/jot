@@ -1,4 +1,5 @@
-use crate::{enums::Item, error::Error};
+use crate::{enums::Item, output::error::Error};
+use colored::Colorize;
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
@@ -184,12 +185,14 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
             print!("├── ")
         }
 
-        println!("{}", entry_name);
-
         if entry.is_dir() {
+            println!("{}", entry_name);
+
             were_last.push(is_last);
             were_last = rec_list(were_last, entry);
             were_last.pop();
+        } else {
+            println!("{}", entry_name.blue());
         }
     }
 

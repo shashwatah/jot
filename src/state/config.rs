@@ -36,20 +36,10 @@ impl Config {
     }
 
     pub fn set_config(&mut self, config_type: &ConfigType, value: &String) {
-        print!(
-            "set {} to {}",
-            match config_type {
-                ConfigType::Editor => {
-                    self.set_editor(value.to_owned());
-                    "editor"
-                }
-                ConfigType::Conflict => {
-                    self.set_conflict(value);
-                    "conflict"
-                }
-            },
-            value
-        );
+        match config_type {
+            ConfigType::Editor => self.set_editor(value.to_owned()),
+            ConfigType::Conflict => self.set_conflict(value.to_owned()),
+        }
     }
 
     pub fn display_config(&self, config_type: &ConfigType) {
@@ -82,7 +72,7 @@ impl Config {
         &self.conflict
     }
 
-    fn set_conflict(&mut self, conflict: &str) {
+    fn set_conflict(&mut self, conflict: String) {
         self.conflict = conflict.parse().unwrap();
         self.store()
     }
