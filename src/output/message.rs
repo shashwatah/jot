@@ -1,0 +1,52 @@
+use crate::enums::{ConfigType, Item, VaultItem};
+use colored::Colorize;
+use std::fmt::Display;
+
+pub enum Message {
+    VaultEntered(String),
+    ItemCreated(Item, String),
+    ItemRemoved(Item, String),
+    ItemRenamed(Item, String, String),
+    ItemMoved(Item, String),
+    ItemVMoved(VaultItem, String, String),
+    FolderChanged,
+    ConfigSet(ConfigType, String),
+    Empty,
+}
+
+impl Display for Message {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Message::VaultEntered(name) => format!("entered {}", name.italic().blue()),
+                Message::ItemCreated(item_type, name) =>
+                    format!("{} {} created", item_type.full(), name.italic().blue()),
+                Message::ItemRemoved(item_type, name) =>
+                    format!("{} {} removed", item_type.full(), name.italic().blue()),
+                Message::ItemRenamed(item_type, name, new_name) => format!(
+                    "{} {} renamed to {}",
+                    item_type.full(),
+                    name.italic().blue(),
+                    new_name.blue()
+                ),
+                Message::ItemMoved(item_type, name) =>
+                    format!("{} {} moved", item_type.full(), name.italic().blue()),
+                Message::ItemVMoved(item_type, name, vault_name) => format!(
+                    "{} {} moved to vault {}",
+                    item_type.full(),
+                    name.italic().blue(),
+                    vault_name.blue()
+                ),
+                Message::FolderChanged => "changed folder".to_string(),
+                Message::ConfigSet(config_type, value) => format!(
+                    " set {} to {}",
+                    config_type.to_str().italic().blue(),
+                    value.italic().blue()
+                ),
+                Message::Empty => "".to_string(),
+            }
+        )
+    }
+}
