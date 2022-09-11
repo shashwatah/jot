@@ -42,21 +42,14 @@ impl Config {
         }
     }
 
-    pub fn display_config(&self, config_type: &ConfigType) {
-        print!(
-            "{}",
-            match config_type {
-                ConfigType::Editor => {
-                    self.get_editor()
-                }
-                ConfigType::Conflict => {
-                    match self.get_conflict() {
-                        true => "true",
-                        false => "false",
-                    }
-                }
-            }
-        );
+    pub fn get_config(&self, config_type: &ConfigType) -> String {
+        match config_type {
+            ConfigType::Editor => self.get_editor().to_owned(),
+            ConfigType::Conflict => match self.get_conflict() {
+                true => "true".to_string(),
+                false => "false".to_string(),
+            },
+        }
     }
 
     fn get_editor(&self) -> &String {

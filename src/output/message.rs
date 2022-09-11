@@ -10,6 +10,7 @@ pub enum Message {
     ItemMoved(Item, String),
     ItemVMoved(VaultItem, String, String),
     FolderChanged,
+    Config(ConfigType, String),
     ConfigSet(ConfigType, String),
     Empty,
 }
@@ -20,31 +21,30 @@ impl Display for Message {
             f,
             "{}",
             match self {
-                Message::VaultEntered(name) => format!("entered {}", name.italic().blue()),
+                Message::VaultEntered(name) => format!("entered {}", name.blue()),
                 Message::ItemCreated(item_type, name) =>
-                    format!("{} {} created", item_type.full(), name.italic().blue()),
+                    format!("{} {} created", item_type.full(), name.blue()),
                 Message::ItemRemoved(item_type, name) =>
-                    format!("{} {} removed", item_type.full(), name.italic().blue()),
+                    format!("{} {} removed", item_type.full(), name.blue()),
                 Message::ItemRenamed(item_type, name, new_name) => format!(
                     "{} {} renamed to {}",
                     item_type.full(),
-                    name.italic().blue(),
+                    name.blue(),
                     new_name.blue()
                 ),
                 Message::ItemMoved(item_type, name) =>
-                    format!("{} {} moved", item_type.full(), name.italic().blue()),
+                    format!("{} {} moved", item_type.full(), name.blue()),
                 Message::ItemVMoved(item_type, name, vault_name) => format!(
                     "{} {} moved to vault {}",
                     item_type.full(),
-                    name.italic().blue(),
+                    name.blue(),
                     vault_name.blue()
                 ),
                 Message::FolderChanged => "changed folder".to_string(),
-                Message::ConfigSet(config_type, value) => format!(
-                    " set {} to {}",
-                    config_type.to_str().italic().blue(),
-                    value.italic().blue()
-                ),
+                Message::Config(config_type, value) =>
+                    format!("{}: {}", config_type.to_str(), value.blue()),
+                Message::ConfigSet(config_type, value) =>
+                    format!("set {} to {}", config_type.to_str().blue(), value.blue()),
                 Message::Empty => "".to_string(),
             }
         )

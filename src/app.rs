@@ -25,10 +25,6 @@ impl App {
         }
     }
 
-    pub fn display_app_state(&self) {
-        println!("{:#?}\n{:#?}\n{:#?}", self.args, self.config, self.vaults);
-    }
-
     pub fn handle_args(&mut self) -> Result<Message, Error> {
         match &self.args.command {
             Command::Vl {
@@ -135,14 +131,11 @@ impl App {
                     self.config.set_config(config_type, value);
                     return Ok(Message::ConfigSet(config_type.to_owned(), value.to_owned()));
                 } else {
-                    self.config.display_config(config_type);
-                    return Ok(Message::Empty);
+                    let value = self.config.get_config(config_type);
+                    return Ok(Message::Config(config_type.to_owned(), value));
                 }
             }
-            _ => {
-                self.display_app_state();
-                Ok(Message::Empty)
-            }
+            _ => Ok(Message::Empty),
         }
     }
 }
