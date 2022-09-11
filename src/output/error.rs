@@ -1,5 +1,4 @@
 use crate::enums::Item;
-use colored::Colorize;
 use std::fmt::Display;
 
 #[allow(unused)]
@@ -41,15 +40,14 @@ impl Display for Error {
                 Error::ItemAlreadyExists(item_type, name) => format!(
                     "a {} named {} already exists in this location",
                     item_type.fs_name(),
-                    name.italic()
+                    name
                 ),
                 Error::ItemNotFound(item_type, name) =>
-                    format!("{} {} not found", item_type.fs_name(), name.italic()),
-                Error::VaultAlreadyExists(name) =>
-                    format!("vault {} already exists", name.italic()),
-                Error::VaultNotFound(name) => format!("vault {} doesn't exist", name.italic()),
+                    format!("{} {} not found", item_type.fs_name(), name),
+                Error::VaultAlreadyExists(name) => format!("vault {} already exists", name),
+                Error::VaultNotFound(name) => format!("vault {} doesn't exist", name),
                 Error::NotInsideVault => "not inside a vault".to_string(),
-                Error::AlreadyInVault(name) => format!("already in vault {}", name.italic()),
+                Error::AlreadyInVault(name) => format!("already in vault {}", name),
                 Error::OutOfBounds => "path crosses the bounds of vault".to_string(),
                 Error::EditorNotFound => "editor not found".to_string(),
                 Error::MoveError(msg) => msg.to_owned(),
