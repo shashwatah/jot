@@ -26,16 +26,16 @@ create items
         \x1b[0;34mnt\x1b[0m      create a note 
         \x1b[0;34mfd\x1b[0m      create a folder
 
+interact with items
+    \x1b[0;34men\x1b[0m      enter a vault
+    \x1b[0;34mop\x1b[0m      open a note from current folder
+    \x1b[0;34mcd\x1b[0m      change folder within current vault
+
 perform fs operations on items
     \x1b[0;34mrm\x1b[0m      remove an item 
     \x1b[0;34mrn\x1b[0m      rename an item 
     \x1b[0;34mmv\x1b[0m      move an item to a new location
     \x1b[0;34mvm\x1b[0m      move an item to a different vault
-
-other commands
-    \x1b[0;34men\x1b[0m      enter a vault
-    \x1b[0;34mop\x1b[0m      open a note from current folder
-    \x1b[0;34mcd\x1b[0m      change folder within current vault
 
 get help 
     use \x1b[0;34mhelp\x1b[0m or \x1b[0;34m-h\x1b[0m and \x1b[0;34m--help\x1b[0m flags along with a command to get corresponding help."))]
