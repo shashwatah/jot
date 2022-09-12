@@ -1,5 +1,4 @@
 use crate::enums::{ConfigType, Item, VaultItem};
-use colored::Colorize;
 use std::fmt::Display;
 
 pub enum Message {
@@ -21,30 +20,33 @@ impl Display for Message {
             f,
             "{}",
             match self {
-                Message::VaultEntered(name) => format!("entered {}", name.blue()),
+                Message::VaultEntered(name) => format!("entered \x1b[0;34m{}\x1b[0m", name),
                 Message::ItemCreated(item_type, name) =>
-                    format!("{} {} created", item_type.full(), name.blue()),
+                    format!("{} \x1b[0;34m{}\x1b[0m created", item_type.full(), name),
                 Message::ItemRemoved(item_type, name) =>
-                    format!("{} {} removed", item_type.full(), name.blue()),
+                    format!("{} \x1b[0;34m{}\x1b[0m removed", item_type.full(), name),
                 Message::ItemRenamed(item_type, name, new_name) => format!(
-                    "{} {} renamed to {}",
+                    "{} \x1b[0;34m{}\x1b[0m renamed to \x1b[0;34m{}\x1b[0m",
                     item_type.full(),
-                    name.blue(),
-                    new_name.blue()
+                    name,
+                    new_name
                 ),
                 Message::ItemMoved(item_type, name) =>
-                    format!("{} {} moved", item_type.full(), name.blue()),
+                    format!("{} \x1b[0;34m{}\x1b[0m moved", item_type.full(), name),
                 Message::ItemVMoved(item_type, name, vault_name) => format!(
-                    "{} {} moved to vault {}",
+                    "{} \x1b[0;34m{}\x1b[0m moved to vault \x1b[0;34m{}\x1b[0m",
                     item_type.full(),
-                    name.blue(),
-                    vault_name.blue()
+                    name,
+                    vault_name
                 ),
                 Message::FolderChanged => "changed folder".to_string(),
                 Message::Config(config_type, value) =>
-                    format!("{}: {}", config_type.to_str(), value.blue()),
-                Message::ConfigSet(config_type, value) =>
-                    format!("set {} to {}", config_type.to_str().blue(), value.blue()),
+                    format!("{}: \x1b[0;34m{}\x1b[0m", config_type.to_str(), value),
+                Message::ConfigSet(config_type, value) => format!(
+                    "set \x1b[0;34m{}\x1b[0m to \x1b[0;34m{}\x1b[0m",
+                    config_type.to_str(),
+                    value
+                ),
                 Message::Empty => "".to_string(),
             }
         )

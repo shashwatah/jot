@@ -1,11 +1,10 @@
 pub mod error;
 pub mod message;
 
-use colored::Colorize;
 use std::fmt::Display;
 
 use error::Error;
-use message::Message;
+pub use message::Message;
 
 pub enum Output {
     Message(Message),
@@ -19,7 +18,7 @@ impl Display for Output {
             "{}",
             match self {
                 Output::Message(msg) => msg.to_string(),
-                Output::Error(err) => format!("{}: {}", "error".red(), err),
+                Output::Error(err) => format!("\x1b[0;31merror\x1b[0m: {}", err),
             }
         )
     }

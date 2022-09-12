@@ -7,7 +7,6 @@ use crate::{
     traits::FileIO,
     utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
 };
-use colored::Colorize;
 use data::Data;
 use std::path::Path;
 use vault::Vault;
@@ -49,7 +48,7 @@ impl Vaults {
 
         for vault_name in self.data.get_vaults().keys() {
             if current_vault_name.is_some() && vault_name == current_vault_name.unwrap() {
-                print!("👉 {}", vault_name.blue())
+                print!("👉 \x1b[0;34m{}\x1b[0m", vault_name)
             } else {
                 print!("   {}", vault_name)
             }

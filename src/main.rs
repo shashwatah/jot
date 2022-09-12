@@ -5,14 +5,18 @@ mod state;
 mod traits;
 mod utils;
 
-use crate::{app::App, output::Output};
+use crate::{
+    app::App,
+    output::{Message, Output},
+};
 fn main() {
     let mut app = App::new();
-    println!(
-        "{}",
-        match app.handle_args() {
-            Ok(msg) => Output::Message(msg),
-            Err(err) => Output::Error(err),
-        }
-    );
+
+    match app.handle_args() {
+        Ok(msg) => match msg {
+            Message::Empty => (),
+            _ => println!("{}", Output::Message(msg)),
+        },
+        Err(err) => println!("{}", Output::Error(err)),
+    }
 }
