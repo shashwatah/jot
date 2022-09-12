@@ -7,19 +7,38 @@ use std::path::PathBuf;
 #[clap(global_setting(AppSettings::DontCollapseArgsInUsage))]
 #[clap(global_setting(AppSettings::DeriveDisplayOrder))]
 #[clap(global_setting(AppSettings::ColorNever))]
-#[clap(before_help(
-    r#"
-                                    ________      _____ 
-                                    ______(_)_______  /_
-                                    _____  /_  __ \  __/
-                                    ____  / / /_/ / /_  
-                                    ___  /  \____/\__/  
-                                    /___/ 
-"#
-))]
-#[clap(help_template(
-    "{before-help}{about-with-newline}{usage-heading}\n    {usage}\n\n{all-args}"
-))]
+#[clap(help_template("\x1b[0;34m________      _____ 
+______(_)_______  /_
+_____  /_  __ \\  __/
+____  / / /_/ / /_  
+___  /  \\____/\\__/  
+/___/
+\x1b[0m
+
+\x1b[0;34mv0.1.0\x1b[0m | crafted with ❤️ by \x1b[0;34maraekiel\x1b[0m
+
+
+usage: jot <command>
+
+create items
+    \x1b[0;34mvl\x1b[0m      create a vault with absolute location or list vaults
+    create vault items in current location
+        \x1b[0;34mnt\x1b[0m      create a note 
+        \x1b[0;34mfd\x1b[0m      create a folder
+
+perform fs operations on items
+    \x1b[0;34mrm\x1b[0m      remove an item 
+    \x1b[0;34mrn\x1b[0m      rename an item 
+    \x1b[0;34mmv\x1b[0m      move an item with to a new location
+    \x1b[0;34mvm\x1b[0m      move a vault item to a different vault
+
+other commands
+    \x1b[0;34men\x1b[0m      enter a vault
+    \x1b[0;34mop\x1b[0m      open a note
+    \x1b[0;34mcd\x1b[0m      change the current folder
+
+get help 
+    use \x1b[0;34mhelp\x1b[0m or \x1b[0;34m-h\x1b[0m and \x1b[0;34m--help\x1b[0m flags along with a command to get corresponding help"))]
 pub struct Args {
     #[clap(subcommand)]
     pub command: Command,
