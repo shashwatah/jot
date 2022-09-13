@@ -2,7 +2,7 @@
 
 <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/apm/l/atomic-design-ui.svg?"></a>
 <a href="https://github.com/araekiel/jot/releases/tag/v0.1.0"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.0-red"></a>
-<a href=""><img alt="Cargo" src="https://img.shields.io/badge/cargo-jt-blue"></a>
+<a href="https://crates.io/crates/jt"><img alt="Cargo" src="https://img.shields.io/badge/cargo-jt-blue"></a>
 
 <p>
   <a href="#highlights">Highlights</a> •
