@@ -2,7 +2,7 @@
 
 <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/apm/l/atomic-design-ui.svg?"></a>
 <a href="https://github.com/araekiel/jot/releases/tag/v0.1.0"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.0-red"></a>
-<a href=""><img alt="Cargo" src="https://img.shields.io/badge/cargo-jot-blue"></a>
+<a href=""><img alt="Cargo" src="https://img.shields.io/badge/cargo-jt-blue"></a>
 
 <p>
   <a href="#highlights">Highlights</a> •
@@ -41,12 +41,12 @@ Jot is aimed at making note management, that can seem tedious on a GUI, blaaaazi
 Run the following command to install jot with cargo:
 
 ```bash
-$ cargo install jot
+$ cargo install jt
 ```
 
 ### v0.1.0 Executable Download
 
-[Jot v0.1.0](https://github.com/araekiel/jot/releases/download/v0.1.0/jot.exe) (.exe)
+[Jot v0.1.0](https://github.com/araekiel/jot/releases/download/v0.1.0/jt.exe) (.exe)
 
 ## Commands
 
@@ -61,7 +61,6 @@ This command needs an absolute path (as location for vault) that already exists 
 Pass in no arguments to get a list of vaults.
 
 <img alt="jt-vl" src="assets/gifs/jt-vl.gif">
-
 
 Use the *-l* flag to get vaults' locations.
 
@@ -79,7 +78,7 @@ Use this command to enter a vault.
 
 ### `nt`
 
-This command will create a note in current folder.
+Use this command to create a note in current folder.
 
 <img alt="jt-nt" src="assets/gifs/jt-nt.gif">
 
@@ -95,7 +94,7 @@ Use this command to open a note.
 
 ### `fd`
 
-This command will create a folder in current folder
+Use this command to create a folder in current folder
 
 <img alt="jt-fd" src="assets/gifs/jt-fd.gif">
 
@@ -103,7 +102,7 @@ This command will create a folder in current folder
 
 ### `cd`
 
-Use this command to change current folder with a path from the current folder.
+Use this command to change current folder.
 
 <img alt="jt-cd" src="assets/gifs/jt-cd.gif">
 
@@ -131,11 +130,15 @@ Rename an item (*vl*, *nt* or *fd*).
 
 <img alt="jt-rn" src="assets/gifs/jt-rn.gif">
 
+<hr>
+
 ### `mv`
 
 Move an item (*vl*, *nt* or *fd*).
 
 <img alt="jt-mv" src="assets/gifs/jt-mv.gif">
+
+<hr>
 
 ### `vm` 
 
@@ -154,6 +157,8 @@ Use this command to get the value of a config field.
 Pass in a value along with the above command to set the value of the config field.
 
 <img alt="jt-cf-set" src="assets/gifs/jt-cf-set.gif">
+
+<hr>
 
 ## Build from Source
 
