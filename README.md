@@ -54,33 +54,18 @@ $ cargo install jot
 
 Use this command to create a vault.
 <br>
-This command needs an absolute path that already exists or it will fail.
+This command needs an absolute path (as location for vault) that already exists or it will fail.
 
-<img alt="jot-vl" src="assets/gifs/jot-vl-cr.gif">
+<img alt="jt-vl-cr" src="assets/gifs/jt-vl-cr.gif">
 
 Pass in no arguments to get a list of vaults.
 
-<img alt="jot-vl" src="assets/gifs/jot-vl.gif">
+<img alt="jt-vl" src="assets/gifs/jt-vl.gif">
+
 
 Use the *-l* flag to get vaults' locations.
 
-<img alt="jot-vl" src="assets/gifs/jot-vl-l.gif">
-
-<hr>
-
-### `nt`
-
-This command will create a note in current folder.
-
-<img alt="jot-vl" src="assets/gifs/jot-nt.gif">
-
-<hr>
-
-### `fd`
-
-This command will create a folder in current folder
-
-<img alt="jot-vl" src="assets/gifs/jot-fd.gif">
+<img alt="jt-vl-l" src="assets/gifs/jt-vl-l.gif">
 
 <hr>
 
@@ -88,7 +73,15 @@ This command will create a folder in current folder
 
 Use this command to enter a vault.
 
-<img alt="jot-vl" src="assets/gifs/jot-en.gif">
+<img alt="jt-en" src="assets/gifs/jt-en.gif">
+
+<hr>
+
+### `nt`
+
+This command will create a note in current folder.
+
+<img alt="jt-nt" src="assets/gifs/jt-nt.gif">
 
 <hr>
 
@@ -96,7 +89,15 @@ Use this command to enter a vault.
 
 Use this command to open a note.
 
-<img alt="jot-vl" src="assets/gifs/jot-op.gif">
+<img alt="jt-op" src="assets/gifs/jt-op.gif">
+
+<hr>
+
+### `fd`
+
+This command will create a folder in current folder
+
+<img alt="jt-fd" src="assets/gifs/jt-fd.gif">
 
 <hr>
 
@@ -104,7 +105,7 @@ Use this command to open a note.
 
 Use this command to change current folder with a path from the current folder.
 
-<img alt="jot-vl" src="assets/gifs/jot-cd.gif">
+<img alt="jt-cd" src="assets/gifs/jt-cd.gif">
 
 <hr>
 
@@ -112,7 +113,7 @@ Use this command to change current folder with a path from the current folder.
 
 Use this command to print dir tree of the current folder
 
-<img alt="jot-vl" src="assets/gifs/jot-ls.gif">
+<img alt="jt-ls" src="assets/gifs/jt-ls.gif">
 
 <hr>
 
@@ -120,7 +121,7 @@ Use this command to print dir tree of the current folder
 
 Remove an item (*vl*, *nt* or *fd*).
 
-<img alt="jot-vl" src="assets/gifs/jot-rm.gif">
+<img alt="jt-rm" src="assets/gifs/jt-rm.gif">
 
 <hr>
 
@@ -128,19 +129,19 @@ Remove an item (*vl*, *nt* or *fd*).
 
 Rename an item (*vl*, *nt* or *fd*).
 
-<img alt="jot-vl" src="assets/gifs/jot-rn.gif">
+<img alt="jt-rn" src="assets/gifs/jt-rn.gif">
 
 ### `mv`
 
 Move an item (*vl*, *nt* or *fd*).
 
-<img alt="jot-vl" src="assets/gifs/jot-mv.gif">
+<img alt="jt-mv" src="assets/gifs/jt-mv.gif">
 
 ### `vm` 
 
 Move an item (*nt* or *fd*) to a different vault.
 
-<img alt="jot-vl" src="assets/gifs/jot-vm.gif">
+<img alt="jt-vm" src="assets/gifs/jt-vm.gif">
 
 <hr>
 
@@ -148,11 +149,11 @@ Move an item (*nt* or *fd*) to a different vault.
 
 Use this command to get the value of a config field.
 
-<img alt="jot-vl" src="assets/gifs/jot-cf.gif">
+<img alt="jt-cf" src="assets/gifs/jt-cf.gif">
 
 Pass in a value along with the above command to set the value of the config field.
 
-<img alt="jot-vl" src="assets/gifs/jot-cf-set.gif">
+<img alt="jt-cf-set" src="assets/gifs/jt-cf-set.gif">
 
 ## Build from Source
 

@@ -139,7 +139,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "jot"
+name = "jt"
 version = "0.1.0"
 dependencies = [
  "clap",
