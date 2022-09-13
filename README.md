@@ -15,7 +15,7 @@
 </p>
 
 
-Jot is a CLI alternative for obsidian built with rust.
+Jot is a CLI alternative for Obsidian built with rust.
 <br>
 While Obsidian is an excellent knowledge management tool, it proves to be overkill when all I want to do is jot down (pun intended) some notes and manage them locally, plus the GUI can often slow things down. Since Obsidian doesn't have a CLI client or an API that can enable the creation of one, I decided to make a fast and lightweight CLI alternative.
 <br>
