@@ -2,7 +2,14 @@
 name = "jot"
 version = "0.1.0"
 edition = "2021"
-authors = ["araekiel"]
+authors = ["araekiel <kumarshashwatsri@gmail.com>"]
+license = "MIT"
+description = "Blaaaazingly fast ⚡ CLI alternative for Obsidian."
+readme = "README.md"
+homepage = "https://github.com/araekiel/jot"
+repository = "https://github.com/araekiel/jot"
+keywords = ["cli", "notes", "note-management", "obsidian"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 serde = { version = "1.0.142", features = ["derive"] }
