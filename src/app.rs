@@ -60,7 +60,7 @@ impl App {
                 self.vaults
                     .ref_current()?
                     .create_vault_item(VaultItem::Fd, name)?;
-                return Ok(Message::ItemCreated(Item::Nt, name.to_owned()));
+                return Ok(Message::ItemCreated(Item::Fd, name.to_owned()));
             }
             Command::Cd { path } => {
                 self.vaults.mut_current()?.change_folder(path)?;
