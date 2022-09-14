@@ -32,6 +32,7 @@ While Obsidian is an excellent knowledge management tool, it often proves to be 
 - App config has two fields: *editor* & *conflict*.
     - *editor* by default is set to *nvim* and conflict to *true*.
     - *conflict* field tells the app if the editor conflicts with it for control over the terminal. Set it to *true* for editors like *nvim* and *false* for editors like *notepad*.
+- This tool has not been tested on platforms other than Windows as yet.
 
 ## Installation
 
