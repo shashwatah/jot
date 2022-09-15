@@ -2,17 +2,20 @@ use clap::ValueEnum;
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum Item {
+    Vault,
     Vl,
+    Note,
     Nt,
+    Folder,
     Fd,
 }
 
 impl Item {
     pub fn to_vault_item(&self) -> VaultItem {
         match self {
-            Item::Vl => VaultItem::Fd,
-            Item::Nt => VaultItem::Nt,
-            Item::Fd => VaultItem::Fd,
+            Item::Vault | Item::Vl => VaultItem::Fd,
+            Item::Note | Item::Nt => VaultItem::Nt,
+            Item::Folder | Item::Fd => VaultItem::Fd,
         }
     }
 
@@ -22,31 +25,33 @@ impl Item {
 
     pub fn full(&self) -> String {
         match self {
-            Item::Vl => "vault".to_string(),
-            Item::Nt => "note".to_string(),
-            Item::Fd => "folder".to_string(),
+            Item::Vault | Item::Vl => "vault".to_string(),
+            Item::Note | Item::Nt => "note".to_string(),
+            Item::Folder | Item::Fd => "folder".to_string(),
         }
     }
 }
 
 #[derive(ValueEnum, Clone, Debug)]
 pub enum VaultItem {
+    Note,
     Nt,
+    Folder,
     Fd,
 }
 
 impl VaultItem {
     pub fn to_item(&self) -> Item {
         match self {
-            VaultItem::Nt => Item::Nt,
-            VaultItem::Fd => Item::Fd,
+            VaultItem::Note | VaultItem::Nt => Item::Nt,
+            VaultItem::Folder | VaultItem::Fd => Item::Fd,
         }
     }
 
     pub fn full(&self) -> String {
         match self {
-            VaultItem::Nt => "note".to_string(),
-            VaultItem::Fd => "folder".to_string(),
+            VaultItem::Note | VaultItem::Nt => "note".to_string(),
+            VaultItem::Folder | VaultItem::Fd => "folder".to_string(),
         }
     }
 }
