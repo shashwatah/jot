@@ -5,11 +5,12 @@
 <a href="https://crates.io/crates/jt"><img alt="Cargo" src="https://img.shields.io/badge/cargo-jt-blue"></a>
 
 <p>
-  <a href="#highlights">Highlights</a> •
-  <a href="#notes">Notes</a> •
   <a href="#installation">Installation</a> •
+  <a href="#notes">Notes</a> •
   <a href="#usage">Usage</a> •
+  <a href="#changelog">Changelog</a> •
   <a href="#build-from-source">Build from Source</a> •
+  <a href="#dependencies">Dependencies</a> •
   <a href="#authors">Authors</a> •
   <a href="#license">License</a>
 </p>
@@ -27,6 +28,18 @@ Commands that encompass all basic needs are included. Each command has an alias 
 <br>
 
 Jot is under active development. While it contains all basic functions that should serve most needs, there's a laundry list of features that are yet to and will be added overtime.   
+
+## Installation
+
+#### ***Install with cargo:***
+
+```bash
+$ cargo install jt
+```
+
+#### ***Use executable*** (only for windows)
+
+Download [Jot v0.1.1](https://github.com/araekiel/jot/releases/download/v0.1.1/jt.exe) (.exe) and add it to your path.
 
 ## Notes
 
@@ -172,18 +185,6 @@ $ jt config editor code.cmd
   - As advised by [***u/epage***](https://www.reddit.com/user/epage/) ([github/epage](https://github.com/epage)) on my r/rust [***post***](https://www.reddit.com/r/rust/comments/xebk9j/i_am_working_on_a_cli_alternative_for_obsidian/), commands are now represented by their full word, and the two letter abbreviations (previously serving as commands themselves) are now aliases for these commands.
   - Updated docs.
 
-## Installation
-
-#### ***Install with cargo:***
-
-```bash
-$ cargo install jt
-```
-
-#### ***Use executable*** (only for windows)
-
-Download [Jot v0.1.1](https://github.com/araekiel/jot/releases/download/v0.1.1/jt.exe) (.exe) and add it to your path.
-
 ## Build from Source
 
 ### Prerequisites
@@ -191,7 +192,7 @@ Download [Jot v0.1.1](https://github.com/araekiel/jot/releases/download/v0.1.1/j
 - Git is need to clone the repository on your machine.
 - Cargo is needed to compile the program.
 
-### Installation
+### Build
 
 Clone the repo and cd into the directory: 
 
