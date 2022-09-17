@@ -179,6 +179,24 @@ The value of the provided field will be printed with `config` command. Providing
 $ jt config editor code.cmd
 ```
 
+#### ***Get Help***
+
+Run ***jt*** without a command, or with `help` command or ***-h*** flag for main help message.   
+
+```bash
+jt
+```
+
+Use `help` command or ***-h*** flag with a command to get corresponding help.
+
+```
+jt help vault
+```
+
+```
+jt vault -h
+```
+
 ## Changelog  
 
 - ***v0.1.1*** :
