@@ -184,17 +184,17 @@ $ jt config editor code.cmd
 Run ***jt*** without a command, or with `help` command or ***-h*** flag for main help message.   
 
 ```bash
-jt
+$ jt
 ```
 
 Use `help` command or ***-h*** flag with a command to get corresponding help.
 
 ```
-jt help vault
+$ jt help vault
 ```
 
 ```
-jt vault -h
+$ jt vault -h
 ```
 
 ## Changelog  
@@ -207,8 +207,8 @@ jt vault -h
 
 ### Prerequisites
 
-- Git is need to clone the repository on your machine.
-- Cargo is needed to compile the program.
+- ***Git*** is need to clone the repository on your machine.
+- ***Cargo*** is needed to compile the program.
 
 ### Build
 
