@@ -151,7 +151,7 @@ $ jt vmove note newnote somevault
 Every keyword used so far (commands and item names) is interchangeable with its two letter alias, e.g. `move` command can also be written as:
 
 ```
-jt mv nt newnote /newfolder/
+$ jt mv nt newnote /newfolder/
 ```
 
 #### ***Handle Jot's config***
@@ -229,4 +229,4 @@ Pass in commands and arguments after '***--***'.
 
 ## License
 
-[MIT License](https://github.com/araekiel/jot/blob/master/LICENSE) | Copyright (c) 2022 Kumar Shashwat
+[MIT License](https://github.com/araekiel/jot/blob/main/LICENSE) | Copyright (c) 2022 Kumar Shashwat
