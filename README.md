@@ -1,7 +1,7 @@
 # *jot*
 
-<a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/apm/l/atomic-design-ui.svg?"></a>
-<a href="https://github.com/araekiel/jot/releases/tag/v0.1.q"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.1-red"></a>
+<a href="LICENSE"><img alt="Release" src="https://img.shields.io/badge/license-MIT-green"></a>
+<a href="https://github.com/araekiel/jot/releases/tag/v0.1.1"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.1-red"></a>
 <a href="https://crates.io/crates/jt"><img alt="Cargo" src="https://img.shields.io/badge/cargo-jt-blue"></a>
 
 <p>
@@ -27,7 +27,8 @@ Commands that encompass all basic needs are included. Each command has an alias 
 
 <br>
 
-Jot is under active development. While it contains all basic functions that should serve most needs, there's a laundry list of features that are yet to and will be added overtime.   
+Jot is under active development. While it contains all basic functions that should serve most needs, there's a laundry list of features that are yet to and will be added overtime.<br>
+Check out [***UPDATES.md***](UPDATES.md) to see upcoming updates.
 
 ## Installation
 
@@ -39,7 +40,7 @@ $ cargo install jt
 
 #### ***Use executable*** (only for windows)
 
-Download [Jot v0.1.1](https://github.com/araekiel/jot/releases/download/v0.1.1/jt.exe) (.exe) and add it to your path.
+Download [***jt.exe***](https://github.com/araekiel/jot/releases/download/v0.1.1/jt.exe) (***v0.1.1***) and add it to your path.
 
 ## Notes
 
@@ -237,10 +238,10 @@ Pass in commands and arguments after '***--***'.
 
 ## Dependencies
 
-- [***serde***]() & [***toml***](): 'serde' and 'toml' have been used in tandem to read and write data files. 
-- [***clap***](): 'clap' has been used to create the command line interface.
-- [***directories***](): 'directories' crate has been used to generate system-dependent config and data file locations.
-- [***fs_extra***](): 'fs_extra' crate has been used for recursive move of folders.
+- [***serde***](https://serde.rs/) & [***toml***](https://docs.rs/toml/latest/toml/) have been used in tandem to read and write data files. 
+- [***clap***](https://docs.rs/clap/latest/clap/) has been used to create the command line interface.
+- [***directories***](https://docs.rs/directories/latest/directories/) has been used to generate os-dependent config and data file locations.
+- [***fs_extra***](https://docs.rs/fs_extra/latest/fs_extra/) has been used for recursive move of folders.
 
 ## Authors
 

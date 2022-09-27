@@ -19,13 +19,7 @@
 
 #### ***Back Burner:***
 
-- [ ] ***Change:*** Unify item creation under `new` command. 
-<br>
-Example:
-```
-$ jt new vault *name* *location*
-$ jt new note *name* 
-```
+- [ ] ***Change:*** Unify item creation under `new` command.
 
 - [ ] ***Feat:*** Connections between notes like in Obdisian, using ***backlinks*** and ***outgoing links***. 
 
