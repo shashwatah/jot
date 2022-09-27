@@ -1,5 +1,6 @@
 # *jot*
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3786cfe55477410eacc695685338b788)](https://www.codacy.com/gh/araekiel/jot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=araekiel/jot&amp;utm_campaign=Badge_Grade)
 <a href="LICENSE"><img alt="Release" src="https://img.shields.io/badge/license-MIT-green"></a>
 <a href="https://github.com/araekiel/jot/releases/tag/v0.1.1"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.1-red"></a>
 <a href="https://crates.io/crates/jt"><img alt="Cargo" src="https://img.shields.io/badge/cargo-jt-blue"></a>
