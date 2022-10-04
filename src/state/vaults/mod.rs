@@ -64,6 +64,12 @@ impl Vaults {
         }
     }
 
+    pub fn show_vault_location(&self, name: String) {
+        if let Some(vault_location) = self.data.get_vault_location(name.as_str()) {
+            println!("{} \t {}", name, vault_location.display());
+        }
+    }
+
     pub fn ref_current(&self) -> Result<&Vault, Error> {
         if self.current.is_none() {
             return Err(Error::NotInsideVault);

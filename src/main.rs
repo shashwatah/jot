@@ -10,13 +10,16 @@ use crate::{
     output::{Message, Output},
 };
 fn main() {
+    // println!("***************************");
+    // println!("**********JOT DEV**********");
+    // println!("***************************");
     let mut app = App::new();
 
     match app.handle_args() {
         Ok(msg) => match msg {
             Message::Empty => (),
-            _ => println!("{}", Output::Message(msg)),
+            _ => println!("TEST {}", Output::Message(msg)),
         },
-        Err(err) => println!("{}", Output::Error(err)),
+        Err(err) => println!("TEST{}", Output::Error(err)),
     }
 }

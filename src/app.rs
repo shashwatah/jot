@@ -35,6 +35,10 @@ impl App {
                 if let (Some(name), Some(location)) = (name, location) {
                     self.vaults.create_vault(name, location)?;
                     return Ok(Message::ItemCreated(Item::Vl, name.to_owned()));
+                } else if name.is_some() && *show_loc {
+                    let name = name.clone().unwrap();
+                    self.vaults.show_vault_location(name);
+                    return Ok(Message::Empty);
                 } else {
                     self.vaults.list_vaults(show_loc);
                     return Ok(Message::Empty);

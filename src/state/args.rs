@@ -62,7 +62,7 @@ pub enum Command {
         #[clap(parse(from_flag), short = 'l')]
         show_loc: bool,
         /// name for new vault
-        #[clap(value_parser, name = "vault name", requires = "vault location")]
+        #[clap(value_parser, name = "vault name")]
         name: Option<String>,
         /// absolute path to location of new vault
         #[clap(value_parser, name = "vault location")]
