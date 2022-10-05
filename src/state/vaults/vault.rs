@@ -9,6 +9,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
@@ -16,6 +17,7 @@ pub struct Vault {
     location: Option<PathBuf>,
     folder: PathBuf,
     history: Vec<(String, PathBuf)>,
+    aliases: HashMap<String, String>,
 }
 
 impl Default for Vault {
@@ -25,6 +27,7 @@ impl Default for Vault {
             location: None,
             folder: PathBuf::new(),
             history: vec![],
+            aliases: HashMap::new(),
         }
     }
 }
@@ -74,9 +77,52 @@ impl Vault {
     pub fn get_path_data(&self) -> (&String, &PathBuf, &PathBuf) {
         (self.get_name(), self.get_location(), self.get_folder())
     }
+
+    fn name_in_use(&self, new_name: String) -> bool {
+        let notes = self.get_notes();
+
+        if notes.contains(&new_name) {
+            return true
+        }
+        
+        for (_note, alias) in self.aliases.iter() {
+            if new_name == *alias {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub fn get_notes(&self) -> Vec<String> {
+        let path = self.generate_location();
+        let mut notes = vec![];
+
+        for entry in path.read_dir().unwrap() {
+            let entry = entry.unwrap().path();
+
+            if entry.is_file() && entry.ends_with(".md") {
+                let note_name = entry.file_stem().unwrap().to_str().unwrap().to_string();
+                notes.push(note_name);
+            }
+        }
+
+        notes
+    }
 }
 
 impl Vault {
+    pub fn set_alias(&mut self, note_name: String, alias_name: String) -> Result<(), Error> {
+        if self.name_in_use(alias_name.clone()) {
+            return Err(Error::InvalidName)
+        }
+
+        self.aliases.insert(note_name, alias_name);
+        self.store();
+
+        Ok(())
+    }
+
     pub fn create_vault_item(&self, item_type: VaultItem, name: &str) -> Result<(), Error> {
         let location = self.generate_location();
 

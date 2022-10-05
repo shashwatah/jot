@@ -21,6 +21,7 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
                 if let Ok(file_data) = toml::from_str::<Self>(&file_string) {
                     file_data
                 } else {
+                    toml::from_str::<Self>(&file_string).unwrap();
                     panic!("couldn't parse data")
                 }
             }

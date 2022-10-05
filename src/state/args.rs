@@ -83,6 +83,17 @@ pub enum Command {
         #[clap(value_parser, name = "note name")]
         name: String,
     },
+    /// creates an alias for a note
+    #[clap(override_usage("jt alias\n   jt alias [note name] [alias name]"))]
+    #[clap(alias = "al")]
+    Alias {
+        /// name for the note being given an alias
+        #[clap(value_parser, name = "note name")]
+        name: String,
+        /// name for the alias being given to the note
+        #[clap(value_parser, name = "alias name")]
+        alias: String,
+    },
     /// open a note (from the current folder)
     #[clap(alias = "op")]
     Open {
