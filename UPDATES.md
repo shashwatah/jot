@@ -20,10 +20,10 @@
 #### ***Back Burner:***
 
 - [ ] ***Change:*** Unify item creation under `new` command.
-
 - [ ] ***Feat:*** Connections between notes like in Obdisian, using ***backlinks*** and ***outgoing links***. 
-
 - [ ] ***Feat:*** Vault encryption.
+- [ ] ***Feat:*** Preview notes in the terminal.
+- [ ] ***Feat:*** Use templates for note creation.
 
 ### ***Disclaimer:***
 
@@ -32,3 +32,5 @@
 - Bugs have not been included as yet.
 - This project might eventually be open to contributions.
 
+templates
+bat 
