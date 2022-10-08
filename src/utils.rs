@@ -4,6 +4,7 @@ use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
     path::{Path, PathBuf},
     process::Command,
+    collections::HashMap,
 };
 
 fn valid_name(name: &str) -> bool {
@@ -157,26 +158,9 @@ fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), s
     Ok(())
 }
 
-pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
-    let length = path.read_dir().unwrap().count();
-
-    for (count, entry) in path.read_dir().unwrap().enumerate() {
-        let entry = entry.unwrap().path();
-        let entry_name = entry.file_stem().unwrap().to_str().unwrap();
-
-        if entry_name == ".jot" {
-            continue;
-        }
-
-        let is_last = length - count == 1;
-
-        for level in 0..were_last.len() - 1 {
-            if were_last[level + 1] {
-                print!("    ")
-            } else {
-                print!("│   ")
-            }
-        }
+pub fn list_notes(notes: &Vec<String>, aliases: &HashMap<String, String>) {
+    for (i, note) in notes.iter().enumerate() {
+        let is_last = i == notes.len() - 1;
 
         if is_last {
             print!("└── ")
@@ -184,18 +168,12 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
             print!("├── ")
         }
 
-        if entry.is_dir() {
-            println!("{}", entry_name);
-
-            were_last.push(is_last);
-            were_last = rec_list(were_last, entry);
-            were_last.pop();
-        } else {
-            println!("\x1b[0;34m{}\x1b[0m", entry_name);
+        print!("\x1b[0;34m{}\x1b[0m", note);
+        if let Some(alias) = aliases.get(note) {
+            print!(" -> \x1b[0;34m{}\x1b[0m", alias);
         }
+        println!();
     }
-
-    were_last
 }
 
 fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<PathBuf, Error> {

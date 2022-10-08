@@ -3,7 +3,7 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
+        create_item, join_paths, move_item, process_path, list_notes, remove_item, rename_item,
         run_editor,
     },
 };
@@ -280,8 +280,9 @@ impl Vault {
             println!("{} > {}", self.get_name(), folder.display());
         }
 
-        let location = self.generate_location();
-        rec_list(vec![true], location);
+        let notes = self.get_notes();
+
+        list_notes(&notes, &self.aliases);
     }
 
     fn generate_location(&self) -> PathBuf {
