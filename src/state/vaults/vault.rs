@@ -111,13 +111,34 @@ impl Vault {
         for entry in path.read_dir().unwrap() {
             let entry = entry.unwrap().path();
 
-            if entry.is_file() && entry.ends_with(".md") {
+            if entry.is_file() && entry.extension().unwrap() == "md" {
                 let note_name = entry.file_stem().unwrap().to_str().unwrap().to_string();
                 notes.push(note_name);
             }
         }
 
         notes
+    }
+
+    /**
+     * Check if the vault contains a note with the 
+     * give name.
+     */
+    fn contains_note(&self, note_name: &String) -> bool {
+        self.get_notes().contains(note_name)
+    }
+
+    /**
+     * Try to retrieve a note from an alias
+     */
+    fn get_note_from_alias(&self, alias: &String) -> Option<String> {
+        for (note, note_alias) in self.aliases.iter() {
+            if note_alias == alias {
+                return Some(note.clone())
+            }
+        }
+
+        None
     }
 }
 
@@ -206,12 +227,26 @@ impl Vault {
         Ok(())
     }
 
-    pub fn open_note(&self, name: &str, editor_data: (&String, bool)) -> Result<(), Error> {
+    pub fn open_note(&self, name_str: &str, editor_data: (&String, bool)) -> Result<(), Error> {
         let location = self.generate_location();
+        let name = name_str.to_string();
 
-        run_editor(editor_data, name, &location)?;
+        /*
+         * Check if the name is a valid note name, then check 
+         * if the name is alias to a note. If neither is true, throw
+         * an error.
+         */
+        if self.contains_note(&name) {
+            run_editor(editor_data, &name, &location)?;
+        } else if let Some(note_name) = self.get_note_from_alias(&name) {
+            run_editor(editor_data, &note_name, &location)?;
+        } else {
+            return Err(Error::InvalidName);
+        }
+
         Ok(())
     }
+
 
     pub fn change_folder(&mut self, path: &PathBuf) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
