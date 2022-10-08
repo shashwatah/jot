@@ -60,7 +60,7 @@ pub enum Command {
     #[clap(alias = "vl")]
     Vault {
         /// show vaults' location
-        #[clap(parse(from_flag), short = 'l')]
+        #[clap(parse(from_flag), short = 'l', long="location")]
         show_loc: bool,
         /// name for new vault
         #[clap(value_parser, name = "vault name")]
