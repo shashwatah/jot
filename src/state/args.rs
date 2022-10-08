@@ -33,6 +33,7 @@ interact with items
     \x1b[0;34mopen\x1b[0m, \x1b[0;34mop\x1b[0m        open a note from current folder
     \x1b[0;34mchdir\x1b[0m, \x1b[0;34mcd\x1b[0m       change folder within current vault
     \x1b[0;34mlist\x1b[0m, \x1b[0;34mls\x1b[0m        print dir tree of current folder
+    \x1b[0;34malias\x1b[0m, \x1b[0;34mal\x1b[0m       set aliases for a note
 
 perform fs operations on items
     \x1b[0;34mremove\x1b[0m, \x1b[0;34mrm\x1b[0m      remove an item 
@@ -59,10 +60,10 @@ pub enum Command {
     #[clap(alias = "vl")]
     Vault {
         /// show vaults' location
-        #[clap(parse(from_flag), short = 'l')]
+        #[clap(parse(from_flag), short = 'l', long="location")]
         show_loc: bool,
         /// name for new vault
-        #[clap(value_parser, name = "vault name", requires = "vault location")]
+        #[clap(value_parser, name = "vault name")]
         name: Option<String>,
         /// absolute path to location of new vault
         #[clap(value_parser, name = "vault location")]
@@ -82,6 +83,20 @@ pub enum Command {
         /// name for new note (to be created in the current folder)
         #[clap(value_parser, name = "note name")]
         name: String,
+    },
+    /// creates an alias for a note
+    #[clap(override_usage("jt alias\n    jt alias <note name> -r\n    jt alias <note name> <alias>"))]
+    #[clap(alias = "al")]
+    Alias {
+        /// name of the note being given an alias
+        #[clap(value_parser, name = "note name")]
+        name: String,
+        /// remove alias from a note
+        #[clap(parse(from_flag), short='r', long="remove", name="remove")]
+        remove_alias: bool,
+        /// alias being given to the note
+        #[clap(value_parser, name = "alias", required_unless_present("remove"))]
+        maybe_alias: Option<String>,
     },
     /// open a note (from the current folder)
     #[clap(alias = "op")]

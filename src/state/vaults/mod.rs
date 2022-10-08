@@ -44,10 +44,8 @@ impl Vaults {
     }
 
     pub fn list_vaults(&self, show_loc: &bool) {
-        let current_vault_name = self.data.get_current_vault();
-
         for vault_name in self.data.get_vaults().keys() {
-            if current_vault_name.is_some() && vault_name == current_vault_name.unwrap() {
+            if self.is_current_vault(vault_name) {
                 print!("👉 \x1b[0;34m{}\x1b[0m", vault_name)
             } else {
                 print!("   {}", vault_name)
@@ -62,6 +60,22 @@ impl Vaults {
                 println!();
             }
         }
+    }
+
+    pub fn show_vault_location(&self, vault_name: String) {
+        if let Some(vault_location) = self.data.get_vault_location(vault_name.as_str()) {
+            if self.is_current_vault(&vault_name) {
+                println!("👉 \x1b[0;34m{}\x1b[0m \t {}", vault_name, vault_location.display());
+            } else {
+                println!("{} \t {}", vault_name, vault_location.display());
+            }
+        }
+    }
+
+    fn is_current_vault(&self, vault_name: &String) -> bool {
+        let current_vault_name = self.data.get_current_vault();
+
+        current_vault_name.is_some() && vault_name == current_vault_name.unwrap()
     }
 
     pub fn ref_current(&self) -> Result<&Vault, Error> {

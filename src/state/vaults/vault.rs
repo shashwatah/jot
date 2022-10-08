@@ -3,12 +3,13 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
+        create_item, join_paths, move_item, process_path, list_notes, remove_item, rename_item,
         run_editor,
     },
 };
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Vault {
@@ -16,6 +17,7 @@ pub struct Vault {
     location: Option<PathBuf>,
     folder: PathBuf,
     history: Vec<(String, PathBuf)>,
+    aliases: HashMap<String, String>,
 }
 
 impl Default for Vault {
@@ -25,6 +27,7 @@ impl Default for Vault {
             location: None,
             folder: PathBuf::new(),
             history: vec![],
+            aliases: HashMap::new(),
         }
     }
 }
@@ -74,9 +77,95 @@ impl Vault {
     pub fn get_path_data(&self) -> (&String, &PathBuf, &PathBuf) {
         (self.get_name(), self.get_location(), self.get_folder())
     }
+
+    fn name_in_use(&self, new_name: String) -> bool {
+        let notes = self.get_notes();
+
+        /*
+         * Check if a note is using the given name.
+         */
+        if notes.contains(&new_name) {
+            return true
+        }
+        
+        /*
+         * Check if a note alias has the given name.
+         */
+        for (_note, alias) in self.aliases.iter() {
+            if new_name == *alias {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    /**
+     * Returns the list of all notes stored in this vault,
+     * in the form `<note name>.md`.
+     */
+    pub fn get_notes(&self) -> Vec<String> {
+        let path = self.generate_location();
+        let mut notes = vec![];
+
+        for entry in path.read_dir().unwrap() {
+            let entry = entry.unwrap().path();
+
+            if entry.is_file() && entry.extension().unwrap() == "md" {
+                let note_name = entry.file_stem().unwrap().to_str().unwrap().to_string();
+                notes.push(note_name);
+            }
+        }
+
+        notes
+    }
+
+    /**
+     * Check if the vault contains a note with the 
+     * give name.
+     */
+    fn contains_note(&self, note_name: &String) -> bool {
+        self.get_notes().contains(note_name)
+    }
+
+    /**
+     * Try to retrieve a note from an alias
+     */
+    fn get_note_from_alias(&self, alias: &String) -> Option<String> {
+        for (note, note_alias) in self.aliases.iter() {
+            if note_alias == alias {
+                return Some(note.clone())
+            }
+        }
+
+        None
+    }
 }
 
 impl Vault {
+    pub fn set_alias(&mut self, note_name: String, alias_name: String) -> Result<(), Error> {
+        if self.name_in_use(alias_name.clone()) {
+            return Err(Error::InvalidName)
+        }
+
+        self.aliases.insert(note_name, alias_name);
+        self.store();
+
+        Ok(())
+    }
+
+    pub fn remove_alias_from_note(&mut self, note_name: String) -> Result<String, Error> {
+
+        if self.aliases.contains_key(&note_name) {
+            let alias_removed = self.aliases.remove(&note_name).unwrap();
+            self.store();
+
+            Ok(alias_removed)
+        } else {
+            Err(Error::AliasDoesNotExist(note_name))
+        }
+    }
+
     pub fn create_vault_item(&self, item_type: VaultItem, name: &str) -> Result<(), Error> {
         let location = self.generate_location();
 
@@ -150,12 +239,26 @@ impl Vault {
         Ok(())
     }
 
-    pub fn open_note(&self, name: &str, editor_data: (&String, bool)) -> Result<(), Error> {
+    pub fn open_note(&self, name_str: &str, editor_data: (&String, bool)) -> Result<(), Error> {
         let location = self.generate_location();
+        let name = name_str.to_string();
 
-        run_editor(editor_data, name, &location)?;
+        /*
+         * Check if the name is a valid note name, then check 
+         * if the name is alias to a note. If neither is true, throw
+         * an error.
+         */
+        if self.contains_note(&name) {
+            run_editor(editor_data, &name, &location)?;
+        } else if let Some(note_name) = self.get_note_from_alias(&name) {
+            run_editor(editor_data, &note_name, &location)?;
+        } else {
+            return Err(Error::InvalidName);
+        }
+
         Ok(())
     }
+
 
     pub fn change_folder(&mut self, path: &PathBuf) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
@@ -189,8 +292,9 @@ impl Vault {
             println!("{} > {}", self.get_name(), folder.display());
         }
 
-        let location = self.generate_location();
-        rec_list(vec![true], location);
+        let notes = self.get_notes();
+
+        list_notes(&notes, &self.aliases);
     }
 
     fn generate_location(&self) -> PathBuf {

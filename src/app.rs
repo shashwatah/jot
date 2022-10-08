@@ -35,6 +35,10 @@ impl App {
                 if let (Some(name), Some(location)) = (name, location) {
                     self.vaults.create_vault(name, location)?;
                     return Ok(Message::ItemCreated(Item::Vl, name.to_owned()));
+                } else if name.is_some() && *show_loc {
+                    let name = name.clone().unwrap();
+                    self.vaults.show_vault_location(name);
+                    return Ok(Message::Empty);
                 } else {
                     self.vaults.list_vaults(show_loc);
                     return Ok(Message::Empty);
@@ -49,6 +53,22 @@ impl App {
                     .ref_current()?
                     .create_vault_item(VaultItem::Nt, name)?;
                 return Ok(Message::ItemCreated(Item::Nt, name.to_owned()));
+            }
+            Command::Alias { name, maybe_alias, remove_alias } => {
+                if *remove_alias {
+                    let alias_removed = self.vaults
+                        .mut_current()?
+                        .remove_alias_from_note(name.to_string())?;
+                    
+                    return Ok(Message::NoteAliasRemoved(name.to_string(), alias_removed))
+                } else if let Some(alias) = maybe_alias {
+                    self.vaults
+                        .mut_current()?
+                        .set_alias(name.to_string(), alias.to_string())?;
+                    return Ok(Message::NoteAliasCreated(name.to_string(), alias.to_string()))
+                } 
+
+                return Ok(Message::Empty);
             }
             Command::Open { name } => {
                 self.vaults
