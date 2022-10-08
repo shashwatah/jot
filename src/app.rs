@@ -54,10 +54,19 @@ impl App {
                     .create_vault_item(VaultItem::Nt, name)?;
                 return Ok(Message::ItemCreated(Item::Nt, name.to_owned()));
             }
-            Command::Alias { name, alias } => {
-                self.vaults
-                    .mut_current()?
-                    .set_alias(name.to_string(), alias.to_string())?;
+            Command::Alias { name, maybe_alias, remove_alias } => {
+                if *remove_alias {
+                    let alias_removed = self.vaults
+                        .mut_current()?
+                        .remove_alias_from_note(name.to_string())?;
+                    
+                    return Ok(Message::NoteAliasRemoved(name.to_string(), alias_removed))
+                } else if let Some(alias) = maybe_alias {
+                    self.vaults
+                        .mut_current()?
+                        .set_alias(name.to_string(), alias.to_string())?;
+                    return Ok(Message::NoteAliasCreated(name.to_string(), alias.to_string()))
+                } 
 
                 return Ok(Message::Empty);
             }

@@ -154,6 +154,18 @@ impl Vault {
         Ok(())
     }
 
+    pub fn remove_alias_from_note(&mut self, note_name: String) -> Result<String, Error> {
+
+        if self.aliases.contains_key(&note_name) {
+            let alias_removed = self.aliases.remove(&note_name).unwrap();
+            self.store();
+
+            Ok(alias_removed)
+        } else {
+            Err(Error::AliasDoesNotExist(note_name))
+        }
+    }
+
     pub fn create_vault_item(&self, item_type: VaultItem, name: &str) -> Result<(), Error> {
         let location = self.generate_location();
 

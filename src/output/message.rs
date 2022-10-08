@@ -3,6 +3,8 @@ use std::fmt::Display;
 
 pub enum Message {
     VaultEntered(String),
+    NoteAliasCreated(String, String),
+    NoteAliasRemoved(String, String),
     ItemCreated(Item, String),
     ItemRemoved(Item, String),
     ItemRenamed(Item, String, String),
@@ -47,6 +49,12 @@ impl Display for Message {
                     config_type.to_str(),
                     value
                 ),
+                Message::NoteAliasCreated(note_name, alias_name) => {
+                    format!("created alias \x1b[0;34m{}\x1b[0m -> \x1b[0;34m{}\x1b[0m", note_name, alias_name)
+                },
+                Message::NoteAliasRemoved(note_name, alias_name) => {
+                    format!("removed alias \x1b[0;34m{}\x1b[0m -> \x1b[0;34m{}\x1b[0m", note_name, alias_name)
+                }
                 Message::Empty => "".to_string(),
             }
         )
