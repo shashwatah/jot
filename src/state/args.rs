@@ -33,6 +33,7 @@ interact with items
     \x1b[0;34mopen\x1b[0m, \x1b[0;34mop\x1b[0m        open a note from current folder
     \x1b[0;34mchdir\x1b[0m, \x1b[0;34mcd\x1b[0m       change folder within current vault
     \x1b[0;34mlist\x1b[0m, \x1b[0;34mls\x1b[0m        print dir tree of current folder
+    \x1b[0;34malias\x1b[0m, \x1b[0;34mal\x1b[0m        create an alias for a note
 
 perform fs operations on items
     \x1b[0;34mremove\x1b[0m, \x1b[0;34mrm\x1b[0m      remove an item 
@@ -87,11 +88,11 @@ pub enum Command {
     #[clap(override_usage("jt alias\n   jt alias [note name] [alias name]"))]
     #[clap(alias = "al")]
     Alias {
-        /// name for the note being given an alias
+        /// name of the note being given an alias
         #[clap(value_parser, name = "note name")]
         name: String,
-        /// name for the alias being given to the note
-        #[clap(value_parser, name = "alias name")]
+        /// alias being given to the note
+        #[clap(value_parser, name = "alias")]
         alias: String,
     },
     /// open a note (from the current folder)
