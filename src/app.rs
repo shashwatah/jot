@@ -58,7 +58,7 @@ impl App {
                 // TODO: make name and alias parameters &str
                 self.vaults
                     .mut_current()?
-                    .set_alias(name.to_string(), alias.to_string());
+                    .set_alias(name.to_string(), alias.to_string())?;
 
                 // TODO: add a better note
                 return Ok(Message::Empty);

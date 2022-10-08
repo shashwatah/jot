@@ -62,12 +62,12 @@ impl Vaults {
         }
     }
 
-    pub fn show_vault_location(&self, name: String) {
-        if let Some(vault_location) = self.data.get_vault_location(name.as_str()) {
-            if self.is_current_vault(&name) {
-                println!("👉 \x1b[0;34m{}\x1b[0m \t {}", name, vault_location.display());
+    pub fn show_vault_location(&self, vault_name: String) {
+        if let Some(vault_location) = self.data.get_vault_location(vault_name.as_str()) {
+            if self.is_current_vault(&vault_name) {
+                println!("👉 \x1b[0;34m{}\x1b[0m \t {}", vault_name, vault_location.display());
             } else {
-                println!("{} \t {}", name, vault_location.display());
+                println!("{} \t {}", vault_name, vault_location.display());
             }
         }
     }

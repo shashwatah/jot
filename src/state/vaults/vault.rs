@@ -81,10 +81,16 @@ impl Vault {
     fn name_in_use(&self, new_name: String) -> bool {
         let notes = self.get_notes();
 
+        /*
+         * Check if a note is using the given name.
+         */
         if notes.contains(&new_name) {
             return true
         }
         
+        /*
+         * Check if a note alias has the given name.
+         */
         for (_note, alias) in self.aliases.iter() {
             if new_name == *alias {
                 return true;
@@ -94,6 +100,10 @@ impl Vault {
         false
     }
 
+    /**
+     * Returns the list of all notes stored in this vault,
+     * in the form `<note name>.md`.
+     */
     pub fn get_notes(&self) -> Vec<String> {
         let path = self.generate_location();
         let mut notes = vec![];
