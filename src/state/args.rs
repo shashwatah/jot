@@ -73,7 +73,12 @@ pub enum Command {
     /// create or edit the daily note
     /// format: YYYY-MM-DD
     #[clap(override_usage("jt today"))]
-    Today,
+    Today {
+        /// create the daily note, if it does not exist 
+        #[clap(parse(from_flag), short = 'c', long="create")]
+        // dne = does not exist
+        create_if_dne: bool,
+    },
     /// enter a vault.
     #[clap(alias = "en")]
     Enter {

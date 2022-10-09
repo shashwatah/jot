@@ -55,20 +55,19 @@ impl App {
                     .create_vault_item(VaultItem::Nt, name)?;
                 return Ok(Message::ItemCreated(Item::Nt, name.to_owned()));
             }
-            Command::Today => {
-                /*
-                 * Daily note will be created if it does not already exist.
-                 * TODO: this should be make a configurable option
-                 *
-                 * 1. Get the name of the daily note
-                 * 2. Create it if it doesn't alreay exist
-                 * 3. Edit the daily note
-                 */
-                
+            Command::Today { create_if_dne } => {
                 let daily_note_name = daily_note_name(); 
                 let vault = self.vaults.mut_current()?;
 
-                vault.create_and_open_note(&daily_note_name, self.config.get_editor_data())?;
+                /*
+                 * Edit the daily note. If -c is supplied, create the 
+                 * daily note if it doesn't exist. 
+                 */
+                if *create_if_dne {
+                    vault.create_and_open_note(&daily_note_name, self.config.get_editor_data())?;
+                } else {
+                    vault.open_note(&daily_note_name, self.config.get_editor_data())?;
+                }
 
                 return Ok(Message::Empty);
             }
