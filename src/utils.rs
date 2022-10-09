@@ -1,4 +1,5 @@
-use crate::{enums::Item, output::error::Error};
+use crate::{enums::Item, output::error::Error, state::config::EditorData};
+use chrono;
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
@@ -129,16 +130,14 @@ pub fn move_item(
     Ok(new_path)
 }
 
-pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> Result<(), Error> {
+pub fn run_editor(editor_data: &EditorData, name: &str, location: &Path) -> Result<(), Error> {
     let path = generate_item_path(&Item::Nt, name, location)?;
 
     if !path.exists() {
         return Err(Error::ItemNotFound(Item::Nt, name.to_string()));
     }
 
-    let (editor, conflict) = editor_data;
-
-    if let Err(error) = run_editor_collect(editor, conflict, &path) {
+    if let Err(error) = run_editor_collect(editor_data, &path) {
         return Err(match error.kind() {
             std::io::ErrorKind::NotFound => Error::EditorNotFound,
             _ => Error::Undefined(error),
@@ -148,10 +147,10 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> 
     Ok(())
 }
 
-fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), std::io::Error> {
-    let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
+fn run_editor_collect(editor_data: &EditorData, path: &Path) -> Result<(), std::io::Error> {
+    let mut cmd = Command::new(editor_data.editor.to_owned()).arg(path.to_str().unwrap()).spawn()?;
 
-    if conflict {
+    if editor_data.conflict {
         cmd.wait()?;
     }
 
@@ -188,4 +187,15 @@ fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<P
     }
 
     Ok(path)
+}
+
+fn generate_date_string() -> String {
+     let local_timestamp = chrono::offset::Local::now();
+     let local_date = local_timestamp.date_naive();
+
+     local_date.to_string()
+}
+
+pub fn daily_note_name() -> String {
+    generate_date_string()
 }

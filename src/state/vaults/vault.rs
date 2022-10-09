@@ -2,6 +2,7 @@ use crate::{
     enums::VaultItem,
     output::error::Error,
     traits::FileIO,
+    state::config::EditorData,
     utils::{
         create_item, join_paths, move_item, process_path, list_notes, remove_item, rename_item,
         run_editor,
@@ -17,8 +18,7 @@ pub struct Vault {
     location: Option<PathBuf>,
     folder: PathBuf,
     history: Vec<(String, PathBuf)>,
-    aliases: HashMap<String, String>,
-}
+    aliases: HashMap<String, String>, }
 
 impl Default for Vault {
     fn default() -> Self {
@@ -101,8 +101,9 @@ impl Vault {
     }
 
     /**
-     * Returns the list of all notes stored in this vault,
-     * in the form `<note name>.md`.
+     * Returns the list of all notes stored in this vault.
+     * Note: returned notes are file stem and do not have  
+     * the .md extension 
      */
     pub fn get_notes(&self) -> Vec<String> {
         let path = self.generate_location();
@@ -239,7 +240,18 @@ impl Vault {
         Ok(())
     }
 
-    pub fn open_note(&self, name_str: &str, editor_data: (&String, bool)) -> Result<(), Error> {
+    /**
+     * Opens a note with the given name, and creates it if it doesn't exist.
+     */
+    pub fn create_and_open_note(&mut self, name: &str, editor_data: &EditorData) -> Result<(), Error> {
+        if !self.contains_note(&name.to_owned()) {
+            self.create_vault_item(VaultItem::Nt, name)?;
+        }
+
+        self.open_note(name, editor_data)
+    }
+
+    pub fn open_note(&self, name_str: &str, editor_data: &EditorData) -> Result<(), Error> {
         let location = self.generate_location();
         let name = name_str.to_string();
 

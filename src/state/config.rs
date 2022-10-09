@@ -4,16 +4,30 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Config {
-    editor: String,
-    conflict: bool,
+pub struct EditorData {
+    pub editor: String,
+    pub conflict: bool,
 }
+
+impl Default for EditorData {
+    fn default() -> Self {
+        EditorData {
+            editor: "nvim".to_string(),
+            conflict: true,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Config {
+    editor_data: EditorData,
+}
+
 
 impl Default for Config {
     fn default() -> Self {
         Config {
-            editor: "nvim".to_string(),
-            conflict: true,
+            editor_data: EditorData::default(),
         }
     }
 }
@@ -31,8 +45,8 @@ impl FileIO for Config {
 }
 
 impl Config {
-    pub fn get_editor_data(&self) -> (&String, bool) {
-        (&self.editor, self.conflict)
+    pub fn get_editor_data(&self) -> &EditorData {
+        &self.editor_data
     }
 
     pub fn set_config(&mut self, config_type: &ConfigType, value: &String) {
@@ -53,20 +67,20 @@ impl Config {
     }
 
     fn get_editor(&self) -> &String {
-        &self.editor
+        &self.editor_data.editor
     }
 
     fn set_editor(&mut self, editor: String) {
-        self.editor = editor;
+        self.editor_data.editor = editor;
         self.store()
     }
 
     fn get_conflict(&self) -> &bool {
-        &self.conflict
+        &self.editor_data.conflict
     }
 
     fn set_conflict(&mut self, conflict: String) {
-        self.conflict = conflict.parse().unwrap();
+        self.editor_data.conflict = conflict.parse().unwrap();
         self.store()
     }
 }
