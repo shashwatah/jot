@@ -54,6 +54,14 @@ pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathB
 fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
     if let Item::Nt = item_type {
         File::options().create_new(true).write(true).open(&path)?;
+    } else if let Item::Vl = item_type {
+        if let Err(error) = DirBuilder::new().create(&path) {
+            match error.kind() {
+                // use existing folders as vaults
+                std::io::ErrorKind::AlreadyExists => return Ok(()),
+                _ => return Err(error),
+            }
+        }
     } else {
         DirBuilder::new().create(&path)?;
     }
