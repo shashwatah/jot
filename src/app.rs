@@ -56,6 +56,25 @@ impl App {
                     .open_note(name, self.config.get_editor_data())?;
                 return Ok(Message::Empty);
             }
+            Command::Insert {
+                name,
+                text,
+                task,
+                list,
+            } => {
+                // make sure that only one of the formatting option (task, list) is true
+                if *task && *list {
+                    return Err(Error::ClapError(clap::error::Error::raw(
+                        clap::ErrorKind::ArgumentConflict,
+                        "pass either task or list",
+                    )));
+                }
+
+                self.vaults
+                    .ref_current()?
+                    .append_text(name, text, task, list)?;
+                return Ok(Message::TextAdded(name.to_owned()));
+            }
             Command::Folder { name } => {
                 self.vaults
                     .ref_current()?

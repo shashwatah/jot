@@ -2,6 +2,7 @@ use crate::{enums::Item, output::error::Error};
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
+    io::Write,
     path::{Path, PathBuf},
     process::Command,
 };
@@ -152,6 +153,24 @@ fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), s
 
     if conflict {
         cmd.wait()?;
+    }
+
+    Ok(())
+}
+
+pub fn append_to_file(name: &str, text: String, location: &Path) -> Result<(), Error> {
+    let path = generate_item_path(&Item::Nt, name, location)?;
+
+    if !path.exists() {
+        return Err(Error::ItemNotFound(Item::Nt, name.to_string()));
+    }
+
+    let mut file = File::options().append(true).open(path).unwrap();
+    if let Err(err) = writeln!(file, "{text}") {
+        return Err(Error::FileError(
+            "Could not append to file".to_string(),
+            err,
+        ));
     }
 
     Ok(())

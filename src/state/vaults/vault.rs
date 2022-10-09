@@ -3,8 +3,8 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
-        run_editor,
+        append_to_file, create_item, join_paths, move_item, process_path, rec_list, remove_item,
+        rename_item, run_editor,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -154,6 +154,27 @@ impl Vault {
         let location = self.generate_location();
 
         run_editor(editor_data, name, &location)?;
+        Ok(())
+    }
+
+    pub fn append_text(
+        &self,
+        name: &str,
+        text: &String,
+        task: &bool,
+        list: &bool,
+    ) -> Result<(), Error> {
+        // either task/list is present at this point
+        let text = if *task {
+            format!("-[ ] {text}")
+        } else if *list {
+            format!("- {text}")
+        } else {
+            text.to_owned()
+        };
+        let location = self.generate_location();
+
+        append_to_file(name, text, &location)?;
         Ok(())
     }
 

@@ -19,6 +19,7 @@ pub enum Error {
     OutOfBounds,
     EditorNotFound,
     MoveError(String), // this will be removed upon switching to custom recursive move fn
+    ClapError(clap::Error),
     Undefined(std::io::Error),
 }
 
@@ -51,6 +52,7 @@ impl Display for Error {
                 Error::OutOfBounds => "path crosses the bounds of vault".to_string(),
                 Error::EditorNotFound => "editor not found".to_string(),
                 Error::MoveError(msg) => msg.to_owned(),
+                Error::ClapError(err) => format!("{}", err),
                 Error::Undefined(error) => format!("undefined error: {}", error),
                 _ => "error msg not set".to_string(),
             }
