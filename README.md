@@ -29,7 +29,7 @@ Commands that encompass all basic needs are included. Each command has an alias 
 <br>
 
 Jot is under active development. While it contains all basic functions that should serve most needs, there's a laundry list of features that are yet to and will be added overtime.<br>
-Check out [***UPDATES.md***](UPDATES.md) to see upcoming updates.
+Check out [***UPDATES.md***](UPDATES.md) to see upcoming updates. ***This project is not open to contributions at the moment.***
 
 ## Installation
 

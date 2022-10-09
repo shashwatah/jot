@@ -30,10 +30,7 @@
 
 ### ***Disclaimer:***
 
+- The project is not open to contributions at the moment.
 - Above mentioned lists will be subject to frequent change. Items here will eventually also be maintained as issues on a project board. This file may or may not exist in the future.
 - Some of the ideas have been taken from the comment section of my ***HackerNews*** [***post***](https://news.ycombinator.com/item?id=32962524) about Jot.  
 - Bugs have not been included as yet.
-- This project might eventually be open to contributions.
-
-templates
-bat 
