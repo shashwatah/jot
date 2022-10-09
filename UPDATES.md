@@ -2,11 +2,14 @@
 
 #### ***Upcoming:***
 
-- [ ] ***Feat***: Create ***quick notes*** or ***memos***, irrespective of the current vault, with `quick` (alias: `qn`) command.
-- [ ] ***Feat:*** Secondary list input for commands that don't necessarily require text input, e.g. `open` command.
-- [ ] ***Feat:*** Open notes from current vault's history (a list of 10 last opened notes in descending order) with `history` (alias: `hs`) command.
-- [ ] ***Feat:*** Open notes from current vault using fuzzy finder, with `find` (alias: `fn`) command.
-- [ ] ***QOL:*** Use existing folders as vaults.
+- v1.2.0:
+    - [ ] ***Feat***: Create ***quick notes*** or ***memos***, irrespective of the current vault, with `quick` (alias: `qn`) command.
+    - [ ] ***Feat:*** Secondary list input for commands that don't necessarily require text input, e.g. `open` command.
+    - [ ] ***Feat:*** Open notes from current vault's history (a list of 10 last opened notes in descending order) with `history` (alias: `hs`) command & Open last opened note with `last` (alias: `lt`) command.
+    
+- v1.2.1:
+    - [ ] ***Feat:*** Open notes from current vault using fuzzy finder, with `find` (alias: `fn`) command.
+    - [ ] ***QOL:*** Use existing folders as vaults.
 
 
 #### ***Front Burner:***
