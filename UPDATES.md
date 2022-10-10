@@ -3,6 +3,8 @@
 #### ***Upcoming:***
 
 - v0.1.2:
+    - [ ] ***QOL:*** Edit config file in editor.
+    - [ ] ***QOL:*** Open current folder in explorer.
     - [ ] ***QOL:*** Use existing folders as vaults.
     - [ ] ***QOL:*** Secondary list input for commands that don't necessarily require text input, e.g. `open` command.
     
@@ -14,8 +16,6 @@
 
 #### ***Front Burner:***
 
-- [ ] ***QOL:*** Edit config file in editor.
-- [ ] ***QOL:*** Open current folder in explorer.
 - [ ] ***QOL:*** Allow multiple inputs for item creation and removal commands.
 - [ ] ***QOL:*** Confirmation/Warning before removing an item.
 - [ ] ***Feat:*** Cross device data sync with Git, which can also be used for change logs.
