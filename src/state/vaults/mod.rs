@@ -5,7 +5,7 @@ use crate::{
     enums::{Item, VaultItem},
     output::error::Error,
     traits::FileIO,
-    utils::{create_item, join_paths, move_item, process_path, remove_item, rename_item},
+    utils::{create_item, join_paths, move_item, remove_item, rename_item, resolve_path},
 };
 use data::Data;
 use std::path::Path;
@@ -85,7 +85,11 @@ impl Vaults {
             return Err(Error::VaultAlreadyExists(name.to_owned()));
         }
 
-        let location = process_path(location);
+        if !location.is_absolute() {
+            return Err(Error::PathNotAbsolute);
+        }
+
+        let location = resolve_path(location)?;
         let path = create_item(Item::Vl, name, &location)?;
         let data_path = join_paths(vec![path.to_str().unwrap(), ".jot/data"]);
 
@@ -141,11 +145,15 @@ impl Vaults {
     }
 
     pub fn move_vault(&mut self, name: &str, new_location: &Path) -> Result<(), Error> {
+        if !new_location.is_absolute() {
+            return Err(Error::PathNotAbsolute);
+        }
+
         if let Some(original_location) = self.data.get_vault_location(name) {
             let new_path = move_item(Item::Vl, name, original_location, new_location)?;
             let data_path = join_paths(vec![new_path.to_str().unwrap(), ".jot/data"]);
 
-            let new_location = process_path(new_location);
+            let new_location = resolve_path(new_location)?;
             Vault::load_path(data_path).set_location(new_location.to_owned());
             self.data.set_vault_location(name, new_location);
 

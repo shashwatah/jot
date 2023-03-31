@@ -1,4 +1,5 @@
 use crate::{enums::Item, output::error::Error};
+use dunce::canonicalize;
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
@@ -18,21 +19,15 @@ pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
     full_path
 }
 
-// returns new pathbuf -> with slashes formatted according to os & '..'s collapsed
-// use this when storing or displaying paths
-// not using canonicalize because it returns \\?\C:\*path* on windows
-pub fn process_path(path: &Path) -> PathBuf {
-    let mut processed_path = PathBuf::new();
-
-    for element in path.iter() {
-        if element == ".." {
-            processed_path.pop();
-        } else if element != "." {
-            processed_path.push(element);
-        }
+// resolve_path() (prev. process_path()0 is a wrapper function for dunce::canonicalize, meant to translate errors
+// reason for this change will be explained in the "unexpected behaviors" section of docs
+// wasn't meant to check for PathNotFound error, still susceptible to changes
+pub fn resolve_path(path: &Path) -> Result<PathBuf, Error> {
+    if let Ok(processed_path) = canonicalize(path) {
+        Ok(processed_path)
+    } else {
+        Err(Error::PathNotFound)
     }
-
-    processed_path
 }
 
 pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
@@ -165,6 +160,10 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
         let entry_name = entry.file_stem().unwrap().to_str().unwrap();
 
         if entry_name == ".jot" {
+            continue;
+        }
+
+        if entry.is_file() && entry.extension().unwrap() != "md" {
             continue;
         }
 

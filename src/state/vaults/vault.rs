@@ -3,7 +3,7 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
+        create_item, join_paths, move_item, rec_list, remove_item, rename_item, resolve_path,
         run_editor,
     },
 };
@@ -115,7 +115,7 @@ impl Vault {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
         let original_location = join_paths(vec![&vault_path, self.get_folder()]);
 
-        let new_location = process_path(&join_paths(vec![&original_location, new_location]));
+        let new_location = resolve_path(&join_paths(vec![&original_location, new_location]))?;
 
         if !new_location.starts_with(vault_path) {
             return Err(Error::OutOfBounds);
@@ -159,14 +159,15 @@ impl Vault {
 
     pub fn change_folder(&mut self, path: &PathBuf) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
-        let new_location = process_path(&join_paths(vec![&vault_path, self.get_folder(), path]));
-
-        if !new_location.exists() {
-            return Err(Error::PathNotFound);
-        }
+        let current_location = resolve_path(&join_paths(vec![&vault_path, self.get_folder()]))?;
+        let new_location = resolve_path(&join_paths(vec![&current_location, path]))?;
 
         if !new_location.starts_with(&vault_path) {
             return Err(Error::OutOfBounds);
+        }
+
+        if new_location == current_location {
+            return Err(Error::SameLocation);
         }
 
         let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();

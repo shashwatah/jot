@@ -9,7 +9,8 @@ pub enum Error {
     InvalidName,
     SameName,
     SameLocation,
-    PathNotFound,
+    PathNotFound, // PathNotFound and PathNotAbsolute might be subject to change in output type
+    PathNotAbsolute,
     ItemAlreadyExists(Item, String),
     ItemNotFound(Item, String),
     VaultAlreadyExists(String),
@@ -37,6 +38,7 @@ impl Display for Error {
                 Error::SameName => "new name is same as old name".to_string(),
                 Error::SameLocation => "new location is same as old location".to_string(),
                 Error::PathNotFound => "couldn't find the path specified".to_string(),
+                Error::PathNotAbsolute => "specified path isn't absolute".to_string(),
                 Error::ItemAlreadyExists(item_type, name) => format!(
                     "a {} named {} already exists in this location",
                     item_type.fs_name(),
