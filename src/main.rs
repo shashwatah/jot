@@ -9,6 +9,7 @@ use crate::{
     app::App,
     output::{Message, Output},
 };
+
 fn main() {
     let mut app = App::new();
 
