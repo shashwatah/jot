@@ -3,8 +3,8 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, rec_list, remove_item, rename_item, resolve_path,
-        run_editor,
+        create_item, join_paths, move_item, open_folder, rec_list, remove_item, rename_item,
+        resolve_path, run_editor,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -157,26 +157,37 @@ impl Vault {
         Ok(())
     }
 
+    pub fn open_folder(&self) -> Result<(), Error> {
+        let folder_abs = join_paths(vec![
+            self.get_location(),
+            &PathBuf::from(self.get_name()),
+            self.get_folder(),
+        ]);
+
+        open_folder(&folder_abs)?;
+        Ok(())
+    }
+
     pub fn change_folder(&mut self, path: &PathBuf) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
-        let current_location = resolve_path(&join_paths(vec![&vault_path, self.get_folder()]))?;
-        let new_location = resolve_path(&join_paths(vec![&current_location, path]))?;
+        let current_folder_abs = resolve_path(&join_paths(vec![&vault_path, self.get_folder()]))?;
+        let dest_folder_abs = resolve_path(&join_paths(vec![&current_folder_abs, path]))?;
 
-        if !new_location.starts_with(&vault_path) {
+        if !dest_folder_abs.starts_with(&vault_path) {
             return Err(Error::OutOfBounds);
         }
 
-        if new_location == current_location {
+        if dest_folder_abs == current_folder_abs {
             return Err(Error::SameLocation);
         }
 
-        let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();
-        if destination_folder.has_root() {
-            destination_folder = destination_folder.strip_prefix("/").unwrap();
+        let mut dest_folder = dest_folder_abs.strip_prefix(vault_path).unwrap();
+        if dest_folder.has_root() {
+            dest_folder = dest_folder.strip_prefix("/").unwrap();
         }
-        let destination_folder = destination_folder.to_path_buf();
+        let dest_folder = dest_folder.to_path_buf();
 
-        self.set_folder(destination_folder);
+        self.set_folder(dest_folder);
 
         Ok(())
     }

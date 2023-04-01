@@ -2,6 +2,7 @@ use crate::{enums::Item, output::error::Error};
 use dunce::canonicalize;
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
+    env::consts::OS,
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
     path::{Path, PathBuf},
     process::Command,
@@ -195,6 +196,21 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
     }
 
     were_last
+}
+
+pub fn open_folder(location: &Path) -> Result<(), Error> {
+    let cmd = match OS {
+        "windows" => "explorer",
+        "linux" => "xdg-open",
+        "macos" => "open",
+        _ => return Ok(()),
+    };
+
+    if let Err(err) = Command::new(cmd).arg(location).spawn() {
+        Err(Error::Undefined(err))
+    } else {
+        Ok(())
+    }
 }
 
 fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<PathBuf, Error> {

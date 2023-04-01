@@ -62,6 +62,10 @@ impl App {
                     .create_vault_item(VaultItem::Fd, name)?;
                 return Ok(Message::ItemCreated(Item::Fd, name.to_owned()));
             }
+            Command::Opdir => {
+                self.vaults.ref_current()?.open_folder()?;
+                return Ok(Message::FolderOpened);
+            }
             Command::Chdir { path } => {
                 self.vaults.mut_current()?.change_folder(path)?;
                 return Ok(Message::FolderChanged);

@@ -31,6 +31,7 @@ create items
 interact with items
     \x1b[0;34menter\x1b[0m, \x1b[0;34men\x1b[0m       enter a vault
     \x1b[0;34mopen\x1b[0m, \x1b[0;34mop\x1b[0m        open a note from current folder
+    \x1b[0;34mopdir\x1b[0m, \x1b[0;34mod\x1b[0m       open current folder in default explorer
     \x1b[0;34mchdir\x1b[0m, \x1b[0;34mcd\x1b[0m       change folder within current vault
     \x1b[0;34mlist\x1b[0m, \x1b[0;34mls\x1b[0m        print dir tree of current folder
 
@@ -98,6 +99,9 @@ pub enum Command {
         #[clap(value_parser, name = "folder name")]
         name: String,
     },
+    /// open current folder with default explorer
+    #[clap(alias = "od")]
+    Opdir,
     /// change folder within current vault
     #[clap(alias = "cd")]
     Chdir {
