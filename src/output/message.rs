@@ -8,7 +8,6 @@ pub enum Message {
     ItemRenamed(Item, String, String),
     ItemMoved(Item, String),
     ItemVMoved(VaultItem, String, String),
-    FolderOpened,
     FolderChanged,
     Config(ConfigType, String),
     ConfigSet(ConfigType, String),
@@ -40,7 +39,6 @@ impl Display for Message {
                     name,
                     vault_name
                 ),
-                Message::FolderOpened => "folder opened".to_string(),
                 Message::FolderChanged => "folder changed".to_string(),
                 Message::Config(config_type, value) =>
                     format!("{}: \x1b[0;34m{}\x1b[0m", config_type.to_str(), value),

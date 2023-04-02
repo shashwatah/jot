@@ -64,7 +64,7 @@ impl App {
             }
             Command::Opdir => {
                 self.vaults.ref_current()?.open_folder()?;
-                return Ok(Message::FolderOpened);
+                return Ok(Message::Empty);
             }
             Command::Chdir { path } => {
                 self.vaults.mut_current()?.change_folder(path)?;
@@ -131,6 +131,13 @@ impl App {
                 return Ok(Message::Empty);
             }
             Command::Config { config_type, value } => {
+                if let None = config_type {
+                    self.config.open_config()?;
+                    return Ok(Message::Empty);
+                }
+
+                let config_type = config_type.as_ref().unwrap();
+
                 if let Some(value) = value {
                     self.config.set_config(config_type, value);
                     return Ok(Message::ConfigSet(config_type.to_owned(), value.to_owned()));

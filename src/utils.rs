@@ -8,10 +8,6 @@ use std::{
     process::Command,
 };
 
-fn valid_name(name: &str) -> bool {
-    name.chars().all(|char| !r#"\/?%*:|"<>"#.contains(char))
-}
-
 pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
     let mut full_path = PathBuf::new();
     for path in paths {
@@ -47,16 +43,6 @@ pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathB
     Ok(path)
 }
 
-fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
-    if let Item::Nt = item_type {
-        File::options().create_new(true).write(true).open(&path)?;
-    } else {
-        DirBuilder::new().create(&path)?;
-    }
-
-    Ok(())
-}
-
 pub fn remove_item(item_type: Item, name: &str, location: &Path) -> Result<(), Error> {
     let path = generate_item_path(&item_type, name, location)?;
 
@@ -65,16 +51,6 @@ pub fn remove_item(item_type: Item, name: &str, location: &Path) -> Result<(), E
             std::io::ErrorKind::NotFound => Error::ItemNotFound(item_type, name.to_owned()),
             _ => Error::Undefined(error),
         });
-    }
-
-    Ok(())
-}
-
-fn remove_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
-    if let Item::Nt = item_type {
-        remove_file(path)?;
-    } else {
-        remove_dir_all(path)?;
     }
 
     Ok(())
@@ -124,13 +100,33 @@ pub fn move_item(
     Ok(new_path)
 }
 
-pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> Result<(), Error> {
+pub fn open_note(editor_data: (&String, bool), name: &str, location: &Path) -> Result<(), Error> {
     let path = generate_item_path(&Item::Nt, name, location)?;
 
     if !path.exists() {
         return Err(Error::ItemNotFound(Item::Nt, name.to_string()));
     }
 
+    run_editor(editor_data, &path)?;
+    Ok(())
+}
+
+pub fn open_folder(location: &Path) -> Result<(), Error> {
+    let cmd = match OS {
+        "windows" => "explorer",
+        "linux" => "xdg-open",
+        "macos" => "open",
+        _ => return Ok(()),
+    };
+
+    if let Err(err) = Command::new(cmd).arg(location).spawn() {
+        Err(Error::Undefined(err))
+    } else {
+        Ok(())
+    }
+}
+
+pub fn run_editor(editor_data: (&String, bool), path: &Path) -> Result<(), Error> {
     let (editor, conflict) = editor_data;
 
     if let Err(error) = run_editor_collect(editor, conflict, &path) {
@@ -138,16 +134,6 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> 
             std::io::ErrorKind::NotFound => Error::EditorNotFound,
             _ => Error::Undefined(error),
         });
-    }
-
-    Ok(())
-}
-
-fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), std::io::Error> {
-    let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
-
-    if conflict {
-        cmd.wait()?;
     }
 
     Ok(())
@@ -198,19 +184,8 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
     were_last
 }
 
-pub fn open_folder(location: &Path) -> Result<(), Error> {
-    let cmd = match OS {
-        "windows" => "explorer",
-        "linux" => "xdg-open",
-        "macos" => "open",
-        _ => return Ok(()),
-    };
-
-    if let Err(err) = Command::new(cmd).arg(location).spawn() {
-        Err(Error::Undefined(err))
-    } else {
-        Ok(())
-    }
+fn valid_name(name: &str) -> bool {
+    name.chars().all(|char| !r#"\/?%*:|"<>"#.contains(char))
 }
 
 fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
@@ -225,4 +200,34 @@ fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<P
     }
 
     Ok(path)
+}
+
+fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
+    if let Item::Nt = item_type {
+        File::options().create_new(true).write(true).open(&path)?;
+    } else {
+        DirBuilder::new().create(&path)?;
+    }
+
+    Ok(())
+}
+
+fn remove_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
+    if let Item::Nt = item_type {
+        remove_file(path)?;
+    } else {
+        remove_dir_all(path)?;
+    }
+
+    Ok(())
+}
+
+fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), std::io::Error> {
+    let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
+
+    if conflict {
+        cmd.wait()?;
+    }
+
+    Ok(())
 }

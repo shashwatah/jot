@@ -167,7 +167,7 @@ pub enum Command {
     Config {
         /// name of config item to display or set
         #[clap(value_enum, value_parser, name = "config type")]
-        config_type: ConfigType,
+        config_type: Option<ConfigType>,
         /// pass a value if config needs to be updated
         #[clap(value_parser, name = "config value")]
         value: Option<String>,

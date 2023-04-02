@@ -3,8 +3,8 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, open_folder, rec_list, remove_item, rename_item,
-        resolve_path, run_editor,
+        create_item, join_paths, move_item, open_folder, open_note, rec_list, remove_item,
+        rename_item, resolve_path,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -152,8 +152,7 @@ impl Vault {
 
     pub fn open_note(&self, name: &str, editor_data: (&String, bool)) -> Result<(), Error> {
         let location = self.generate_location();
-
-        run_editor(editor_data, name, &location)?;
+        open_note(editor_data, name, &location)?;
         Ok(())
     }
 
