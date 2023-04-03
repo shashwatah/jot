@@ -1,4 +1,7 @@
-use crate::{enums::Item, output::error::Error};
+use crate::{
+    enums::{Item, VaultItem},
+    output::error::Error,
+};
 use dunce::canonicalize;
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
@@ -137,6 +140,38 @@ pub fn run_editor(editor_data: (&String, bool), path: &Path) -> Result<(), Error
     }
 
     Ok(())
+}
+
+pub fn filtered_list(item_type: &VaultItem, path: PathBuf) {
+    let mut filtered_entries: Vec<String> = vec![];
+
+    for entry in path.read_dir().unwrap() {
+        let entry = entry.unwrap().path();
+        let entry_name = entry.file_stem().unwrap().to_str().unwrap();
+
+        match item_type {
+            VaultItem::Folder | VaultItem::Fd => {
+                if entry.is_dir() {
+                    filtered_entries.push(entry_name.to_string())
+                }
+            }
+            _ => {
+                if entry.is_file() && entry.extension().unwrap() == "md" {
+                    filtered_entries.push(format!("\x1b[0;34m{}\x1b[0m", entry_name));
+                }
+            }
+        }
+    }
+
+    for (index, entry) in filtered_entries.iter().enumerate() {
+        if filtered_entries.len() - index == 1 {
+            print!("└── ")
+        } else {
+            print!("├── ")
+        }
+
+        println!("{}", entry);
+    }
 }
 
 pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {

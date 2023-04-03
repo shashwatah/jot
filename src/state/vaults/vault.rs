@@ -3,8 +3,8 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, open_folder, open_note, rec_list, remove_item,
-        rename_item, resolve_path,
+        create_item, filtered_list, join_paths, move_item, open_folder, open_note, rec_list,
+        remove_item, rename_item, resolve_path,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -191,7 +191,7 @@ impl Vault {
         Ok(())
     }
 
-    pub fn list(&self) {
+    pub fn list(&self, item_type: &Option<VaultItem>) {
         let folder = self.get_folder();
 
         if folder.as_os_str().is_empty() {
@@ -201,7 +201,12 @@ impl Vault {
         }
 
         let location = self.generate_location();
-        rec_list(vec![true], location);
+
+        if let Some(item_type) = item_type {
+            filtered_list(item_type, location)
+        } else {
+            rec_list(vec![true], location);
+        }
     }
 
     fn generate_location(&self) -> PathBuf {

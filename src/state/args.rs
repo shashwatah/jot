@@ -160,7 +160,11 @@ pub enum Command {
     },
     /// list tree of current folder
     #[clap(alias = "ls")]
-    List,
+    List {
+        // list note(s) (or nt) | folder(s) (or fd)
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: Option<VaultItem>,
+    },
     /// display or set a config item
     #[clap(override_usage("jt config <config type>\n    jt config <config type> [config value]"))]
     #[clap(alias = "cf")]
