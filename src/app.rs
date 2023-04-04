@@ -131,7 +131,7 @@ impl App {
                 Ok(Message::Empty)
             }
             Command::Config { config_type, value } => {
-                if let None = config_type {
+                if config_type.is_none() {
                     self.config.open_config()?;
                     return Ok(Message::Empty);
                 }

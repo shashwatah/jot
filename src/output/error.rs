@@ -40,20 +40,19 @@ impl Display for Error {
                 Error::PathNotFound => "couldn't find the path specified".to_string(),
                 Error::PathNotAbsolute => "specified path isn't absolute".to_string(),
                 Error::ItemAlreadyExists(item_type, name) => format!(
-                    "a {} named {} already exists in this location",
-                    item_type.fs_name(),
-                    name
+                    "a {} named {name} already exists in this location",
+                    item_type.fs_name()
                 ),
                 Error::ItemNotFound(item_type, name) =>
-                    format!("{} {} not found", item_type.fs_name(), name),
-                Error::VaultAlreadyExists(name) => format!("vault {} already exists", name),
-                Error::VaultNotFound(name) => format!("vault {} doesn't exist", name),
+                    format!("{} {name} not found", item_type.fs_name()),
+                Error::VaultAlreadyExists(name) => format!("vault {name} already exists"),
+                Error::VaultNotFound(name) => format!("vault {name} doesn't exist"),
                 Error::NotInsideVault => "not inside a vault".to_string(),
-                Error::AlreadyInVault(name) => format!("already in vault {}", name),
+                Error::AlreadyInVault(name) => format!("already in vault {name}"),
                 Error::OutOfBounds => "path crosses the bounds of vault".to_string(),
                 Error::EditorNotFound => "editor not found".to_string(),
                 Error::MoveError(msg) => msg.to_owned(),
-                Error::Undefined(error) => format!("undefined error: {}", error),
+                Error::Undefined(error) => format!("undefined error: {error}"),
                 _ => "error msg not set".to_string(),
             }
         )
@@ -68,7 +67,7 @@ impl From<fs_extra::error::Error> for Error {
 
 fn process_io_error(error: String) -> String {
     let mut error = error.to_lowercase();
-    if let Some(dot) = error.find(".") {
+    if let Some(dot) = error.find('.') {
         error.replace_range(dot.., "");
     }
     error

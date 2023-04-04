@@ -98,7 +98,7 @@ pub fn move_item(
     }
 
     let original_path = vec![generate_item_path(&item_type, name, original_location)?];
-    move_items(&original_path, &new_location, &CopyOptions::new())?;
+    move_items(&original_path, new_location, &CopyOptions::new())?;
 
     Ok(new_path)
 }
@@ -132,7 +132,7 @@ pub fn open_folder(location: &Path) -> Result<(), Error> {
 pub fn run_editor(editor_data: (&String, bool), path: &Path) -> Result<(), Error> {
     let (editor, conflict) = editor_data;
 
-    if let Err(error) = run_editor_collect(editor, conflict, &path) {
+    if let Err(error) = run_editor_collect(editor, conflict, path) {
         return Err(match error.kind() {
             std::io::ErrorKind::NotFound => Error::EditorNotFound,
             _ => Error::Undefined(error),
@@ -157,7 +157,7 @@ pub fn filtered_list(item_type: &VaultItem, path: PathBuf) {
             }
             _ => {
                 if entry.is_file() && entry.extension().unwrap() == "md" {
-                    filtered_entries.push(format!("\x1b[0;34m{}\x1b[0m", entry_name));
+                    filtered_entries.push(format!("\x1b[0;34m{entry_name}\x1b[0m"));
                 }
             }
         }
@@ -170,7 +170,7 @@ pub fn filtered_list(item_type: &VaultItem, path: PathBuf) {
             print!("├── ")
         }
 
-        println!("{}", entry);
+        println!("{entry}");
     }
 }
 
@@ -206,13 +206,13 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
         }
 
         if entry.is_dir() {
-            println!("{}", entry_name);
+            println!("{entry_name}");
 
             were_last.push(is_last);
             were_last = rec_list(were_last, entry);
             were_last.pop();
         } else {
-            println!("\x1b[0;34m{}\x1b[0m", entry_name);
+            println!("\x1b[0;34m{entry_name}\x1b[0m",);
         }
     }
 
@@ -239,9 +239,9 @@ fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<P
 
 fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
     if let Item::Nt = item_type {
-        File::options().create_new(true).write(true).open(&path)?;
+        File::options().create_new(true).write(true).open(path)?;
     } else {
-        DirBuilder::new().create(&path)?;
+        DirBuilder::new().create(path)?;
     }
 
     Ok(())

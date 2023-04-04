@@ -48,9 +48,9 @@ impl Vaults {
 
         for vault_name in self.data.get_vaults().keys() {
             if current_vault_name.is_some() && vault_name == current_vault_name.unwrap() {
-                print!("👉 \x1b[0;34m{}\x1b[0m", vault_name)
+                print!("👉 \x1b[0;34m{vault_name}\x1b[0m")
             } else {
-                print!("   {}", vault_name)
+                print!("   {vault_name}")
             }
 
             if *show_loc {
