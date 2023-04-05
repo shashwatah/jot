@@ -25,8 +25,6 @@ Commands that encompass all basic needs are included. Each command has an alias 
 
 <img alt="Screenshot" src="assets/imgs/jot.png"/>
 
-<br>
-
 ## Installation
 
 #### ***Install with cargo:***
@@ -236,11 +234,11 @@ $ jt vault -h
 ## Changelog  
 
 - ***v0.1.2*** :
-  - Fixes:
+  - Fix:
     - `list` command could display items other than notes and folders.
     - ***process_path()*** couldn't collapse certain paths properly, and ***std::fs::canonicalize*** doesn't work as intended on windows. ***dunce*** crate has been used to achieve the required function.
 
-  - Features:
+  - Feat:
     - `opdir` command has been added to enable opening the current folder in the default file explorer.
     - `list` command can now filter items based on the item type provided.
     - `config` command can now open the config file in the set editor.
