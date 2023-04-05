@@ -1,4 +1,4 @@
-use crate::{enums::ConfigType, traits::FileIO};
+use crate::{enums::ConfigType, output::error::Error, traits::FileIO, utils::run_editor};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -50,6 +50,11 @@ impl Config {
                 false => "false".to_string(),
             },
         }
+    }
+
+    pub fn open_config(&self) -> Result<(), Error> {
+        run_editor(self.get_editor_data(), &self.path())?;
+        Ok(())
     }
 
     fn get_editor(&self) -> &String {

@@ -1,14 +1,15 @@
-use crate::{enums::Item, output::error::Error};
+use crate::{
+    enums::{Item, VaultItem},
+    output::error::Error,
+};
+use dunce::canonicalize;
 use fs_extra::{dir::CopyOptions, move_items};
 use std::{
+    env::consts::OS,
     fs::{remove_dir_all, remove_file, rename, DirBuilder, File},
     path::{Path, PathBuf},
     process::Command,
 };
-
-fn valid_name(name: &str) -> bool {
-    name.chars().all(|char| !r#"\/?%*:|"<>"#.contains(char))
-}
 
 pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
     let mut full_path = PathBuf::new();
@@ -18,21 +19,15 @@ pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
     full_path
 }
 
-// returns new pathbuf -> with slashes formatted according to os & '..'s collapsed
-// use this when storing or displaying paths
-// not using canonicalize because it returns \\?\C:\*path* on windows
-pub fn process_path(path: &Path) -> PathBuf {
-    let mut processed_path = PathBuf::new();
-
-    for element in path.iter() {
-        if element == ".." {
-            processed_path.pop();
-        } else if element != "." {
-            processed_path.push(element);
-        }
+// resolve_path() (prev. process_path()0 is a wrapper function for dunce::canonicalize, meant to translate errors
+// reason for this change will be explained in the "unexpected behaviors" section of docs
+// wasn't meant to check for PathNotFound error, still susceptible to changes
+pub fn resolve_path(path: &Path) -> Result<PathBuf, Error> {
+    if let Ok(processed_path) = canonicalize(path) {
+        Ok(processed_path)
+    } else {
+        Err(Error::PathNotFound)
     }
-
-    processed_path
 }
 
 pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
@@ -51,16 +46,6 @@ pub fn create_item(item_type: Item, name: &str, location: &Path) -> Result<PathB
     Ok(path)
 }
 
-fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
-    if let Item::Nt = item_type {
-        File::options().create_new(true).write(true).open(&path)?;
-    } else {
-        DirBuilder::new().create(&path)?;
-    }
-
-    Ok(())
-}
-
 pub fn remove_item(item_type: Item, name: &str, location: &Path) -> Result<(), Error> {
     let path = generate_item_path(&item_type, name, location)?;
 
@@ -69,16 +54,6 @@ pub fn remove_item(item_type: Item, name: &str, location: &Path) -> Result<(), E
             std::io::ErrorKind::NotFound => Error::ItemNotFound(item_type, name.to_owned()),
             _ => Error::Undefined(error),
         });
-    }
-
-    Ok(())
-}
-
-fn remove_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
-    if let Item::Nt = item_type {
-        remove_file(path)?;
-    } else {
-        remove_dir_all(path)?;
     }
 
     Ok(())
@@ -123,21 +98,41 @@ pub fn move_item(
     }
 
     let original_path = vec![generate_item_path(&item_type, name, original_location)?];
-    move_items(&original_path, &new_location, &CopyOptions::new())?;
+    move_items(&original_path, new_location, &CopyOptions::new())?;
 
     Ok(new_path)
 }
 
-pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> Result<(), Error> {
+pub fn open_note(editor_data: (&String, bool), name: &str, location: &Path) -> Result<(), Error> {
     let path = generate_item_path(&Item::Nt, name, location)?;
 
     if !path.exists() {
         return Err(Error::ItemNotFound(Item::Nt, name.to_string()));
     }
 
+    run_editor(editor_data, &path)?;
+    Ok(())
+}
+
+pub fn open_folder(location: &Path) -> Result<(), Error> {
+    let cmd = match OS {
+        "windows" => "explorer",
+        "linux" => "xdg-open",
+        "macos" => "open",
+        _ => return Ok(()),
+    };
+
+    if let Err(err) = Command::new(cmd).arg(location).spawn() {
+        Err(Error::Undefined(err))
+    } else {
+        Ok(())
+    }
+}
+
+pub fn run_editor(editor_data: (&String, bool), path: &Path) -> Result<(), Error> {
     let (editor, conflict) = editor_data;
 
-    if let Err(error) = run_editor_collect(editor, conflict, &path) {
+    if let Err(error) = run_editor_collect(editor, conflict, path) {
         return Err(match error.kind() {
             std::io::ErrorKind::NotFound => Error::EditorNotFound,
             _ => Error::Undefined(error),
@@ -147,14 +142,36 @@ pub fn run_editor(editor_data: (&String, bool), name: &str, location: &Path) -> 
     Ok(())
 }
 
-fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), std::io::Error> {
-    let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
+pub fn filtered_list(item_type: &VaultItem, path: PathBuf) {
+    let mut filtered_entries: Vec<String> = vec![];
 
-    if conflict {
-        cmd.wait()?;
+    for entry in path.read_dir().unwrap() {
+        let entry = entry.unwrap().path();
+        let entry_name = entry.file_stem().unwrap().to_str().unwrap();
+
+        match item_type {
+            VaultItem::Folder | VaultItem::Fd => {
+                if entry.is_dir() {
+                    filtered_entries.push(entry_name.to_string())
+                }
+            }
+            _ => {
+                if entry.is_file() && entry.extension().unwrap() == "md" {
+                    filtered_entries.push(format!("\x1b[0;34m{entry_name}\x1b[0m"));
+                }
+            }
+        }
     }
 
-    Ok(())
+    for (index, entry) in filtered_entries.iter().enumerate() {
+        if filtered_entries.len() - index == 1 {
+            print!("└── ")
+        } else {
+            print!("├── ")
+        }
+
+        println!("{entry}");
+    }
 }
 
 pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
@@ -165,6 +182,10 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
         let entry_name = entry.file_stem().unwrap().to_str().unwrap();
 
         if entry_name == ".jot" {
+            continue;
+        }
+
+        if entry.is_file() && entry.extension().unwrap() != "md" {
             continue;
         }
 
@@ -185,17 +206,21 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
         }
 
         if entry.is_dir() {
-            println!("{}", entry_name);
+            println!("{entry_name}");
 
             were_last.push(is_last);
             were_last = rec_list(were_last, entry);
             were_last.pop();
         } else {
-            println!("\x1b[0;34m{}\x1b[0m", entry_name);
+            println!("\x1b[0;34m{entry_name}\x1b[0m",);
         }
     }
 
     were_last
+}
+
+fn valid_name(name: &str) -> bool {
+    name.chars().all(|char| !r#"\/?%*:|"<>"#.contains(char))
 }
 
 fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<PathBuf, Error> {
@@ -210,4 +235,34 @@ fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<P
     }
 
     Ok(path)
+}
+
+fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
+    if let Item::Nt = item_type {
+        File::options().create_new(true).write(true).open(path)?;
+    } else {
+        DirBuilder::new().create(path)?;
+    }
+
+    Ok(())
+}
+
+fn remove_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
+    if let Item::Nt = item_type {
+        remove_file(path)?;
+    } else {
+        remove_dir_all(path)?;
+    }
+
+    Ok(())
+}
+
+fn run_editor_collect(editor: &str, conflict: bool, path: &Path) -> Result<(), std::io::Error> {
+    let mut cmd = Command::new(editor).arg(path.to_str().unwrap()).spawn()?;
+
+    if conflict {
+        cmd.wait()?;
+    }
+
+    Ok(())
 }

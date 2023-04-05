@@ -1,6 +1,6 @@
 [package]
 name = "jt"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["araekiel <kumarshashwatsri@gmail.com>"]
 license = "MIT"
@@ -17,3 +17,4 @@ toml = "0.5.9"
 clap = { version = "3.2.15", features = ["derive"] }
 directories = "4.0.1"
 fs_extra = "1.2.0"
+dunce = "1.0.3"

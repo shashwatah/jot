@@ -44,7 +44,7 @@ pub trait FileIO: Debug + Default + Serialize + DeserializeOwned {
     }
 
     fn create_file(path: PathBuf) -> Self {
-        create_dir_all(&path.parent().unwrap()).unwrap();
+        create_dir_all(path.parent().unwrap()).unwrap();
 
         let mut file = File::options().create(true).write(true).open(path).unwrap();
 

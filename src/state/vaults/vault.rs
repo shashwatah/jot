@@ -3,8 +3,8 @@ use crate::{
     output::error::Error,
     traits::FileIO,
     utils::{
-        create_item, join_paths, move_item, process_path, rec_list, remove_item, rename_item,
-        run_editor,
+        create_item, filtered_list, join_paths, move_item, open_folder, open_note, rec_list,
+        remove_item, rename_item, resolve_path,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -115,7 +115,7 @@ impl Vault {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
         let original_location = join_paths(vec![&vault_path, self.get_folder()]);
 
-        let new_location = process_path(&join_paths(vec![&original_location, new_location]));
+        let new_location = resolve_path(&join_paths(vec![&original_location, new_location]))?;
 
         if !new_location.starts_with(vault_path) {
             return Err(Error::OutOfBounds);
@@ -152,35 +152,46 @@ impl Vault {
 
     pub fn open_note(&self, name: &str, editor_data: (&String, bool)) -> Result<(), Error> {
         let location = self.generate_location();
+        open_note(editor_data, name, &location)?;
+        Ok(())
+    }
 
-        run_editor(editor_data, name, &location)?;
+    pub fn open_folder(&self) -> Result<(), Error> {
+        let folder_abs = join_paths(vec![
+            self.get_location(),
+            &PathBuf::from(self.get_name()),
+            self.get_folder(),
+        ]);
+
+        open_folder(&folder_abs)?;
         Ok(())
     }
 
     pub fn change_folder(&mut self, path: &PathBuf) -> Result<(), Error> {
         let vault_path = join_paths(vec![self.get_location().to_str().unwrap(), self.get_name()]);
-        let new_location = process_path(&join_paths(vec![&vault_path, self.get_folder(), path]));
+        let current_folder_abs = resolve_path(&join_paths(vec![&vault_path, self.get_folder()]))?;
+        let dest_folder_abs = resolve_path(&join_paths(vec![&current_folder_abs, path]))?;
 
-        if !new_location.exists() {
-            return Err(Error::PathNotFound);
-        }
-
-        if !new_location.starts_with(&vault_path) {
+        if !dest_folder_abs.starts_with(&vault_path) {
             return Err(Error::OutOfBounds);
         }
 
-        let mut destination_folder = new_location.strip_prefix(vault_path).unwrap();
-        if destination_folder.has_root() {
-            destination_folder = destination_folder.strip_prefix("/").unwrap();
+        if dest_folder_abs == current_folder_abs {
+            return Err(Error::SameLocation);
         }
-        let destination_folder = destination_folder.to_path_buf();
 
-        self.set_folder(destination_folder);
+        let mut dest_folder = dest_folder_abs.strip_prefix(vault_path).unwrap();
+        if dest_folder.has_root() {
+            dest_folder = dest_folder.strip_prefix("/").unwrap();
+        }
+        let dest_folder = dest_folder.to_path_buf();
+
+        self.set_folder(dest_folder);
 
         Ok(())
     }
 
-    pub fn list(&self) {
+    pub fn list(&self, item_type: &Option<VaultItem>) {
         let folder = self.get_folder();
 
         if folder.as_os_str().is_empty() {
@@ -190,7 +201,12 @@ impl Vault {
         }
 
         let location = self.generate_location();
-        rec_list(vec![true], location);
+
+        if let Some(item_type) = item_type {
+            filtered_list(item_type, location)
+        } else {
+            rec_list(vec![true], location);
+        }
     }
 
     fn generate_location(&self) -> PathBuf {

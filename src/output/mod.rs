@@ -18,7 +18,7 @@ impl Display for Output {
             "{}",
             match self {
                 Output::Message(msg) => msg.to_string(),
-                Output::Error(err) => format!("\x1b[0;31merror\x1b[0m: {}", err),
+                Output::Error(err) => format!("\x1b[0;31merror\x1b[0m: {err}"),
             }
         )
     }

@@ -12,11 +12,8 @@ ______(_)_______  /_
 _____  /_  __ \\  __/
 ____  / / /_/ / /_  
 ___  /  \\____/\\__/  
-/___/
-\x1b[0m
-
-\x1b[0;34mv0.1.1\x1b[0m | crafted with ❤️ by \x1b[0;34maraekiel\x1b[0m
-
+/___/         ᵥ₀.₁.₂  
+\x1b[0m         
 
 usage: jt <command>
 
@@ -31,8 +28,9 @@ create items
 interact with items
     \x1b[0;34menter\x1b[0m, \x1b[0;34men\x1b[0m       enter a vault
     \x1b[0;34mopen\x1b[0m, \x1b[0;34mop\x1b[0m        open a note from current folder
+    \x1b[0;34mopdir\x1b[0m, \x1b[0;34mod\x1b[0m       open current folder in file explorer
     \x1b[0;34mchdir\x1b[0m, \x1b[0;34mcd\x1b[0m       change folder within current vault
-    \x1b[0;34mlist\x1b[0m, \x1b[0;34mls\x1b[0m        print dir tree of current folder
+    \x1b[0;34mlist\x1b[0m, \x1b[0;34mls\x1b[0m        list items in current folder
 
 perform fs operations on items
     \x1b[0;34mremove\x1b[0m, \x1b[0;34mrm\x1b[0m      remove an item 
@@ -41,7 +39,7 @@ perform fs operations on items
     \x1b[0;34mvmove\x1b[0m, \x1b[0;34mvm\x1b[0m       move an item to a different vault
 
 config
-    \x1b[0;34mconfig\x1b[0m, \x1b[0;34mcf\x1b[0m      set and get config values
+    \x1b[0;34mconfig\x1b[0m, \x1b[0;34mcf\x1b[0m      display, set or open config
 
 get help 
     use \x1b[0;34mhelp\x1b[0m or \x1b[0;34m-h\x1b[0m and \x1b[0;34m--help\x1b[0m flags along with a command to get corresponding help"))]
@@ -98,6 +96,9 @@ pub enum Command {
         #[clap(value_parser, name = "folder name")]
         name: String,
     },
+    /// open current folder in file explorer
+    #[clap(alias = "od")]
+    Opdir,
     /// change folder within current vault
     #[clap(alias = "cd")]
     Chdir {
@@ -154,16 +155,20 @@ pub enum Command {
         #[clap(value_parser, name = "vault name")]
         vault_name: String,
     },
-    /// list tree of current folder
+    /// list items in current folder
     #[clap(alias = "ls")]
-    List,
-    /// display or set a config item
+    List {
+        // list note(s) (or nt) | folder(s) (or fd)
+        #[clap(value_enum, value_parser, name = "item type")]
+        item_type: Option<VaultItem>,
+    },
+    /// display, set or open config
     #[clap(override_usage("jt config <config type>\n    jt config <config type> [config value]"))]
     #[clap(alias = "cf")]
     Config {
         /// name of config item to display or set
         #[clap(value_enum, value_parser, name = "config type")]
-        config_type: ConfigType,
+        config_type: Option<ConfigType>,
         /// pass a value if config needs to be updated
         #[clap(value_parser, name = "config value")]
         value: Option<String>,

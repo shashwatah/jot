@@ -20,32 +20,27 @@ impl Display for Message {
             f,
             "{}",
             match self {
-                Message::VaultEntered(name) => format!("entered \x1b[0;34m{}\x1b[0m", name),
+                Message::VaultEntered(name) => format!("entered \x1b[0;34m{name}\x1b[0m"),
                 Message::ItemCreated(item_type, name) =>
-                    format!("{} \x1b[0;34m{}\x1b[0m created", item_type.full(), name),
+                    format!("{} \x1b[0;34m{name}\x1b[0m created", item_type.full()),
                 Message::ItemRemoved(item_type, name) =>
-                    format!("{} \x1b[0;34m{}\x1b[0m removed", item_type.full(), name),
+                    format!("{} \x1b[0;34m{name}\x1b[0m removed", item_type.full()),
                 Message::ItemRenamed(item_type, name, new_name) => format!(
-                    "{} \x1b[0;34m{}\x1b[0m renamed to \x1b[0;34m{}\x1b[0m",
+                    "{} \x1b[0;34m{name}\x1b[0m renamed to \x1b[0;34m{new_name}\x1b[0m",
                     item_type.full(),
-                    name,
-                    new_name
                 ),
                 Message::ItemMoved(item_type, name) =>
-                    format!("{} \x1b[0;34m{}\x1b[0m moved", item_type.full(), name),
+                    format!("{} \x1b[0;34m{name}\x1b[0m moved", item_type.full()),
                 Message::ItemVMoved(item_type, name, vault_name) => format!(
-                    "{} \x1b[0;34m{}\x1b[0m moved to vault \x1b[0;34m{}\x1b[0m",
+                    "{} \x1b[0;34m{name}\x1b[0m moved to vault \x1b[0;34m{vault_name}\x1b[0m",
                     item_type.full(),
-                    name,
-                    vault_name
                 ),
-                Message::FolderChanged => "changed folder".to_string(),
+                Message::FolderChanged => "folder changed".to_string(),
                 Message::Config(config_type, value) =>
-                    format!("{}: \x1b[0;34m{}\x1b[0m", config_type.to_str(), value),
+                    format!("{}: \x1b[0;34m{value}\x1b[0m", config_type.to_str()),
                 Message::ConfigSet(config_type, value) => format!(
-                    "set \x1b[0;34m{}\x1b[0m to \x1b[0;34m{}\x1b[0m",
-                    config_type.to_str(),
-                    value
+                    "set \x1b[0;34m{}\x1b[0m to \x1b[0;34m{value}\x1b[0m",
+                    config_type.to_str()
                 ),
                 Message::Empty => "".to_string(),
             }
