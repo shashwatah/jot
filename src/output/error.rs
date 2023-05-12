@@ -4,12 +4,11 @@ use std::fmt::Display;
 #[allow(unused)]
 #[derive(Debug)]
 pub enum Error {
-    InternalError, // internal errors: unwrap calls that fail, internal err result matches
-    FileError(String, std::io::Error), // errors concering FileIO trait
     InvalidName,
     SameName,
     SameLocation,
-    PathNotFound, // PathNotFound and PathNotAbsolute might be subject to change in output type
+    // PathNotFound and PathNotAbsolute might get converted from errors to a different output type.
+    PathNotFound, 
     PathNotAbsolute,
     ItemAlreadyExists(Item, String),
     ItemNotFound(Item, String),
@@ -19,7 +18,8 @@ pub enum Error {
     AlreadyInVault(String),
     OutOfBounds,
     EditorNotFound,
-    MoveError(String), // this will be removed upon switching to custom recursive move fn
+    // MoveError will be removed if and when fs_extra::move_items() is replaced with a custom function.
+    MoveError(String), 
     Undefined(std::io::Error),
 }
 
@@ -29,11 +29,6 @@ impl Display for Error {
             f,
             "{}",
             match self {
-                Error::FileError(title, error) => format!(
-                    "{} file error: {}",
-                    title,
-                    process_io_error(error.to_string())
-                ),
                 Error::InvalidName => "invalid name".to_string(),
                 Error::SameName => "new name is same as old name".to_string(),
                 Error::SameLocation => "new location is same as old location".to_string(),
@@ -52,8 +47,7 @@ impl Display for Error {
                 Error::OutOfBounds => "path crosses the bounds of vault".to_string(),
                 Error::EditorNotFound => "editor not found".to_string(),
                 Error::MoveError(msg) => msg.to_owned(),
-                Error::Undefined(error) => format!("undefined error: {error}"),
-                _ => "error msg not set".to_string(),
+                Error::Undefined(error) => format!("undefined error: {error}")
             }
         )
     }
@@ -65,6 +59,10 @@ impl From<fs_extra::error::Error> for Error {
     }
 }
 
+
+// @desc: Converts error message to jot's native format by removing redundant information, i.e. 
+//        error code after the first full-stop.
+//        Used (specifically) above to convert error message returned by fs_extra::move_items().
 fn process_io_error(error: String) -> String {
     let mut error = error.to_lowercase();
     if let Some(dot) = error.find('.') {

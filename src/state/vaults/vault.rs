@@ -209,6 +209,16 @@ impl Vault {
         }
     }
 
+    // @desc: Generates absoulte location for where jot is pointing currently.
+    // 
+    // @example:
+    //      @conditions: 
+    //          -> current folder: "folder1"
+    //          -> current vault: "my_vault"
+    //          -> vault location: "c:/users/username/desktop"
+    //
+    //      @returns:
+    //          -> c:/users/username/desktop/my_vault/folder1 [PathBuf]
     fn generate_location(&self) -> PathBuf {
         let (current_vault_name, current_vault_location, folder) = self.get_path_data();
         join_paths(vec![

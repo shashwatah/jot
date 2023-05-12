@@ -19,9 +19,10 @@ pub fn join_paths<T: AsRef<Path>>(paths: Vec<T>) -> PathBuf {
     full_path
 }
 
-// resolve_path() (prev. process_path()0 is a wrapper function for dunce::canonicalize, meant to translate errors
-// reason for this change will be explained in the "unexpected behaviors" section of docs
-// wasn't meant to check for PathNotFound error, still susceptible to changes
+// @desc: Wraps around dunce::canonicalize merely to translate error.
+// 
+// @notes:
+//      -> Not the ideal place to check for a PathNotFound error, but has to stay for now.
 pub fn resolve_path(path: &Path) -> Result<PathBuf, Error> {
     if let Ok(processed_path) = canonicalize(path) {
         Ok(processed_path)
@@ -174,6 +175,16 @@ pub fn filtered_list(item_type: &VaultItem, path: PathBuf) {
     }
 }
 
+// @desc: Recursively goes over the contained elements in a folder, then prints the folder's 
+//        tree.
+//
+// @notes:
+//      -> The value in "level" defines how deep into the tree we are.
+//      -> "were_last" is a vector of booleans whose length at any moment is equal to the 
+//         current level + 1. Everytime a folder is traversed, a boolean represening if it
+//         was the last element in its parent folder or not is added to the vector. This 
+//         helps in determining when to print a pipe for elements not part of current parent
+//         folder.
 pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
     let length = path.read_dir().unwrap().count();
 
@@ -236,6 +247,10 @@ fn generate_item_path(item_type: &Item, name: &str, location: &Path) -> Result<P
 
     Ok(path)
 }
+
+// All "_collect" functions below are meant to collect errors from all possible routes a
+// function can take.
+// These errors are then converted to native errors in their corresponding functions above.
 
 fn create_item_collect(item_type: &Item, path: &Path) -> Result<(), std::io::Error> {
     if let Item::Nt = item_type {
