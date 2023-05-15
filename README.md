@@ -3,6 +3,7 @@
 <a href="LICENSE"><img alt="Release" src="https://img.shields.io/badge/license-MIT-green"></a>
 <a href="https://github.com/araekiel/jot/releases/tag/v0.1.2"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.2-red"></a>
 <a href="https://crates.io/crates/jt"><img alt="Cargo" src="https://img.shields.io/badge/crates.io-jt-blue"></a>
+<a href="https://github.com/araekiel/jot/blob/main/CONTRIBUTING.md"><img alt="PRs" src="https://img.shields.io/badge/PRs-welcome-purple"></a>
 
 <p>
   <a href="#installation">Installation</a> •
@@ -11,7 +12,7 @@
   <a href="#changelog">Changelog</a> •
   <a href="#build-from-source">Build from Source</a> •
   <a href="#dependencies">Dependencies</a> •
-  <a href="#authors">Authors</a> •
+  <a href="#contribute">Contribute</a> •
   <a href="#license">License</a>
 </p>
 
@@ -249,14 +250,7 @@ $ jt vault -h
 
 ## Build from Source
 
-### Prerequisites
-
-- ***Git*** is need to clone the repository on your machine.
-- ***Cargo*** is needed to compile the program.
-
-### Build
-
-Clone the repo and cd into the directory: 
+Clone the repository and cd into the directory: 
 
 ```bash
 $ git clone https://github.com/araekiel/jot.git
@@ -287,9 +281,9 @@ Pass in commands and arguments after '***--***'.
 - [***fs_extra***](https://docs.rs/fs_extra/latest/fs_extra/) has been used for recursive move of folders.
 - [***dunce***](https://docs.rs/dunce/latest/dunce/index.html) has been used as an alternative to ***std::fs::canonicalize***.
 
-## Authors
+## Contribute
 
-- **araekiel** - [Github](https://github.com/araekiel)
+Contributions are welcome and appreciated! Please review the [contributing guidelines](https://github.com/araekiel/jot/blob/main/CONTRIBUTING.md) for more information on how to get involved.
 
 ## License
 
