@@ -1,6 +1,6 @@
 # Contributing to *jot*
 
-Thank you for your interest in contributing to ***jot***. This file otulines the guidelines for bug reports, feature requests, and code contributions.
+Thank you for your interest in contributing to ***jot***. This file outlines the guidelines for bug reports, feature requests, and code contributions.
 
 ## Reporting Bugs
 
@@ -10,6 +10,10 @@ If you encounter a bug, please [open a new issue](https://github.com/araekiel/jo
 If you have an idea for a new feature, please [open a new issue](https://github.com/araekiel/jot/issues/new/choose) on GitHub. Please include a clear and detailed description of the feature, how it would benefit the project, and any other relevant details.
 
 ## Contributing Code
+
+#### *Before you begin:*
+
+- Please ensure that you have been assigned to an issue or have discussed your planned work with me to avoid potential loss of work.
 
 #### *Set up your fork:*
 
@@ -35,10 +39,10 @@ $ cargo run -- *args*
 $ git checkout -b *my-branch*
 ```
 
-- Make your changes, then format and lint your code:
+- Make your changes, then lint and format your code:
 
 ```bash
-$ cargo lint
+$ cargo clippy
 $ cargo fmt
 ```
 
