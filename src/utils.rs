@@ -196,8 +196,10 @@ pub fn rec_list(mut were_last: Vec<bool>, path: PathBuf) -> Vec<bool> {
             continue;
         }
 
-        if entry.is_file() && entry.extension().unwrap() != "md" {
-            continue;
+        if let Some(extension) = entry.extension() {
+            if entry.is_file() && extension != "md" {
+                continue;
+            }
         }
 
         let is_last = length - count == 1;
