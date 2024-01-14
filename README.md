@@ -1,9 +1,9 @@
 # *jot*
 
 <a href="LICENSE"><img alt="Release" src="https://img.shields.io/badge/license-MIT-green"></a>
-<a href="https://github.com/araekiel/jot/releases/tag/v0.1.2"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.2-red"></a>
+<a href="https://github.com/shashwatah/jot/releases/tag/v0.1.2"><img alt="Release" src="https://img.shields.io/badge/release-v0.1.2-red"></a>
 <a href="https://crates.io/crates/jt"><img alt="Cargo" src="https://img.shields.io/badge/crates.io-jt-blue"></a>
-<a href="https://github.com/araekiel/jot/blob/main/CONTRIBUTING.md"><img alt="PRs" src="https://img.shields.io/badge/PRs-welcome-purple"></a>
+<a href="https://github.com/shashwatah/jot/blob/main/CONTRIBUTING.md"><img alt="PRs" src="https://img.shields.io/badge/PRs-welcome-purple"></a>
 
 <p>
   <a href="#installation">Installation</a> •
@@ -36,7 +36,7 @@ $ cargo install jt
 
 #### ***Use executable*** (only for windows)
 
-Download [***jt.exe***](https://github.com/araekiel/jot/releases/download/v0.1.2/jt.exe) (***v0.1.2***) and add it to your path.
+Download [***jt.exe***](https://github.com/shashwatah/jot/releases/download/v0.1.2/jt.exe) (***v0.1.2***) and add it to your path.
 
 ## Usage
 
@@ -253,7 +253,7 @@ $ jt vault -h
 Clone the repository and cd into the directory: 
 
 ```bash
-$ git clone https://github.com/araekiel/jot.git
+$ git clone https://github.com/shashwatah/jot.git
 $ cd jot
 ```
 
@@ -283,8 +283,8 @@ Pass in commands and arguments after '***--***'.
 
 ## Contribute
 
-Contributions are welcome and appreciated! Please review the [contributing guidelines](https://github.com/araekiel/jot/blob/main/CONTRIBUTING.md) for more information on how to get involved.
+Contributions are welcome and appreciated! Please review the [contributing guidelines](https://github.com/shashwatah/jot/blob/main/CONTRIBUTING.md) for more information on how to get involved.
 
 ## License
 
-[MIT License](https://github.com/araekiel/jot/blob/main/LICENSE) | Copyright (c) 2023 Kumar Shashwat
+[MIT License](https://github.com/shashwatah/jot/blob/main/LICENSE) | Copyright (c) 2024 Kumar Shashwat
